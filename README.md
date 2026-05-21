@@ -1,6 +1,6 @@
 # Zeng Skills
 
-[![Skills](https://img.shields.io/badge/skills-3-blue)](./)
+[![Skills](https://img.shields.io/badge/skills-5-blue)](./)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 个人全局自定义 AI Agent Skill 集合，主要用于 [Kimi Code CLI](https://github.com/MoonshotAI/kimi-cli) 及其他兼容 Agent Skill 协议的运行时。
@@ -15,6 +15,8 @@
 |-------|------|----------|
 | [`zeng-safe-code`](./zeng-safe-code) | 临时安全编码助手 —— 修改 LEE 项目代码时的安全约束与自检清单 | 在 L3/L2 治理未完全到位前，作为编码阶段的硬约束与自检流程 |
 | [`zeng-doc-quality-loop`](./zeng-doc-quality-loop) | 多文档质量收敛流水线 | 对多份文档执行 BMAD 多角色并行评审、冲突讨论、修复与验证的完整质量闭环 |
+| [`zeng-code-patrol`](./zeng-code-patrol) | 代码库自动化巡检 | 定期扫描代码库，发现风格漂移、架构腐化、安全漏洞、性能陷阱等问题，生成结构化报告 |
+| [`zeng-code-review-deep`](./zeng-code-review-deep) | 多智能体深度代码审查 | 对 Commit/PR/模块执行多维度并行专项审查，生成结构化修复任务与最终报告 |
 | [`zgsd-bootstrap-milestone`](./zgsd-bootstrap-milestone) | 从预设计文档包引导生成 GSD Milestone | 当设计文档包（PRD、UX、技术设计等）已完成，直接转换为可执行的 GSD 里程碑与阶段计划 |
 
 ---

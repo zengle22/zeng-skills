@@ -1,0 +1,24 @@
+skill: zeng-code-patrol
+version: "1.0"
+adr: ADR-020
+author: LL-Team
+category: qa
+chain: code-quality
+phase: patrol
+---
+states:
+  drafted:
+    description: Patrol configuration drafted and scan scope determined
+    transitions: [structurally_validated]
+  structurally_validated:
+    description: Input parameters validated; file manifest generated successfully
+    transitions: [semantically_reviewed]
+  semantically_reviewed:
+    description: Supervisor reviewed scan coverage and rule set consistency
+    transitions: [accepted, drafted]
+  accepted:
+    description: Patrol results accepted; report artifacts ready for consumption
+    transitions: [frozen]
+  frozen:
+    description: Patrol artifacts frozen — immutable evidence for gate decisions
+    transitions: []

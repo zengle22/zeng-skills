@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PatrolState",
+  "description": "Checkpoint state for zeng-code-patrol resume support",
+  "type": "object",
+  "required": ["patrol_id", "status", "current_phase", "completed_phases", "output_dir", "last_updated"],
+  "properties": {
+    "patrol_id": {
+      "type": "string",
+      "pattern": "^[0-9]{8}-[0-9]{6}-[a-zA-Z0-9]{12}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["scanning", "aggregating", "reporting", "completed", "failed"]
+    },
+    "current_phase": { "type": "string", "minLength": 1 },
+    "completed_phases": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "pending_files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "output_dir": { "type": "string", "minLength": 1 },
+    "last_updated": { "type": "string", "format": "date-time" }
+  }
+}

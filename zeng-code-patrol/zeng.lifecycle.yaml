@@ -1,0 +1,9 @@
+skill: zeng-code-patrol
+version: "1.0"
+state: draft
+lifecycle_states:
+  - draft
+  - validated
+  - executed
+  - reviewed
+  - frozen

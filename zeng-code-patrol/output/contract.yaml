@@ -1,0 +1,38 @@
+# Output Contract: zeng-code-patrol
+
+## Required Output Artifacts
+
+All artifacts are written under `{output_dir}/{patrol_id}/`.
+
+### Primary Outputs
+- `report.json` — Machine-readable full patrol report (JSON)
+- `report.md` — Human-readable patrol report (Markdown)
+
+### Secondary Outputs
+- `manifest.json` — Scanned file manifest with metadata
+- `patrol-state.json` — Execution state for resume support
+- `hotspots.json` — Directory-level issue density analysis
+- `baseline-diff.json` — Baseline comparison results (if baseline provided)
+- `suggested-fixes.json` — Fix suggestions (if `fix_mode=suggest-fixes`)
+
+### Raw Evidence
+- `raw/L1-results.json` — L1 pattern matching raw results
+- `raw/L3-results.json` — L3 statistical aggregation raw results
+
+## Output Schema
+
+See `evidence/patrol-report.schema.json` for the canonical `report.json` schema.
+See `evidence/issue.schema.json` for the canonical issue schema.
+See `evidence/patrol-state.schema.json` for the canonical state schema.
+
+## Quality Checks
+
+- [ ] `patrol_id` is present and matches `{YYYYMMDD}-{HHMMSS}-{12alnum}` format
+- [ ] `summary.total_files_scanned` >= 0
+- [ ] `summary.total_issues` >= 0
+- [ ] Severity breakdown sums to `total_issues`
+- [ ] `quality_score` is between 0 and 100
+- [ ] `issues` array items conform to issue schema
+- [ ] `hotspots` array items have non-empty `directory` and numeric `issue_density`
+- [ ] Report is valid JSON (for JSON format) or valid Markdown (for Markdown format)
+- [ ] `patrol-state.json` status is `completed` on success

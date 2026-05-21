@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "skills/zeng-code-review-deep/schemas/fix-task.schema.json",
+  "title": "FixTask",
+  "description": "Structured repair task derived from a consensus issue. Part of ADR-058.",
+  "version": "1.0",
+  "type": "object",
+  "required": ["task_id", "issue_id", "severity", "status", "file", "line_range", "dimension", "problem", "fix_strategy", "estimated_effort"],
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "description": "Unique task ID: {batch_id}-fix-{seq:03d}"
+    },
+    "issue_id": {
+      "type": "string",
+      "description": "Reference to consensus issue id"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["P0", "P1", "P2"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PENDING", "PATCH_GENERATED", "MANUAL_REQUIRED", "DEFERRED"],
+      "description": "Current status of the fix task"
+    },
+    "file": {
+      "type": "string"
+    },
+    "line_range": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": { "type": "integer", "minimum": 1 }
+    },
+    "dimension": {
+      "type": "string"
+    },
+    "problem": {
+      "type": "string",
+      "description": "Concise problem statement"
+    },
+    "fix_strategy": {
+      "type": "string",
+      "enum": ["MINIMAL_CHANGE", "REFACTOR", "ADD_TEST", "UPDATE_CONTRACT", "REMOVE_CODE"],
+      "description": "Recommended repair strategy"
+    },
+    "auto_patch": {
+      "type": "object",
+      "description": "Optional auto-generated patch",
+      "properties": {
+        "available": { "type": "boolean" },
+        "patch_ref": { "type": "string" },
+        "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+        "affected_tests": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "risk_assessment": {
+          "type": "string",
+          "enum": ["无副作用", "需回归验证", "可能引入行为变更"]
+        }
+      },
+      "required": ["available"],
+      "additionalProperties": false
+    },
+    "manual_guidance": {
+      "type": "string",
+      "description": "Detailed fix instructions when auto_patch is unavailable or low confidence"
+    },
+    "verification_command": {
+      "type": "string",
+      "description": "Suggested command to verify the fix"
+    },
+    "estimated_effort": {
+      "type": "string",
+      "enum": ["XS", "S", "M", "L"],
+      "description": "XS(<5min), S(5-15min), M(15-60min), L(>60min)"
+    }
+  },
+  "additionalProperties": false
+}

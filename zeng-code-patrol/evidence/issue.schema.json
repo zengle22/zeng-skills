@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PatrolIssue",
+  "description": "Single issue found by zeng-code-patrol",
+  "type": "object",
+  "required": [
+    "id", "rule_id", "dimension", "severity", "file",
+    "line_start", "message", "found_by", "confidence"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9]{8}-[0-9]{6}-[a-zA-Z0-9]{12}-[A-Z0-9-]+-[0-9]{4}$",
+      "description": "Patrol ID + rule ID + sequence"
+    },
+    "rule_id": { "type": "string", "minLength": 1 },
+    "dimension": {
+      "type": "string",
+      "enum": ["D01", "D02", "D03", "D04", "D05", "D06", "D07", "D08"]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["P0", "P1", "P2", "P3"]
+    },
+    "file": { "type": "string", "minLength": 1 },
+    "line_start": { "type": "integer", "minimum": 1 },
+    "line_end": { "type": "integer", "minimum": 1 },
+    "column_start": { "type": "integer", "minimum": 1 },
+    "column_end": { "type": "integer", "minimum": 1 },
+    "message": { "type": "string", "minLength": 1 },
+    "evidence": { "type": ["string", "null"], "description": "Matching code snippet" },
+    "impact": { "type": ["string", "null"], "description": "Impact description" },
+    "fix_suggestion": { "type": ["string", "null"] },
+    "fix_snippet": { "type": ["string", "null"] },
+    "found_by": {
+      "type": "string",
+      "enum": ["L1-pattern-matching", "L2-semantic-analysis", "L3-statistical-aggregation"]
+    },
+    "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "author_git": { "type": ["string", "null"] },
+    "commit_hash": { "type": ["string", "null"] }
+  }
+}
