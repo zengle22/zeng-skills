@@ -3,7 +3,7 @@
 [![Skills](https://img.shields.io/badge/skills-5-blue)](./)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-个人全局自定义 AI Agent Skill 集合，主要用于 [Kimi Code CLI](https://github.com/MoonshotAI/kimi-cli) 及其他兼容 Agent Skill 协议的运行时。
+个人全局自定义 AI Agent Skill 集合，主要用于Claude Code/Codex/Kimi CLI及其他兼容 Agent Skill 协议的运行时。
 
 本仓库以**单一 Skill 单目录**的形式组织，每个 Skill 自包含完整的 `SKILL.md` 与所需附属资源，可直接挂载到 Agent 的 skills 路径下使用。
 
