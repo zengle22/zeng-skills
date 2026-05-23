@@ -1,4 +1,4 @@
-skill: zeng-code-review-deep
+skill: ll-code-review-deep
 version: "1.0"
 adr: ADR-058
 author: LL-Team
@@ -12,6 +12,9 @@ states:
     transitions: [structurally_validated]
   structurally_validated:
     description: Input parameters validated; diff parsed and snapshot generated
+    transitions: [selecting]
+  selecting:
+    description: Agent selection panel determined and role-panel.json written
     transitions: [semantically_reviewed]
   semantically_reviewed:
     description: Supervisor reviewed agent selection and rubric coverage

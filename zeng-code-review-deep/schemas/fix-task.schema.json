@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "skills/zeng-code-review-deep/schemas/fix-task.schema.json",
+  "$id": "skills/ll-code-review-deep/schemas/fix-task.schema.json",
   "title": "FixTask",
   "description": "Structured repair task derived from a consensus issue. Part of ADR-058.",
   "version": "1.0",

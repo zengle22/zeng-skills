@@ -10,6 +10,7 @@ core_agents:
   - standards-guardian
   - logic-verifier
   - data-architect
+  - security-expert
 
 # === LANGUAGE EXPERTS (triggered by file suffix) ===
 language_experts:

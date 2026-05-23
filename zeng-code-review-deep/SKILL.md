@@ -1,5 +1,5 @@
 ---
-name: zeng-code-review-deep
+name: ll-code-review-deep
 description: "多智能体深度代码审查技能。对单次 Commit/PR/模块执行 4+ 维度并行专项审查，合并去重后生成结构化修复任务与最终报告。"
 argument-hint: "[--mode commit|pr|module|frz] [--ref REF] [--base BASE] [--head HEAD] [--path PATH] [--frz-ref FRZ_REF] [--output-dir .cr-deep] [--preview] [--apply-patches BATCH_ID]"
 allowed-tools:
@@ -11,7 +11,7 @@ allowed-tools:
   - Task
 ---
 
-# zeng-code-review-deep
+# ll-code-review-deep
 
 Governed multi-agent deep code review skill. Spawns specialized reviewer agents in parallel across configurable quality dimensions, merges findings through a moderator, and produces structured fix-tasks plus a human-readable final report.
 
@@ -25,7 +25,7 @@ Pipeline — multi-phase review with checkpoint/resume support
 
 ## Authority
 
-Canonical bundle: `skills/zeng-code-review-deep/`
+Canonical bundle: `skills/ll-code-review-deep/`
 
 ## Not Equal To
 
@@ -51,8 +51,8 @@ This capability is a governed `Skill` for `Code Change → Quality Evidence + Fi
 
 ## Required Read Order
 
-1. `zeng.contract.yaml`
-2. `zeng.lifecycle.yaml`
+1. `ll.contract.yaml`
+2. `ll.lifecycle.yaml`
 3. `schemas/problem.schema.json`
 4. `schemas/batch-state.schema.json`
 5. `schemas/role-panel.schema.json`
@@ -149,4 +149,4 @@ ll code-review-deep --mode module --path src/services/order/
 
 ## Compatibility Note
 
-This skill is part of the LEE Lite governed skill family under `skills/zeng-code-review-deep/`. It follows ADR-058 for multi-agent deep review and ADR-057 for artifact directory layout.
+This skill is part of the LEE Lite governed skill family under `skills/ll-code-review-deep/`. It follows ADR-058 for multi-agent deep review and ADR-057 for artifact directory layout.

@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "skills/zeng-code-review-deep/schemas/role-panel.schema.json",
+  "$id": "skills/ll-code-review-deep/schemas/role-panel.schema.json",
   "title": "RolePanel",
   "description": "Agent selection result for a review batch. Part of ADR-058.",
   "version": "1.0",
