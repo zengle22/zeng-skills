@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "skills/ll-code-review-deep/schemas/conflict.schema.json",
+  "$id": "zeng-code-review-deep/schemas/conflict.schema.json",
   "title": "ReviewConflict",
-  "description": "Severity disagreement between agents on the same issue. Part of ADR-058.",
+  "description": "Severity disagreement between agents on the same issue. .",
   "version": "1.0",
   "type": "object",
   "required": ["conflict_id", "issue_ids", "file", "line_range", "dimension", "severity_dispute", "status"],

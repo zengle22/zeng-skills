@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "skills/ll-code-review-deep/schemas/problem.schema.json",
+  "$id": "zeng-code-review-deep/schemas/problem.schema.json",
   "title": "CodeReviewProblem",
-  "description": "Single issue found by a review agent. Part of ADR-058 Deep Code Review Skill.",
+  "description": "Single issue found by a review agent.  Deep Code Review Skill.",
   "version": "1.0",
   "type": "object",
   "required": ["issue_id", "severity", "dimension", "file", "line_range", "evidence", "description", "found_by"],

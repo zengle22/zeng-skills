@@ -1,7 +1,7 @@
-skill: ll-code-review-deep
+skill: zeng-code-review-deep
 version: "1.0"
 adr: ADR-058
-author: LL-Team
+author: zeng-skills
 category: qa
 chain: code-quality
 phase: deep-review

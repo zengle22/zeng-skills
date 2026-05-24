@@ -1,4 +1,5 @@
-# ADR-058 Agent Selector Rules
+# Agent Selector Rules for zeng-code-review-deep
+# Based on ADR-058 specification
 # MVP: hard-coded rules with keyword / file-suffix / diff-pattern matching
 # Future: LLM-based intelligent selector
 

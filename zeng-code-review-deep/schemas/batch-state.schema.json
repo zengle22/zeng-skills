@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "skills/ll-code-review-deep/schemas/batch-state.schema.json",
+  "$id": "zeng-code-review-deep/schemas/batch-state.schema.json",
   "title": "BatchState",
-  "description": "Runtime state for a single deep code review batch. Supports resume. Part of ADR-058.",
+  "description": "Runtime state for a single deep code review batch. Supports resume. .",
   "version": "1.0",
   "type": "object",
   "required": ["batch_id", "status", "mode", "created_at", "updated_at", "agents", "artifacts"],
