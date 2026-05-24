@@ -136,8 +136,18 @@ This capability is a governed `Skill` for `Code Change → Quality Evidence + Fi
 ## Usage Examples
 
 ```bash
-# Direct invocation via Claude Code skill system
-claude --skill zeng-code-review-deep --mode commit --ref HEAD~1
+# Standalone runtime (no external dependencies)
+cd zeng-code-review-deep
+python run.py --mode commit --ref HEAD~1
+
+# PR-level full review
+python run.py --mode pr --base main --head feature/x --output-dir .cr-deep
+
+# Module health check
+python run.py --mode module --path src/services/order/
+
+# Run with mock agents (for testing/preview)
+python run.py --mode commit --ref HEAD~1 --mock
 ```
 
 ## Compatibility Note
