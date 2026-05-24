@@ -6,16 +6,16 @@ from argparse import Namespace
 from pathlib import Path
 from typing import Any
 
-from runtime.lib.code_review_deep.agent_runner import AgentRunner, MockAgentExecutor, PromptFileExecutor
-from runtime.lib.code_review_deep.artifact_manager import ArtifactManager, generate_batch_id
-from runtime.lib.code_review_deep.cleanup import cleanup_old_batches
-from runtime.lib.code_review_deep.consensus_builder import ConsensusBuilder
-from runtime.lib.code_review_deep.fix_task_generator import generate_fix_tasks
-from runtime.lib.code_review_deep.input_parser import InputParser, validate_mode_args
-from runtime.lib.code_review_deep.moderator import Moderator
-from runtime.lib.code_review_deep.prompt_builder import PromptBuilder
-from runtime.lib.code_review_deep.report_generator import generate_report
-from runtime.lib.code_review_deep.selector import AgentSelector
+from runtime.lib.agent_runner import AgentRunner, MockAgentExecutor, PromptFileExecutor
+from runtime.lib.artifact_manager import ArtifactManager, generate_batch_id
+from runtime.lib.cleanup import cleanup_old_batches
+from runtime.lib.consensus_builder import ConsensusBuilder
+from runtime.lib.fix_task_generator import generate_fix_tasks
+from runtime.lib.input_parser import InputParser, validate_mode_args
+from runtime.lib.moderator import Moderator
+from runtime.lib.prompt_builder import PromptBuilder
+from runtime.lib.report_generator import generate_report
+from runtime.lib.selector import AgentSelector
 from runtime.lib.errors import CommandError, ensure
 from runtime.lib.fs import canonical_to_path, to_canonical_path
 from runtime.lib.protocol import CommandContext, run_with_protocol
@@ -47,7 +47,7 @@ def _run_review(ctx: CommandContext) -> tuple[str, str, dict[str, Any], list[str
     am.update_state({"status": "reviewing"})
 
     # 3. Role selection (hard-coded rules, MVP)
-    skill_dir = ctx.workspace_root / "skills" / "ll-code-review-deep"
+    skill_dir = Path(__file__).parent.parent.parent
     selector = AgentSelector(skill_dir / "selector_rules.yaml")
     selection = selector.select(
         changed_files=changed_files,
