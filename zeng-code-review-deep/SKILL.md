@@ -1,155 +1,148 @@
 ---
 name: zeng-code-review-deep
 description: "多智能体深度代码审查技能。对单次 Commit/PR/模块执行 4+ 维度并行专项审查，合并去重后生成结构化修复任务与最终报告。"
-argument-hint: "[--mode commit|pr|module|frz] [--ref REF] [--base BASE] [--head HEAD] [--path PATH] [--frz-ref FRZ_REF] [--output-dir .cr-deep] [--preview] [--apply-patches BATCH_ID]"
+argument-hint: "[--mode commit|pr|module|frz] [--ref REF] [--base BASE] [--head HEAD] [--path PATH] [--frz-ref FRZ_REF] [--output-dir .cr-deep]"
 allowed-tools:
-  - ReadFile
-  - WriteFile
-  - Shell
-  - Grep
-  - Glob
-  - Task
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Agent
+  - AskUserQuestion
 ---
 
 # zeng-code-review-deep
 
-Governed multi-agent deep code review skill. Spawns specialized reviewer agents in parallel across configurable quality dimensions, merges findings through a moderator, and produces structured fix-tasks plus a human-readable final report.
-
-## Primary Abstraction
-
-Skill (governed capability template)
-
-## Secondary Abstraction
-
-Pipeline — multi-phase review with checkpoint/resume support
-
-## Authority
-
-Canonical bundle: `zeng-code-review-deep/`
+多智能体深度代码审查技能。对单次 Commit/PR/模块执行多维度并行专项审查，合并去重后生成结构化修复任务与最终报告。
 
 ## Not Equal To
 
-- Not a replacement for `bmad-code-review` (complements it; bmad for quick scan, deep for critical PRs)
-- Not a source code auto-fixer (produces fix-tasks + optional patches, human decides)
-- Not a runtime test executor
-- Not a gate decision maker (evidence-only)
+- Not a replacement for `bmad-code-review`（互补；bmad 用于快速扫描，deep 用于关键 PR）
+- Not a source code auto-fixer（生成修复任务，人工决定是否执行）
+- Not a gate decision maker（仅提供证据）
 
-## Canonical Authority
+## Execution Model
 
-- ADR: ADR-058 (规范实现，可独立运行，无需外部治理依赖)
-- Evidence schemas: `schemas/*.schema.json`
+本技能采用**协作式执行架构**：
 
-## Runtime Boundary Baseline
+| 组件 | 职责 |
+|------|------|
+| **外层 AI Agent** | 完整流程编排：参数解析、角色选择、并行审查、合并、报告生成 |
+| **validate.py** | 输出产物的 JSON Schema 契约验证（可选，用于确保输出质量） |
 
-This capability is a governed `Skill` for `Code Change → Quality Evidence + Fix Tasks` transformation.
+> **注意**：本技能是纯 SKILL.md 实现，所有流程逻辑由外层 AI Agent 执行。
+> `validate.py` 仅用于验证输出产物是否符合 JSON Schema 契约。
 
-- **Read-only review** — does NOT modify source files unless `--apply-patches` is explicitly invoked.
-- **Evidence-only output** — does NOT execute gate decisions or block pipelines.
-- **Deterministic batch_id** — `CR-{YYYYMMDD}-{seq:03d}`.
-- **Issue IDs** follow `{batch_id}-{agent_id}-{severity}-{seq:03d}` format.
+## Output Schema
 
-## Required Read Order
+所有输出产物必须符合以下 JSON Schema：
 
-1. `zeng.contract.yaml`
-2. `zeng.lifecycle.yaml`
-3. `schemas/problem.schema.json`
-4. `schemas/batch-state.schema.json`
-5. `schemas/role-panel.schema.json`
-6. `schemas/fix-task.schema.json`
-7. `schemas/conflict.schema.json`
-8. `agents/standards-guardian.md`
-9. `agents/logic-verifier.md`
-10. `agents/moderator.md`
+| 产物 | Schema | 说明 |
+|------|--------|------|
+| `role-panel.json` | `role-panel.schema.json` | Agent 选择结果 |
+| `batch-state.json` | `batch-state.schema.json` | 批次运行状态 |
+| `reviews/{agent}-review.json` | `problem.schema.json` | 各 Agent 审查结果 |
+| `consolidated-review.json` | `problem.schema.json`（数组） | 合并后的问题清单 |
+| `review-conflicts.json` | `conflict.schema.json`（数组） | 冲突记录 |
+| `review-consensus.json` | `problem.schema.json`（数组） | 最终共识问题清单 |
+| `fix-tasks.json` | `fix-task.schema.json`（数组） | 修复任务清单 |
+
+## Issue Schema（每条问题）
+
+```json
+{
+  "issue_id": "{batch_id}-{agent_id}-{severity}-{seq:03d}",
+  "severity": "P0 | P1 | P2 | P3",
+  "dimension": "如 C01-Consistency, C03-Logic",
+  "file": "相对文件路径",
+  "line_range": [10] 或 [10, 20],
+  "evidence": "精确代码片段（带行号）",
+  "description": "问题描述",
+  "found_by": ["agent_id1", "agent_id2"]
+}
+```
+
+## Severity 级别
+
+| 级别 | 含义 | 说明 |
+|------|------|------|
+| P0 | Blocker | 必须立即修复 |
+| P1 | High | 应在合并前修复 |
+| P2 | Medium | 建议修复 |
+| P3 | Low | 可选修复 |
 
 ## Execution Protocol
 
 1. **Initialize**
-   - Parse mode and refs
-   - Generate `batch_id` and create `{output_dir}/{batch_id}/` structure
-   - Capture input snapshot (git diff, PR description, file context)
-   - Write `batch-state.json` with status `initializing`
+   - 解析参数，生成 `batch_id`
+   - 创建输出目录结构
+   - 捕获输入快照（git diff, PR description）
 
 2. **Role Selection**
-   - MVP: hard-code 4 core agents + moderator
-   - Write `role-panel.json`
-   - Update `batch-state.json` → `reviewing`
+   - 根据变更内容选择 2-4 个专业 Agent + 1 个 Moderator
+   - 写入 `role-panel.json`
 
-3. **Parallel Review (Phase 1A)**
-   - Spawn each selected agent with standard prompt + rubric + diff
-   - Each agent writes `{agent_id}-review.json` immediately upon completion
-   - Update `batch-state.json` agent statuses
+3. **Parallel Review**
+   - 并行 Spawn 各 Agent 执行审查
+   - 每个 Agent 写入 `{agent_id}-review.json`
 
-4. **Merge & Conflict Detection (Phase 1B)**
-   - Moderator reads all review.json files
-   - Deduplicate by (file + line_range + dimension)
-   - Detect severity conflicts (diff ≥ 2 levels or P0 vs "none")
-   - Write `consolidated-review.json` + `review-conflicts.json`
+4. **Merge & Conflict Detection**
+   - Moderator 合并去重
+   - 检测严重级别冲突（≥2 级或 P0 vs "none"）
+   - 写入 `consolidated-review.json` + `review-conflicts.json`
 
-5. **Consensus Build (Phase 1D — MVP skip 1C)**
-   - MVP: adjacent severity conflicts auto-resolved to higher level
-   - Write `review-consensus.json`
-   - Update severity summary in `batch-state.json`
+5. **Consensus Build**
+   - 相邻级别冲突自动取高级别
+   - 写入 `review-consensus.json`
 
-6. **Fix Task Generation (Phase 2 — MVP simplified)**
-   - For each P0/P1 in consensus, generate fix-task entry
-   - Write `fix-tasks.json`
+6. **Fix Task Generation**
+   - 为 P0/P1 问题生成修复任务
+   - 写入 `fix-tasks.json`
 
-7. **Report Synthesis (Phase 4 — MVP)**
-   - Generate `final-report.md` with severity tables and per-file summaries
-   - Update `batch-state.json` → `completed`
+7. **Report Synthesis**
+   - 生成 `final-report.md`
 
-## Workflow Boundary
+## Artifact Directory Structure
 
-- **Input**: git diff / PR diff / module path + optional FRZ package
-- **Output**: review artifact bundle under `{output_dir}/{batch_id}/`
-  - `batch-state.json`
-  - `role-panel.json`
-  - `reviews/{agent}-review.json`
-  - `consolidated-review.json`
-  - `review-consensus.json`
-  - `fix-tasks.json` (MVP: simplified)
-  - `final-report.md`
-- **Out of scope (MVP)**:
-  - Conflict discussion rounds (Phase 1C)
-  - Auto-patch generation and application
-  - Independent audit agent (Phase 3)
-  - Smart selector (Phase 0 uses hard-coded rules)
+```
+{output_dir}/{batch_id}/
+├── batch-state.json
+├── role-panel.json
+├── reviews/
+│   ├── {agent1}-review.json
+│   └── {agent2}-review.json
+├── consolidated-review.json
+├── review-conflicts.json
+├── review-consensus.json
+├── fix-tasks.json
+└── final-report.md
+```
+
+## Validation
+
+使用 `validate.py` 验证输出产物是否符合 Schema 契约：
+
+```bash
+# 验证整个批次
+python validate.py .cr-deep/CR-20260527-001
+
+# 安装依赖
+pip install jsonschema
+```
 
 ## Non-Negotiable Rules
 
-- Do not modify source files during review phases.
-- Do not fabricate issues — every finding must have exact code evidence.
-- Style-only issues must not be P0/P1.
-- Agent output must conform to `problem.schema.json`.
-- `batch-state.json` must be updated after every phase.
-- All artifacts written to disk immediately; no in-memory-only state.
-- Default exit code is 0; exit code 1 on structural failure.
+- 审查阶段不修改源文件
+- 不捏造问题 — 每个发现必须有精确代码证据
+- 纯风格问题不得标记为 P0/P1
+- 所有产物立即写入磁盘，不保留内存状态
 
-## Exit Codes
+## Usage
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success (review completed, report generated) |
-| 1 | Structural failure (invalid args, schema validation error, git error) |
-| 2 | Partial success (some agents timed out or failed, but consensus produced) |
+在 Claude Code 中调用：
 
-## Usage Examples
-
-```bash
-# Standalone runtime (no external dependencies)
-cd zeng-code-review-deep
-python run.py --mode commit --ref HEAD~1
-
-# PR-level full review
-python run.py --mode pr --base main --head feature/x --output-dir .cr-deep
-
-# Module health check
-python run.py --mode module --path src/services/order/
-
-# Run with mock agents (for testing/preview)
-python run.py --mode commit --ref HEAD~1 --mock
 ```
-
-## Compatibility Note
-
-This skill is a self-contained multi-agent deep code review capability. It follows the ADR-058 specification for multi-agent deep review and ADR-057 for artifact directory layout. All required schemas and agent definitions are bundled in this directory — no external resources required.
+/zeng-code-review-deep --mode commit --ref HEAD~1
+/zeng-code-review-deep --mode pr --base main --head feature/x
+/zeng-code-review-deep --mode module --path src/services/order/
+```
