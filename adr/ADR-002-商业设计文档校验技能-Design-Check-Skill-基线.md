@@ -1,18 +1,76 @@
+---
+title: "Pre-SSOT 文档校验技能（Design Check Skill）基线"
+status: draft
+created: "2026-05-27"
+updated: "2026-05-28"
+layer: "L3 实现层"
+priority: "P0 必须有"
+related_docs:
+  - "../docs/ITERATION-DOCUMENT-CHECKLIST.md"
+  - "ADR-004-设计文档到实施任务拆分技能-I2I-Impl-Skill-设计规范.md"
+relationships:
+  depends_on:
+    - "ITERATION-DOCUMENT-CHECKLIST v2.1（§2.1 商业设计 + §二 Pre-SSOT 质量门 + PRD 可测性预审）"
+  implements: []
+  constrains:
+    - "ADR-004 (I2I Skill) — 校验通过后的设计文档进入任务拆分"
+  references: []
+  supersedes: []
+  superseded_by: []
+context_policy:
+  load_priority: required
+  task_scopes: ["文档质量治理", "Pre-SSOT 准入门控", "6 维度文档校验"]
+  max_tokens_hint: 5000
+---
+
 # ADR-002：Pre-SSOT 文档校验技能（Design Check Skill）基线
 
 > **SSOT ID**: ADR-002
-> **Title**: 建立 Pre-SSOT 阶段 6 大维度文档校验技能，采用纯 LLM + 结构化输出架构，覆盖商业设计、产品设计、UX 设计、架构设计、测试设计、工程实施全维度及跨维度一致性，确保 Pre-SSOT 输入充分后再进入 SSOT 形式化阶段
-> **Status**: Draft
-> **Version**: v2.0
-> **Effective Date**: TBD
+> **Version**: v2.1
 > **Scope**: 文档质量治理 / Pre-SSOT 准入门控 / 6 维度文档校验 / 纯 LLM Skill 架构
 > **Owner**: 产品流程 / QA 治理 / 架构
 > **Governance Kind**: NEW
 > **Audience**: AI 实施代理、产品文档作者、Tech Lead、QA
-> **Depends On**: ITERATION-DOCUMENT-CHECKLIST v2.1（§2.1 商业设计 + §二 Pre-SSOT 质量门 + PRD 可测性预审）
 > **Supersedes**: 无
 
 ---
+
+## 文档定位
+
+本文档定义 Pre-SSOT 阶段 6 大维度文档校验技能的架构基线，回答"如何在 SSOT 形式化之前，用结构化规则拦截不充分的输入"。
+
+## 关联文档
+
+| 文档 | 关系 | 说明 |
+|------|------|------|
+| [ITERATION-DOCUMENT-CHECKLIST](../docs/ITERATION-DOCUMENT-CHECKLIST.md) | 上游 | 定义 6 大维度必输文档与必输要素 |
+| [zeng-doc-quality-loop](../zeng-doc-quality-loop/) | 平行互补 | Doc Quality Loop 侧重文档结构和可读性 |
+| [zeng-code-review-deep](../zeng-code-review-deep/) | 上下游 | Deep Code Review 在编码阶段拦截代码缺陷 |
+| [ADR-004](ADR-004-设计文档到实施任务拆分技能-I2I-Impl-Skill-设计规范.md) | 下游 | 校验通过后的设计文档进入任务拆分 |
+
+## 范围边界
+
+### In Scope
+
+- Pre-SSOT 阶段 6 大维度文档校验规则定义（D1–D6 + XC）
+- 纯 LLM + 结构化输出架构设计
+- 校验严重级别（BLOCK/WARN/PASS/N/A）
+- 产物规范（JSON + Markdown + Verdict）
+
+### Out of Scope
+
+- SSOT 阶段的形式化文档生成
+- 编码阶段的代码质量检查（由 zeng-code-review-deep 负责）
+- 文档结构和可读性检查（由 zeng-doc-quality-loop 负责）
+
+## 验收/检查点
+
+本文档描述的设计成立的条件：
+
+1. 6 大维度校验规则（BD-1–BD-6, PD-1–PD-7, UX-1–UX-7, AD-1–AD-9, TD-1–TD-8, EI-1–EI-5）全部定义完成
+2. 跨维度一致性检查项（XC-1–XC-8）定义完成
+3. 产物规范（JSON Schema + Markdown 模板）定义完成
+4. 实现路线（Phase 1 MVP + Phase 2 域扩展）规划完成
 
 ## 1. 背景
 
@@ -357,7 +415,7 @@ XC 检查项的触发取决于相关域的产物是否存在：
     └── 输出: design-check-verdict.json
 ```
 
-### 3.6 产物规范
+### 3.5 产物规范
 
 所有产物写入 `{output_dir}/design-check/{check_id}/`：
 
@@ -370,7 +428,7 @@ XC 检查项的触发取决于相关域的产物是否存在：
         └── design-check-verdict.json    # [Human] 人工确认结果
 ```
 
-### 3.7 报告格式
+### 3.6 报告格式
 
 #### 设计检查摘要（design-check-summary.json）
 
@@ -445,7 +503,7 @@ XC 检查项的触发取决于相关域的产物是否存在：
 - **建议**: 具体化为"本期不做微信支付、支付宝支付、Apple Pay"
 ```
 
-### 3.8 触发方式
+### 3.7 触发方式
 
 ```bash
 # 单文档校验（D1 商业设计 + D2 产品设计，无 XC）
@@ -465,7 +523,7 @@ zeng-design-check --dir docs/ --domain architecture    # 仅 D4
 zeng-design-check --dir docs/ --layer gate-only
 ```
 
-### 3.9 实现路线
+### 3.8 实现路线
 
 采用递进式扩展，已完成全部域 Rubric 编写。
 
@@ -780,6 +838,7 @@ zeng-design-check --dir docs/ --layer gate-only
 
 | 版本 | 日期 | 变更摘要 |
 |------|------|---------|
+| **v2.1** | 2026-05-28 | 文档结构升级：添加 YAML frontmatter（符合 DOC-WRITING-GUIDE 标准）；更新文档状态管理规则；添加 relationships 和 context_policy 字段；调整章节结构以符合通用章节要求；修复相对链接路径；补充 ADR-004 双向依赖关系；重新编号 §3.5–§3.8 章节 |
 | **v2.0** | 2026-05-27 | 架构简化为纯 LLM + 结构化输出；移除 Python 脚本层（scanner.py / reporter.py / 编排引擎）和插件加载协议；移除执行者矩阵（全部由 LLM 执行）；移除 Python↔LLM 衔接协议；产物简化为 3 个文件（JSON + Markdown + Verdict）；实现路线改为 2 阶段（MVP → 域扩展）；更新 Rejected Alternatives（混合架构 §7.6 替代纯 LLM 长期方案） |
 | **v1.2** | 2026-05-27 | 架构升级为 Skill 家族 + 领域插件（§3.1）；校验维度从 D1 扩展到 6 域 + 跨维度共 55 项检查（§3.2）；执行流程改为插件化编排（§3.4）；新增领域插件协议（§3.1.3）；新增输入模型定义（§3.1.4：单文档/多文档/目录扫描、文档→域映射、XC 触发条件）；新增 D2–D6 + XC 检查项定义；产物目录改为插件化结构（§3.6）；实现路线改为三阶段（§3.9）；新增 Rejected Alternatives §7.8–7.9（单体扩展/完全独立） |
 | **v1.1** | 2026-05-27 | 新增混合实现架构决策（§3.1）；新增检查项执行者矩阵（§3.5）；新增 Python/LLM 衔接协议（§3.4.1）；新增分阶段实现路线（§3.9）；新增 Rejected Alternatives §7.5–7.7 |
@@ -787,5 +846,6 @@ zeng-design-check --dir docs/ --layer gate-only
 
 ---
 
-*文档版本：v2.0*
+*文档版本：v2.1*
 *创建日期：2026-05-27*
+*最后更新：2026-05-28*

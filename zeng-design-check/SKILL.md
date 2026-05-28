@@ -35,8 +35,16 @@ Canonical bundle: `zeng-design-check/`
 
 ## Canonical Authority
 
-- ADR: ADR-002 v2.0 (Pre-SSOT 文档校验技能 — 纯 LLM + 结构化输出架构)
+- ADR: ADR-002 v2.1 (Pre-SSOT 文档校验技能 — 纯 LLM + 结构化输出架构)
 - Reference: `ITERATION-DOCUMENT-CHECKLIST v2.1` (§2.1–§2.6 六大维度 + §二 Pre-SSOT 质量门 + PRD 可测性预审)
+
+## 关联文档
+
+| 文档 | 关系 | 说明 |
+|------|------|------|
+| [ADR-002](../adr/ADR-002-商业设计文档校验技能-Design-Check-Skill-基线.md) | 上游 | 设计基线，定义 55 项校验规则 |
+| [ADR-004](../adr/ADR-004-设计文档到实施任务拆分技能-I2I-Impl-Skill-设计规范.md) | 下游 | 校验通过后的设计文档进入任务拆分 |
+| [ITERATION-DOCUMENT-CHECKLIST](../docs/ITERATION-DOCUMENT-CHECKLIST.md) | 上游 | 定义 MAC 标准和必输要素 |
 
 ## Runtime Boundary Baseline
 
@@ -256,4 +264,4 @@ zeng-design-check --dir docs/ --output-dir .design-check
 
 ## Compatibility Note
 
-This is a Skill for Pre-SSOT document validation following ADR-002 v2.0 (pure LLM + structured output architecture). All 6 domain rubrics (D1–D6) + cross-dimension (XC) + gate check (G) are implemented. All validation rules and rubrics are bundled in this directory — no external resources required.
+This is a Skill for Pre-SSOT document validation following ADR-002 v2.1 (pure LLM + structured output architecture). All 6 domain rubrics (D1–D6) + cross-dimension (XC) + gate check (G) are implemented. All validation rules and rubrics are bundled in this directory — no external resources required.
