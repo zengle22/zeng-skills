@@ -146,7 +146,7 @@ This capability is a governed `Skill` for `Design Documents → Implementation T
 | `--test` | 指定 Test Design 文件路径 |
 | `--data` | 指定 Data Flow 文件路径 |
 | `--ddd` | 指定 DDD 文件路径 |
-| `--output-dir` | 输出目录（默认 `.impl`） |
+| `--output-dir` | 输出目录（默认 `docs/mvp-lite/impl`） |
 | `--validate-only` | 仅校验，不生成 Task |
 
 ### 1.4 文档发现与类型识别
@@ -610,7 +610,7 @@ zeng-i2i --dir docs/mvp-lite/ --feature M01
 zeng-i2i --prd docs/prds/PRD-M01.md --arch docs/arch/ARCH-M01.md
 
 # 指定输出目录
-zeng-i2i --dir docs/mvp-lite/ --output-dir .impl
+zeng-i2i --dir docs/mvp-lite/ --output-dir docs/mvp-lite/impl
 
 # 仅校验
 zeng-i2i --dir docs/mvp-lite/ --validate-only
