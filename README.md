@@ -3,7 +3,7 @@
 [![Skills](https://img.shields.io/badge/skills-8-blue)](./)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-个人全局自定义 AI Agent Skill 集合，主要用于Claude Code/Codex/Kimi CLI及其他兼容 Agent Skill 协议的运行时。
+个人全局自定义 AI Agent Skill 集合，主要用于 Claude Code / Codex 及其他兼容 Agent Skill 协议的运行时。
 
 本仓库以**单一 Skill 单目录**的形式组织，每个 Skill 自包含完整的 `SKILL.md` 与所需附属资源，可直接挂载到 Agent 的 skills 路径下使用。
 
@@ -48,20 +48,47 @@ git clone git@github.com:zengle22/zeng-skills.git
 
 ### 2. 挂载 Skill
 
-以 **Kimi CLI** 为例，将本仓库目录加入 skills 搜索路径：
+#### Claude Code
+
+将 Skill 目录链接或复制到 Claude Code 的全局 skills 路径：
+
+```bash
+# 创建 skills 目录（如不存在）
+mkdir -p ~/.claude/skills
+
+# 方式 A：符号链接（推荐，自动同步更新）
+ln -s /path/to/zeng-skills/* ~/.claude/skills/
+
+# 方式 B：直接复制
+cp -r /path/to/zeng-skills/* ~/.claude/skills/
+```
+
+或在项目级 `.claude/settings.json` 中指定：
+
+```json
+{
+  "skills": {
+    "paths": ["/path/to/zeng-skills"]
+  }
+}
+```
+
+#### Codex (OpenAI)
+
+将 Skill 目录挂载到 Codex 的 skills 搜索路径：
 
 ```bash
 # 查看当前 skills 路径
-kimi skills path
+codex skills path
 
-# 将本仓库添加到 skills 路径（示例）
-kimi skills add /path/to/zeng-skills
+# 将本仓库添加到 skills 路径
+codex skills add /path/to/zeng-skills
 ```
 
 或在配置文件中指定：
 
 ```yaml
-# ~/.config/kimi/config.yaml
+# ~/.codex/config.yaml
 skills:
   paths:
     - /path/to/zeng-skills
