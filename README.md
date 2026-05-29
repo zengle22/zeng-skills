@@ -17,24 +17,24 @@
 
 | Skill | 描述 | 适用场景 |
 |-------|------|----------|
-| [`zeng-design-check`](./zeng-design-check) | Pre-SSOT 文档校验（6 大维度 + 跨维度一致性，55 项检查） | 设计文档写完后、进入 SSOT 前，校验输入质量 |
-| [`zeng-i2i`](./zeng-i2i) | 设计文档到实施任务转化引擎（15+ 种设计文档输入） | 设计文档校验通过后，拆分为可执行的实施任务 |
-| [`zgsd-bootstrap-milestone`](./zgsd-bootstrap-milestone) | 从预设计文档包引导生成 GSD Milestone | 设计文档包完成，直接转换为 GSD 里程碑与阶段计划 |
-| [`zgsd-plan-phase`](./zgsd-plan-phase) | 桥接 I2I 任务包到 GSD PLAN 格式 | I2I 产出的任务包需转换为 GSD 可执行的 PLAN |
+| [`zdoc-design-check`](./skills/zdoc-design-check) | Pre-SSOT 文档校验（6 大维度 + 跨维度一致性，55 项检查） | 设计文档写完后、进入 SSOT 前，校验输入质量 |
+| [`zdoc-i2i`](./skills/zdoc-i2i) | 设计文档到实施任务转化引擎（15+ 种设计文档输入） | 设计文档校验通过后，拆分为可执行的实施任务 |
+| [`zgsd-bootstrap-milestone`](./skills/zgsd-bootstrap-milestone) | 从预设计文档包引导生成 GSD Milestone | 设计文档包完成，直接转换为 GSD 里程碑与阶段计划 |
+| [`zgsd-plan-phase`](./skills/zgsd-plan-phase) | 桥接 I2I 任务包到 GSD PLAN 格式 | I2I 产出的任务包需转换为 GSD 可执行的 PLAN |
 
 ### 文档质量
 
 | Skill | 描述 | 适用场景 |
 |-------|------|----------|
-| [`zeng-doc-quality-loop`](./zeng-doc-quality-loop) | 多文档质量收敛流水线（BMAD 多角色评审团） | 对多份文档执行并行评审、冲突讨论、修复与验证的完整质量闭环 |
+| [`zdoc-quality-loop`](./skills/zdoc-quality-loop) | 多文档质量收敛流水线（BMAD 多角色评审团） | 对多份文档执行并行评审、冲突讨论、修复与验证的完整质量闭环 |
 
 ### 代码质量
 
 | Skill | 描述 | 适用场景 |
 |-------|------|----------|
-| [`zeng-safe-code`](./zeng-safe-code) | 临时安全编码助手（6 条硬约束 + 自检清单） | 修改项目代码时，作为编码阶段的硬约束与自检流程 |
-| [`zeng-code-patrol`](./zeng-code-patrol) | 代码库自动化巡检（8 大维度） | 定期扫描代码库，发现风格漂移、架构腐化、安全漏洞等问题 |
-| [`zeng-code-review-deep`](./zeng-code-review-deep) | 多智能体深度代码审查（Commit/PR/模块并行专项审查） | 关键 PR 的深度审查，生成结构化修复任务与报告 |
+| [`zcode-safe-dev`](./skills/zcode-safe-dev) | 临时安全编码助手（6 条硬约束 + 自检清单） | 修改项目代码时，作为编码阶段的硬约束与自检流程 |
+| [`zcode-patrol`](./skills/zcode-patrol) | 代码库自动化巡检（8 大维度） | 定期扫描代码库，发现风格漂移、架构腐化、安全漏洞等问题 |
+| [`zcode-review-deep`](./skills/zcode-review-deep) | 多智能体深度代码审查（Commit/PR/模块并行专项审查） | 关键 PR 的深度审查，生成结构化修复任务与报告 |
 
 ---
 
@@ -99,13 +99,13 @@ skills:
 在对话中通过斜杠命令或工具调用：
 
 ```
-/zeng-safe-code
+/zcode-safe-dev
 ```
 
 或
 
 ```
-Skill(skill="zeng-doc-quality-loop", arguments="doc1.md doc2.md")
+Skill(skill="zdoc-quality-loop", arguments="doc1.md doc2.md")
 ```
 
 ---

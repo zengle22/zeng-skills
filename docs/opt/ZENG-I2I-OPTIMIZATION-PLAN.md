@@ -1,11 +1,11 @@
 ---
-title: "zeng-i2i Skill 优化方案 — 基于 M12 Impl Review Handoff"
+title: "zdoc-i2i Skill 优化方案 — 基于 M12 Impl Review Handoff"
 status: draft
 created: "2026-05-29"
 layer: "L3 实现层"
 priority: "P0"
 related_docs:
-  - "../zeng-i2i/SKILL.md"
+  - "../zdoc-i2i/SKILL.md"
   - "../adr/ADR-004-设计文档到实施任务拆分技能-I2I-Impl-Skill-设计规范.md"
 relationships:
   depends_on:
@@ -21,9 +21,9 @@ context_policy:
   max_tokens_hint: 5000
 ---
 
-# zeng-i2i Skill 优化方案
+# zdoc-i2i Skill 优化方案
 
-> 基于 M12 Onboarding & Identity 实现文档评审 Handoff，针对 zeng-i2i 在源文档校验和 impl 生成中暴露的系统性问题，提出分层优化方案。
+> 基于 M12 Onboarding & Identity 实现文档评审 Handoff，针对 zdoc-i2i 在源文档校验和 impl 生成中暴露的系统性问题，提出分层优化方案。
 
 ---
 
@@ -331,11 +331,11 @@ IF 字段在 PRD 正文中引用 AND 在 TECH 数据模型中不存在 AND 无 O
 
 | 文件 | 改动类型 | 改动内容 |
 |------|---------|---------|
-| `zeng-i2i/SKILL.md` | **编辑** | Phase 0 新增 PRD↔TECH/ARCH 校验维度（§0.1）；Phase 3 新增已有表依赖验证（§3.8）；Phase 3→4 新增 ENUM 校验步骤（§4.3 之后）；Phase 4 新增 SUMMARY 动态计算校验（§4.7 #15-17）；Phase 5 delivery-report.json 增加 ENUM 校验字段 |
-| `zeng-i2i/gate/rubric.md` | **编辑** | G5 一致性检查增加 ENUM/数值/字段存在性子维度，明确 FAIL/WARN 分级标准 |
-| `zeng-i2i/templates/summary.md` | **编辑** | 新增"源文档 PRD↔TECH 对齐结果"章节；统计数字标注"从 task-list.json 动态计算" |
-| `zeng-i2i/templates/task.md` | **编辑** | "技术约束"章节新增"枚举值定义（以 PRD 为准）"子表；"验收/检查点"新增 ENUM 溯源确认项 |
-| `zeng-i2i/templates/feature-context.md` | **编辑** | Data Model 章节分区：新建表 vs 复用/预留表 |
+| `zdoc-i2i/SKILL.md` | **编辑** | Phase 0 新增 PRD↔TECH/ARCH 校验维度（§0.1）；Phase 3 新增已有表依赖验证（§3.8）；Phase 3→4 新增 ENUM 校验步骤（§4.3 之后）；Phase 4 新增 SUMMARY 动态计算校验（§4.7 #15-17）；Phase 5 delivery-report.json 增加 ENUM 校验字段 |
+| `zdoc-i2i/gate/rubric.md` | **编辑** | G5 一致性检查增加 ENUM/数值/字段存在性子维度，明确 FAIL/WARN 分级标准 |
+| `zdoc-i2i/templates/summary.md` | **编辑** | 新增"源文档 PRD↔TECH 对齐结果"章节；统计数字标注"从 task-list.json 动态计算" |
+| `zdoc-i2i/templates/task.md` | **编辑** | "技术约束"章节新增"枚举值定义（以 PRD 为准）"子表；"验收/检查点"新增 ENUM 溯源确认项 |
+| `zdoc-i2i/templates/feature-context.md` | **编辑** | Data Model 章节分区：新建表 vs 复用/预留表 |
 | `adr/ADR-004-*.md` | **编辑** | 更新 Phase 0/3/4 规范，对齐上述改动 |
 
 ---

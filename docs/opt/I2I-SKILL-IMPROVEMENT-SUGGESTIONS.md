@@ -9,7 +9,7 @@ source_event: "ARCH-LITE-007 impl 文档四轮评审"
 
 # I2I Skill 改进建议
 
-> 基于 `impl-formal-app-foundation-ARCH-LITE-007` 四轮评审中发现的 15 个问题的回溯分析，提出 I2I Pipeline（zeng-i2i v1.2）在输入准入、拆解过程、交付审核三个环节的改进建议。
+> 基于 `impl-formal-app-foundation-ARCH-LITE-007` 四轮评审中发现的 15 个问题的回溯分析，提出 I2I Pipeline（zdoc-i2i v1.2）在输入准入、拆解过程、交付审核三个环节的改进建议。
 
 ---
 

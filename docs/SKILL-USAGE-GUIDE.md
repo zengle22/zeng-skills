@@ -8,12 +8,12 @@
 
 | # | Skill | 分类 | 一句话说明 |
 |---|-------|------|-----------|
-| 1 | [zeng-safe-code](#1-zeng-safe-code) | 编码安全 | 临时安全编码助手 — 修改项目代码时的硬约束与自检清单 |
-| 2 | [zeng-doc-quality-loop](#2-zeng-doc-quality-loop) | 文档质量 | 多文档质量收敛流水线 — BMAD 多角色评审团 |
-| 3 | [zeng-code-patrol](#3-zeng-code-patrol) | 代码质量 | 代码库自动化巡检 — 风格/安全/性能/重复/死代码 |
-| 4 | [zeng-code-review-deep](#4-zeng-code-review-deep) | 代码审查 | 多智能体深度代码审查 — Commit/PR/模块并行专项审查 |
-| 5 | [zeng-design-check](#5-zeng-design-check) | 设计校验 | Pre-SSOT 文档校验 — 6 大维度 + 跨维度一致性，55 项检查 |
-| 6 | [zeng-i2i](#6-zeng-i2i) | 设计到实施 | 设计文档到实施任务转化引擎 — 15+ 种设计文档输入 |
+| 1 | [zcode-safe-dev](#1-zcode-safe-dev) | 编码安全 | 临时安全编码助手 — 修改项目代码时的硬约束与自检清单 |
+| 2 | [zdoc-quality-loop](#2-zdoc-quality-loop) | 文档质量 | 多文档质量收敛流水线 — BMAD 多角色评审团 |
+| 3 | [zcode-patrol](#3-zcode-patrol) | 代码质量 | 代码库自动化巡检 — 风格/安全/性能/重复/死代码 |
+| 4 | [zcode-review-deep](#4-zcode-review-deep) | 代码审查 | 多智能体深度代码审查 — Commit/PR/模块并行专项审查 |
+| 5 | [zdoc-design-check](#5-zdoc-design-check) | 设计校验 | Pre-SSOT 文档校验 — 6 大维度 + 跨维度一致性，55 项检查 |
+| 6 | [zdoc-i2i](#6-zdoc-i2i) | 设计到实施 | 设计文档到实施任务转化引擎 — 15+ 种设计文档输入 |
 | 7 | [zgsd-bootstrap-milestone](#7-zgsd-bootstrap-milestone) | GSD 集成 | 从预设计文档包引导生成 GSD Milestone |
 | 8 | [zgsd-plan-phase](#8-zgsd-plan-phase) | GSD 集成 | 桥接 I2I 任务包到 GSD PLAN 格式 |
 
@@ -25,25 +25,25 @@
 设计文档质量验证 → 设计到实施转化 → GSD 里程碑引导 / GSD Phase 规划
 ─────────────────────────────────────────────────────────────────────────
 
-  zeng-design-check          zeng-i2i               zgsd-bootstrap-milestone
+  zdoc-design-check          zdoc-i2i               zgsd-bootstrap-milestone
        │                         │                    zgsd-plan-phase
        ▼                         ▼                         │
   Pre-SSOT 文档校验    →    实施任务拆分          →    GSD 可执行计划
                                                          │
-  zeng-doc-quality-loop                          GSD 执行 (gsd-execute-phase)
+  zdoc-quality-loop                          GSD 执行 (gsd-execute-phase)
        │
        ▼
   文档质量收敛（BMAD 多角色评审）
 
   ────────────── 编码阶段 ──────────────
 
-  zeng-safe-code  →  zeng-code-patrol  →  zeng-code-review-deep
+  zcode-safe-dev  →  zcode-patrol  →  zcode-review-deep
   (编码安全约束)     (自动化巡检)           (深度代码审查)
 ```
 
 ---
 
-## 1. zeng-safe-code
+## 1. zcode-safe-dev
 
 ### 功能概述
 
@@ -63,13 +63,13 @@
 ### 使用方式
 
 ```
-/zeng-safe-code
+/zcode-safe-dev
 ```
 
 或通过 Skill 工具调用：
 
 ```
-Skill(skill="zeng-safe-code")
+Skill(skill="zcode-safe-dev")
 ```
 
 ### 输入参数
@@ -101,7 +101,7 @@ Skill(skill="zeng-safe-code")
 
 ---
 
-## 2. zeng-doc-quality-loop
+## 2. zdoc-quality-loop
 
 ### 功能概述
 
@@ -142,7 +142,7 @@ Skill(skill="zeng-safe-code")
 ### 使用方式
 
 ```
-/zeng-doc-quality-loop spec.md prd.md [--ssot <path>] [--rubric <path>] [--max-rounds 5] [--parallel] [--output-dir .quality-loop]
+/zdoc-quality-loop spec.md prd.md [--ssot <path>] [--rubric <path>] [--max-rounds 5] [--parallel] [--output-dir .quality-loop]
 ```
 
 ### 参数
@@ -176,7 +176,7 @@ Skill(skill="zeng-safe-code")
 
 ---
 
-## 3. zeng-code-patrol
+## 3. zcode-patrol
 
 ### 功能概述
 
@@ -198,7 +198,7 @@ Skill(skill="zeng-safe-code")
 ### 使用方式
 
 ```
-/zeng-code-patrol --paths src/ --scope full
+/zcode-patrol --paths src/ --scope full
 ```
 
 ### 参数
@@ -209,7 +209,7 @@ Skill(skill="zeng-safe-code")
 | `--scope` | enum | `full` | `full`（全量）/ `delta`（增量）/ `staged`（暂存区）/ `targeted`（定向） |
 | `--format` | enum | `markdown` | 输出格式：`markdown` / `json` |
 | `--max-files` | int | 500 | 最大扫描文件数 |
-| `--output-dir` | string | `.zeng-code-patrol` | 输出目录 |
+| `--output-dir` | string | `.zcode-patrol` | 输出目录 |
 | `--min-severity` | enum | `P3` | 最低严重级别：`P0` / `P1` / `P2` / `P3` |
 | `--baseline` | string | — | 基线报告路径（用于对比） |
 
@@ -225,29 +225,29 @@ Skill(skill="zeng-safe-code")
 
 ```
 # 全量扫描
-/zeng-code-patrol --paths src/ --scope full
+/zcode-patrol --paths src/ --scope full
 
 # 增量扫描（与基线对比）
-/zeng-code-patrol --paths src/ --scope delta --baseline .zeng-code-patrol/20260527-120000-xxx/report.json
+/zcode-patrol --paths src/ --scope delta --baseline .zcode-patrol/20260527-120000-xxx/report.json
 
 # 仅扫描暂存区文件
-/zeng-code-patrol --paths src/ --scope staged
+/zcode-patrol --paths src/ --scope staged
 
 # 只关注高严重级别
-/zeng-code-patrol --paths src/ --min-severity P1
+/zcode-patrol --paths src/ --min-severity P1
 ```
 
 ### 验证
 
 ```bash
 # 验证输出产物
-python validate.py .zeng-code-patrol/{patrol_id}
+python validate.py .zcode-patrol/{patrol_id}
 # 依赖: pip install jsonschema
 ```
 
 ---
 
-## 4. zeng-code-review-deep
+## 4. zcode-review-deep
 
 ### 功能概述
 
@@ -265,7 +265,7 @@ python validate.py .zeng-code-patrol/{patrol_id}
 ### 使用方式
 
 ```
-/zeng-code-review-deep --mode commit --ref HEAD~1
+/zcode-review-deep --mode commit --ref HEAD~1
 ```
 
 ### 参数
@@ -294,13 +294,13 @@ python validate.py .zeng-code-patrol/{patrol_id}
 
 ```
 # 审查最近一次提交
-/zeng-code-review-deep --mode commit --ref HEAD~1
+/zcode-review-deep --mode commit --ref HEAD~1
 
 # 审查 PR 的所有变更
-/zeng-code-review-deep --mode pr --base main --head feature/x
+/zcode-review-deep --mode pr --base main --head feature/x
 
 # 审查指定模块
-/zeng-code-review-deep --mode module --path src/services/order/
+/zcode-review-deep --mode module --path src/services/order/
 ```
 
 ### 验证
@@ -312,7 +312,7 @@ python validate.py .cr-deep/{batch_id}
 
 ---
 
-## 5. zeng-design-check
+## 5. zdoc-design-check
 
 ### 功能概述
 
@@ -345,7 +345,7 @@ Pre-SSOT 文档校验技能，覆盖 6 大维度（商业/产品/UX/架构/测�
 ### 使用方式
 
 ```
-/zeng-design-check --dir docs/ --domain all
+/zdoc-design-check --dir docs/ --domain all
 ```
 
 ### 参数
@@ -370,19 +370,19 @@ Pre-SSOT 文档校验技能，覆盖 6 大维度（商业/产品/UX/架构/测�
 
 ```bash
 # 全量校验
-/zeng-design-check --dir docs/ --project my-project --domain all
+/zdoc-design-check --dir docs/ --project my-project --domain all
 
 # 仅校验商业设计
-/zeng-design-check --input docs/prd/xxx-prd.md --domain business
+/zdoc-design-check --input docs/prd/xxx-prd.md --domain business
 
 # 仅校验架构设计
-/zeng-design-check --dir docs/ --domain architecture
+/zdoc-design-check --dir docs/ --domain architecture
 
 # 仅做通用质量门检查（快速筛查）
-/zeng-design-check --dir docs/ --layer gate-only
+/zdoc-design-check --dir docs/ --layer gate-only
 
 # 自定义输出目录
-/zeng-design-check --dir docs/ --output-dir .design-check
+/zdoc-design-check --dir docs/ --output-dir .design-check
 ```
 
 ### 严重级别
@@ -401,7 +401,7 @@ Pre-SSOT 文档校验技能，覆盖 6 大维度（商业/产品/UX/架构/测�
 
 ---
 
-## 6. zeng-i2i
+## 6. zdoc-i2i
 
 ### 功能概述
 
@@ -449,7 +449,7 @@ Pre-SSOT 文档校验技能，覆盖 6 大维度（商业/产品/UX/架构/测�
 ### 使用方式
 
 ```
-/zeng-i2i --dir docs/mvp-lite/
+/zdoc-i2i --dir docs/mvp-lite/
 ```
 
 ### 参数
@@ -474,16 +474,16 @@ Pre-SSOT 文档校验技能，覆盖 6 大维度（商业/产品/UX/架构/测�
 
 ```bash
 # 从目录自动扫描并转化
-/zeng-i2i --dir docs/mvp-lite/
+/zdoc-i2i --dir docs/mvp-lite/
 
 # 指定各文档路径
-/zeng-i2i --prd docs/PRD.md --arch docs/ARCH.md --api docs/API.md
+/zdoc-i2i --prd docs/PRD.md --arch docs/ARCH.md --api docs/API.md
 
 # 仅校验输入
-/zeng-i2i --dir docs/mvp-lite/ --validate-only
+/zdoc-i2i --dir docs/mvp-lite/ --validate-only
 
 # 指定源代码根路径（路径规范化）
-/zeng-i2i --dir docs/mvp-lite/ --src apps/my-app/src
+/zdoc-i2i --dir docs/mvp-lite/ --src apps/my-app/src
 ```
 
 ### 输出结构
@@ -672,9 +672,9 @@ node validate-bridge.mjs --phase <n>
 ### 工作流 A：设计文档 → 实施任务 → GSD 执行
 
 ```
-1. zeng-design-check    →  校验设计文档质量（55 项检查）
-2. zeng-doc-quality-loop →  多角色质量收敛（修复文档问题）
-3. zeng-i2i              →  设计文档转化为实施任务
+1. zdoc-design-check    →  校验设计文档质量（55 项检查）
+2. zdoc-quality-loop →  多角色质量收敛（修复文档问题）
+3. zdoc-i2i              →  设计文档转化为实施任务
 4. zgsd-plan-phase       →  任务包桥接到 GSD PLAN
 5. gsd-execute-phase     →  GSD 执行阶段计划
 ```
@@ -682,7 +682,7 @@ node validate-bridge.mjs --phase <n>
 ### 工作流 B：设计文档 → GSD 里程碑
 
 ```
-1. zeng-design-check           →  校验设计文档质量
+1. zdoc-design-check           →  校验设计文档质量
 2. zgsd-bootstrap-milestone    →  文档包转换为 GSD 里程碑
 3. gsd-plan-phase              →  阶段规划
 4. gsd-execute-phase           →  执行
@@ -691,9 +691,9 @@ node validate-bridge.mjs --phase <n>
 ### 工作流 C：代码质量保障
 
 ```
-1. zeng-safe-code          →  编码阶段安全约束
-2. zeng-code-patrol        →  代码库自动化巡检
-3. zeng-code-review-deep   →  关键 PR 深度审查
+1. zcode-safe-dev          →  编码阶段安全约束
+2. zcode-patrol        →  代码库自动化巡检
+3. zcode-review-deep   →  关键 PR 深度审查
 ```
 
 ---
@@ -705,14 +705,14 @@ node validate-bridge.mjs --phase <n>
 部分技能提供验证脚本：
 
 ```bash
-# zeng-code-patrol 验证
-python zeng-code-patrol/validate.py .zeng-code-patrol/{patrol_id}
+# zcode-patrol 验证
+python zcode-patrol/validate.py .zcode-patrol/{patrol_id}
 
-# zeng-code-review-deep 验证
-python zeng-code-review-deep/validate.py .cr-deep/{batch_id}
+# zcode-review-deep 验证
+python zcode-review-deep/validate.py .cr-deep/{batch_id}
 
-# zeng-i2i DAG 校验
-python zeng-i2i/validate-dag.py {task-list.json}
+# zdoc-i2i DAG 校验
+python zdoc-i2i/validate-dag.py {task-list.json}
 
 # zgsd-plan-phase 桥接验证
 node zgsd-plan-phase/validate-bridge.mjs --phase <n>
