@@ -55,8 +55,8 @@ context_policy:
 **Feature 编号**: {feature_id}
 **生成时间**: {timestamp}
 **输入文档数**: {total_input_docs}
-**Task 总数**: {total_tasks}
-**预估总工时**: {estimated_hours}h
+**Task 总数**: {total_tasks}（从 task-list.json 动态计算）
+**预估总工时**: {estimated_hours}h（从 task-list.json 动态计算，SUM(tasks[*].estimated_hours)）
 **关键路径长度**: {critical_path_length} 个 Task
 
 ## 输入文档校验结果
@@ -94,6 +94,49 @@ context_policy:
 {如果 CYCLE_DETECTED，列出环路路径}
 {如果 WARNING，列出孤立节点}
 
+## 依赖完整性校验
+
+**状态**: {dep_validation_status}
+
+| Task | 缺失依赖 | 建议 | 规则 |
+|------|---------|------|------|
+| {task_id} | {missing_dep} | {suggested_dep} | {rule_name} |
+
+## AC-测试点覆盖率
+
+| 指标 | 数值 |
+|------|------|
+| TESTSET 测试点总数 | {total} |
+| 被 Task AC 覆盖数 | {covered} |
+| 孤立测试点 | {orphans} |
+| 覆盖率 | {rate} |
+
+## 源文档交叉一致性
+
+**状态**: {consistency_status}
+{如果 FAIL，列出冲突项}
+{如果 WARN，列出警告项}
+
+## PRD↔TECH/ARCH 对齐结果
+
+### ENUM 值对齐
+
+| 字段 | PRD 值 | TECH 值 | ARCH 值 | 状态 | 处理 |
+|------|--------|---------|---------|------|------|
+| {field} | {prd_values} | {tech_values} | {arch_values} | {PASS/FAIL} | {resolution} |
+
+### 数值常量对齐
+
+| 常量 | PRD 值 | 其他文档值 | 状态 | 差异来源 |
+|------|--------|-----------|------|---------|
+| {concept} | {prd_value} | {other_value} | {PASS/FAIL} | {source_doc} |
+
+### 字段存在性对齐
+
+| 字段 | PRD 引用 | TECH 定义 | 状态 | 备注 |
+|------|---------|----------|------|------|
+| {field} | {prd_location} | {true/false} | {PASS/WARN} | {resolution} |
+
 ## 文档状态变更
 
 | 文档 | 原状态 | 新状态 | 变更时间 |
@@ -103,10 +146,14 @@ context_policy:
 ## 验收/检查点
 
 - [ ] 所有输入文档校验结果已记录
+- [ ] 源文档交叉一致性已校验
 - [ ] Task 映射完整
+- [ ] 依赖完整性已校验
+- [ ] AC-测试点覆盖率已记录
 - [ ] 关键决策有依据
 - [ ] 风险有缓解措施
 - [ ] DAG 校验通过
+- [ ] 交付报告已生成
 
 ## Open Questions / Assumptions
 

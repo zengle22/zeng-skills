@@ -99,6 +99,22 @@ context_policy:
 
 {从 DDD-*.md 提取的领域模型、聚合根、值对象}
 
+## 数据模型
+
+### 本 Feature 新建的表
+
+| 表名 | 说明 | 创建 Task |
+|------|------|----------|
+| {table_name} | {description} | task-{nnn} |
+
+### 复用/预留的表（不在本 Feature 实施范围）
+
+| 表名 | 说明 | 状态 |
+|------|------|------|
+| ~~{table_name}~~ | {description} | 已存在 / Phase 2 预留 |
+
+> **注意**：Out of Scope 中声明的表必须出现在"复用/预留"区，不得出现在"新建的表"列表中。
+
 ## 数据流（来自 Data Flow）
 
 {从 DataFlow-*.md 提取的数据流转、状态机}
