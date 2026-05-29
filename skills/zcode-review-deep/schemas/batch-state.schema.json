@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "zcode-review-deep/schemas/batch-state.schema.json",
+  "title": "BatchState",
+  "description": "Runtime state for a single deep code review batch. Supports resume. .",
+  "version": "1.0",
+  "type": "object",
+  "required": ["batch_id", "status", "mode", "created_at", "updated_at", "agents", "artifacts"],
+  "properties": {
+    "batch_id": {
+      "type": "string",
+      "description": "Unique batch identifier: CR-{YYYYMMDD}-{seq:03d}"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "initializing",
+        "selecting",
+        "reviewing",
+        "merging",
+        "conflict_resolving",
+        "fix_planning",
+        "auditing",
+        "reporting",
+        "completed",
+        "failed"
+      ]
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["commit", "pr", "module", "frz"]
+    },
+    "ref": {
+      "type": "string",
+      "description": "Git ref or path under review"
+    },
+    "base_ref": {
+      "type": "string",
+      "description": "Base git ref for PR mode"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["agent_id", "status"],
+        "properties": {
+          "agent_id": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "running", "completed", "failed", "timeout", "skipped"]
+          },
+          "artifact_ref": { "type": "string" },
+          "started_at": { "type": "string", "format": "date-time" },
+          "completed_at": { "type": "string", "format": "date-time" },
+          "issues_count": { "type": "integer" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of artifact relative paths produced so far"
+    },
+    "severity_summary": {
+      "type": "object",
+      "properties": {
+        "P0": { "type": "integer" },
+        "P1": { "type": "integer" },
+        "P2": { "type": "integer" },
+        "P3": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "phase": { "type": "string" },
+        "message": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,27 @@
+skill: zcode-review-deep
+version: "1.0"
+adr: ADR-058
+author: zeng-skills
+category: qa
+chain: code-quality
+phase: deep-review
+---
+states:
+  drafted:
+    description: Review configuration drafted and role panel determined
+    transitions: [structurally_validated]
+  structurally_validated:
+    description: Input parameters validated; diff parsed and snapshot generated
+    transitions: [selecting]
+  selecting:
+    description: Agent selection panel determined and role-panel.json written
+    transitions: [semantically_reviewed]
+  semantically_reviewed:
+    description: Supervisor reviewed agent selection and rubric coverage
+    transitions: [accepted, drafted]
+  accepted:
+    description: Review results accepted; consensus and report artifacts ready
+    transitions: [frozen]
+  frozen:
+    description: Review artifacts frozen — immutable evidence for gate decisions
+    transitions: []

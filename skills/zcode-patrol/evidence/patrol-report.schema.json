@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PatrolReport",
+  "description": "Full patrol report produced by zcode-patrol",
+  "type": "object",
+  "required": ["patrol_id", "started_at", "completed_at", "config", "summary", "issues"],
+  "properties": {
+    "patrol_id": {
+      "type": "string",
+      "pattern": "^[0-9]{8}-[0-9]{6}-[a-zA-Z0-9]{12}$"
+    },
+    "started_at": { "type": "string", "format": "date-time" },
+    "completed_at": { "type": "string", "format": "date-time" },
+    "config": {
+      "type": "object",
+      "required": ["paths", "scope", "format", "max_files", "max_file_size", "min_severity", "fix_mode", "non_interactive", "fail_on_p0p1"],
+      "properties": {
+        "paths": { "type": "array", "items": { "type": "string" } },
+        "scope": { "type": "string", "enum": ["full", "delta", "staged", "targeted"] },
+        "format": { "type": "string", "enum": ["markdown", "json"] },
+        "max_files": { "type": "integer", "minimum": 1 },
+        "max_file_size": { "type": "integer", "minimum": 1 },
+        "min_severity": { "type": "string", "enum": ["P0", "P1", "P2", "P3"] },
+        "fix_mode": { "type": "string", "enum": ["report-only", "suggest-fixes"] },
+        "since_days": { "type": ["integer", "null"], "minimum": 1 },
+        "ruleset": { "type": ["string", "null"] },
+        "baseline": { "type": ["string", "null"] },
+        "non_interactive": { "type": "boolean" },
+        "resume": { "type": ["string", "null"] },
+        "fail_on_p0p1": { "type": "boolean" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total_files_scanned", "total_issues", "severity_breakdown", "dimension_breakdown", "skipped_dimensions", "quality_score"],
+      "properties": {
+        "total_files_scanned": { "type": "integer", "minimum": 0 },
+        "total_issues": { "type": "integer", "minimum": 0 },
+        "severity_breakdown": {
+          "type": "object",
+          "properties": {
+            "P0": { "type": "integer", "minimum": 0 },
+            "P1": { "type": "integer", "minimum": 0 },
+            "P2": { "type": "integer", "minimum": 0 },
+            "P3": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "dimension_breakdown": {
+          "type": "object",
+          "properties": {
+            "D01": { "type": "integer", "minimum": 0 },
+            "D02": { "type": "integer", "minimum": 0 },
+            "D03": { "type": "integer", "minimum": 0 },
+            "D04": { "type": "integer", "minimum": 0 },
+            "D05": { "type": "integer", "minimum": 0 },
+            "D06": { "type": "integer", "minimum": 0 },
+            "D07": { "type": "integer", "minimum": 0 },
+            "D08": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "skipped_dimensions": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["D01", "D02", "D03", "D04", "D05", "D06", "D07", "D08"] }
+        },
+        "quality_score": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "hotspots": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["directory", "issue_density", "max_severity"],
+        "properties": {
+          "directory": { "type": "string", "minLength": 1 },
+          "issue_density": { "type": "number", "minimum": 0 },
+          "max_severity": { "type": "string", "enum": ["P0", "P1", "P2", "P3"] }
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": { "$ref": "issue.schema.json" }
+    },
+    "baseline_comparison": {
+      "type": ["object", "null"],
+      "required": ["previous_patrol_id", "new_issues", "resolved_issues", "persistent_issues"],
+      "properties": {
+        "previous_patrol_id": { "type": "string" },
+        "new_issues": { "type": "integer", "minimum": 0 },
+        "resolved_issues": { "type": "integer", "minimum": 0 },
+        "persistent_issues": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "trend": {
+      "type": ["object", "null"],
+      "properties": {
+        "history_length": { "type": "integer", "minimum": 1 },
+        "direction": { "type": "string", "enum": ["improving", "stable", "degrading"] },
+        "quality_score": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    }
+  }
+}

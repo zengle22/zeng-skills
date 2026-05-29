@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "zcode-review-deep/schemas/role-panel.schema.json",
+  "title": "RolePanel",
+  "description": "Agent selection result for a review batch. .",
+  "version": "1.0",
+  "type": "object",
+  "required": ["batch_id", "mode", "selected_agents", "moderator"],
+  "properties": {
+    "batch_id": { "type": "string" },
+    "mode": {
+      "type": "string",
+      "enum": ["commit", "pr", "module", "frz"]
+    },
+    "selected_agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["agent_id", "dimensions"],
+        "properties": {
+          "agent_id": { "type": "string" },
+          "dimensions": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "reason": { "type": "string", "description": "Why this agent was selected" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "moderator": {
+      "type": "string",
+      "default": "moderator",
+      "description": "Agent ID responsible for merging reviews"
+    },
+    "language_experts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Selected language expert agent IDs"
+    }
+  },
+  "additionalProperties": false
+}
