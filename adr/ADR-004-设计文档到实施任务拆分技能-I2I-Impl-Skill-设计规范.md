@@ -31,7 +31,7 @@ context_policy:
 > **SSOT ID**: ADR-004
 > **Title**: 设计文档到实施任务拆分技能 — 输入校验 + 内容整合 + 最小可验收任务拆分 + 依赖关系定义
 > **Status**: Draft
-> **Version**: v1.4
+> **Version**: v1.7
 > **Effective Date**: TBD
 > **Scope**: 设计文档整合 / 实施任务拆分 / 依赖关系管理 / 实施文档生成
 > **Owner**: 研发流程 / AI 实施
@@ -115,6 +115,13 @@ context_policy:
 │              I2I — 设计文档 → 实施任务 转化引擎                        │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
+│  Phase 0: 源文档交叉一致性校验                                       │
+│  ──────────────────────────────────────────                         │
+│  1. ARCH ↔ TESTSET 交叉扫描（数量/语义/路径/版本）                    │
+│  2. 约束溯源图构建                                                   │
+│  3. 术语/命名预扫描                                                  │
+│  4. BLOCK → 要求源文档澄清后重跑                                     │
+│                                                                     │
 │  Phase 1: 输入校验（内嵌 Design Check Gate Rubric）                 │
 │  ──────────────────────────────────────────                         │
 │  1. 识别输入文档类型（15+ 种设计文档）                                │
@@ -132,9 +139,11 @@ context_policy:
 │  Phase 3: 任务拆分                                                  │
 │  ──────────────────────────────────────────                         │
 │  1. 按最小可验收颗粒度拆分 Task                                       │
-│  2. 每个 Task 定义验收标准（来自 AC/测试设计）                         │
-│  3. 定义 Task 间依赖关系                                             │
-│  4. 生成实施拓扑排序                                                 │
+│  2. 每个 Task 注入结构化上下文（溯源链/约束/API 版本）                 │
+│  3. 每个 Task 定义验收标准（来自 AC/测试设计）                         │
+│  4. 定义 Task 间依赖关系                                             │
+│  5. 生成实施拓扑排序                                                 │
+│  6. 依赖完整性校验 + AC-测试点映射校验                                │
 │                                                                     │
 │  Phase 4: 文档生成                                                  │
 │  ──────────────────────────────────────────                         │
@@ -143,8 +152,14 @@ context_policy:
 │  3. Feature 上下文文档                                               │
 │  4. 汇总报告（统计数据 + 决策摘要）                                   │
 │                                                                     │
+│  Phase 5: 交付前审核 + 交付报告                                      │
+│  ──────────────────────────────────────────                         │
+│  1. 交付前自动审核清单（AC 覆盖率/排除项/API 版本）                    │
+│  2. 语义偏移检测                                                     │
+│  3. 生成 delivery-report.json                                        │
+│                                                                     │
 │  输入: 设计文档路径（PRD/Arch/API/UX/Tech/Test/Data/DDD/...）       │
-│  输出: impl-{feature}-{number}/ 目录                                 │
+│  输出: impl-{feature}-{number}/ 目录 + delivery-report.json         │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -210,6 +225,7 @@ context_policy:
 | **标准输入** | PRD + Architecture + API + Tech | 完整 Feature 聚合 + Task 拆分 + 技术上下文 |
 | **全量输入** | 所有可用设计文档 | 全量上下文整合 + Task 拆分 + 验收标准 + 测试上下文 |
 | **目录扫描** | `--dir docs/` | 自动发现所有文档，按文件名前缀识别类型 |
+| **源代码路径指定** | `--src apps/ai-coach-skill/src` | 指定项目源代码根路径，确保文件路径使用项目根相对的完整路径 |
 
 #### 文档状态要求
 
@@ -269,6 +285,39 @@ I2I Phase 4 所有 Task 文档生成成功后，将所有输入文档的状态�
 ### 3.3 执行流程
 
 ```
+阶段 0: 源文档交叉一致性校验 [LLM]
+    │
+    ├── 识别输入文档对（ARCH ↔ TESTSET、ARCH ↔ PRD、API ↔ TECH 等）
+    │
+    ├── 交叉一致性扫描:
+    │   ├── 数量一致性: ARCH §11 门槛数字 vs TESTSET 细化数字
+    │   ├── 语义明确性: 表格行是否包含多个语义不同的值
+    │   ├── 例外显式化: "排除项"是否在 ARCH 中有显式批准
+    │   ├── 路径一致性: 文件路径在不同文档中是否一致
+    │   └── 版本一致性: 依赖版本号表述是否一致
+    │
+    ├── 约束溯源图构建:
+    │   └── §11 门槛 N → §X.Y 具体约束 → TESTSET 测试点编号
+    │
+    ├── 术语/命名预扫描:
+    │   ├── 版本相关 API 名是否标注适用版本
+    │   ├── 是否引用已废弃 API
+    │   └── 命名空间一致性
+    │
+    ├── 源代码路径规范化:
+    │   ├── 如果指定了 --src 参数，将其作为源代码根路径基准
+    │   ├── 从设计文档中提取所有源代码文件路径
+    │   ├── 对每个路径执行规范化（简写路径 → 完整项目根相对路径）
+    │   └── 记录到 source-consistency-report.json 的 path_normalization 字段
+    │
+    ├── 输出: source-consistency-report.json（含 path_normalization）
+    │
+    ├── 判定:
+    │   ├── FAIL（BLOCK 级冲突）→ 要求源文档澄清后重跑，不进入阶段 1
+    │   ├── WARN → 记录到报告，带标注进入阶段 1
+    │   └── PASS → 进入阶段 1
+    │
+    ▼
 阶段 1: 输入校验 [LLM]
     │
     ├── 读取输入文档路径
@@ -310,6 +359,11 @@ I2I Phase 4 所有 Task 文档生成成功后，将所有输入文档的状态�
     │
     ├── 对每个 Feature:
     │   ├── 按最小可验收颗粒度拆分 Task（§3.4 规则）
+    │   ├── 为每个 Task 注入结构化上下文（§3.7 上下文模板）
+    │   │   ├── acceptance_gates: §11 门槛编号
+    │   │   ├── source_constraints: §X.Y 具体约束编号
+    │   │   ├── exclusions: 排除项 + 例外来源
+    │   │   └── api_versions: 外部 API 版本信息
     │   ├── 为每个 Task 定义验收标准（来自 AC + 测试设计）
     │   ├── 标注优先级（继承自 PRD 的 P0/P1/P2）
     │   └── 标注依赖关系（哪些 Task 必须先完成）
@@ -323,6 +377,18 @@ I2I Phase 4 所有 Task 文档生成成功后，将所有输入文档的状态�
     │       ├── 孤立节点检测（无依赖也无被依赖的 Task）
     │       └── 输出: dag-validation.json（PASS / CYCLE_DETECTED / WARNING）
     │
+    ├── 依赖完整性校验 [LLM]:
+    │   ├── 目录结构依赖: 创建文件的 task 必须依赖 task-001
+    │   ├── 配置依赖: 使用 env 变量的 task 必须依赖 task-002
+    │   ├── 基础设施依赖: Drizzle → task-005, Redis → task-009
+    │   ├── 类型依赖: API 类型 → task-004
+    │   └── 输出: dependency-suggestions.json
+    │
+    ├── AC-测试点映射校验 [LLM]:
+    │   ├── TESTSET 测试点 → 是否被 task AC 覆盖
+    │   ├── 未覆盖 → ORPHAN
+    │   └── task AC 覆盖 TESTSET 之外 → EXTRA
+    │
     ├── 输出: task-list.json（结构化任务清单 + 依赖关系）
     │
     ▼
@@ -331,13 +397,15 @@ I2I Phase 4 所有 Task 文档生成成功后，将所有输入文档的状态�
     ├── 为每个 Task 生成独立 impl 文档:
     │   ├── Task 描述（做什么）
     │   ├── 验收标准（怎么算完成）
+    │   ├── 溯源链（§11 门槛 → §X.Y 约束 → TESTSET 测试点）
     │   ├── 完整上下文（从各设计文档聚合的相关信息）
     │   ├── 技术约束（来自 Architecture/Tech Design）
     │   ├── 交互要求（来自 UX Spec/UX Prototype）
     │   ├── 领域模型（来自 DDD）+ 数据流（来自 Data Flow）
     │   ├── 测试要点（来自 Test Design）
     │   ├── 依赖项（前置 Task + 产出物）
-    │   ├── 排除项（Out of Scope 中与本 Task 相关的部分）
+    │   ├── 排除项（含例外来源标注）
+    │   ├── API 版本信息（废弃 API + 兼容 API）
     │   └── 实施指引（仅基于设计文档已明确信息，§4.2 边界定义）
     │
     ├── 生成索引文档 INDEX.md:
@@ -350,6 +418,9 @@ I2I Phase 4 所有 Task 文档生成成功后，将所有输入文档的状态�
     │   ├── 统计信息（Task 数量、依赖深度、预估工作量）
     │   ├── Feature → Task 映射
     │   ├── 输入文档引用 + 校验结果（含 CONDITIONAL 的 WARN 项）
+    │   ├── 依赖完整性校验结果
+    │   ├── AC-测试点覆盖率
+    │   ├── 源文档交叉一致性结果
     │   ├── Out of Scope 汇总
     │   ├── 关键决策记录
     │   └── 风险与注意事项
@@ -374,7 +445,30 @@ I2I Phase 4 所有 Task 文档生成成功后，将所有输入文档的状态�
     │   └── 不冻结文档，保持原有状态，允许修复后重跑
     │
     ▼
-    完成。产出 impl-{feature}-{PRD-ID}/ 目录 + IMPL-INDEX.md + 输入文档 frozen。
+阶段 5: 交付前审核 + 交付报告 [LLM]
+    │
+    ├── 交付前自动审核清单:
+    │   ├── AC-测试点覆盖率: 每个 task 的 AC 至少引用一个 TESTSET 测试点
+    │   ├── 排除项一致性: 排除项必须标注例外来源
+    │   ├── API 版本标注: API 名称必须标注适用版本范围
+    │   ├── 依赖 DAG 完整性: 通过依赖完整性校验
+    │   ├── 上下文字段完整性: 通过强制字段检查
+    │   └── 配置示例完整性: ESLint/lint 配置覆盖所有声明约束
+    │
+    ├── 语义偏移检测:
+    │   ├── 源文档原文 ↔ task AC 表述
+    │   ├── 检测语义偏移（如"验证后删除"→"删除"）
+    │   └── 标记 SEMANTIC_DRIFT
+    │
+    ├── 生成 delivery-report.json:
+    │   ├── source_consistency: 源文档一致性状态
+    │   ├── dependency_validation: 依赖校验状态
+    │   ├── ac_coverage: AC-测试点覆盖率
+    │   ├── semantic_drift: 语义偏移统计
+    │   └── pre_delivery_checks: 交付前检查结果
+    │
+    ▼
+    完成。产出 impl-{feature}-{PRD-ID}/ 目录 + IMPL-INDEX.md + delivery-report.json + 输入文档 frozen。
 ```
 
 ### 3.4 最小可验收颗粒度定义
@@ -436,6 +530,149 @@ graph TD
 - 如果 `CYCLE_DETECTED`：在 SUMMARY.md 中输出警告，不自动修改依赖关系，由人工在实施前确认如何打破环路
 - 如果 `WARNING`（孤立节点）：记录但不阻塞，可能是新增 Task 尚未建立依赖
 
+### 3.6 输出 task-list.json
+
+Phase 3 产出 `task-list.json`，作为 Phase 4 文档生成的数据源（Phase 3→4 桥接文件）。Phase 4 读取此文件生成所有 Task impl 文档、INDEX.md 和 SUMMARY.md。
+
+```json
+{
+  "feature_id": "M01",
+  "feature_name": "用户注册",
+  "generated_at": "2026-05-28T10:00:00",
+  "tasks": [
+    {
+      "id": "task-001",
+      "slug": "data-model",
+      "name": "数据模型定义",
+      "priority": "P0",
+      "estimated_hours": 4,
+      "dependencies": [],
+      "dependency_type": {},
+      "acceptance_criteria": ["AC-001: Given ..., When ..., Then ..."],
+      "source_docs": ["PRD-M01 §3.1", "ARCH-M01 §4.2"],
+      "exception": null,
+      "acceptance_gates": ["§11 门槛 1"],
+      "source_constraints": ["§4.2", "§5.1"],
+      "exclusions": [],
+      "api_versions": [],
+      "semantic_overlaps": []
+    }
+  ]
+}
+```
+
+**字段说明**：
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `feature_id` | string | 是 | Feature 编号 |
+| `feature_name` | string | 是 | Feature 名称 |
+| `generated_at` | string | 是 | ISO 8601 时间戳 |
+| `tasks` | array | 是 | Task 列表 |
+| `tasks[].id` | string | 是 | `task-{3位序号}` |
+| `tasks[].slug` | string | 是 | kebab-case 摘要（≤ 5 词） |
+| `tasks[].name` | string | 是 | Task 名称 |
+| `tasks[].priority` | string | 是 | P0 / P1 / P2 |
+| `tasks[].estimated_hours` | number | 是 | 预估工时（h） |
+| `tasks[].dependencies` | string[] | 是 | 依赖的 Task ID 列表 |
+| `tasks[].dependency_type` | object | 是 | 依赖类型映射 `{task_id: "FS"\|"FF"\|"data-dependency"}` |
+| `tasks[].acceptance_criteria` | string[] | 是 | 验收标准 |
+| `tasks[].source_docs` | string[] | 是 | 来源文档引用（`文件名 §章节`） |
+| `tasks[].exception` | string\|null | 是 | 超 8h 时的例外理由，否则 null |
+| `tasks[].acceptance_gates` | string[] | 是 | 该 task 涉及的所有 §11 门槛编号 |
+| `tasks[].source_constraints` | string[] | 是 | 该 task 涉及的所有 §X.Y 具体约束编号 |
+| `tasks[].exclusions` | object[] | 是 | 排除项与例外声明（空数组 = 无排除） |
+| `tasks[].api_versions` | object[] | 是 | 外部 API 版本信息（空数组 = 无） |
+| `tasks[].semantic_overlaps` | string[] | 否 | 与该 task 存在语义重叠的其他 task ID |
+
+### 3.7 Task 上下文注入模板
+
+为每个 Task 定义强制注入的上下文字段，确保信息完整传递：
+
+```yaml
+task_context:
+  # 必填：该 task 涉及的所有 §11 门槛编号
+  acceptance_gates: ["§11 门槛 N", ...]
+
+  # 必填：该 task 涉及的所有 §4/§5/§6/§7/§8 具体约束编号
+  source_constraints: ["§X.Y", ...]
+
+  # 必填：该 task 的排除项与例外声明
+  exclusions:
+    - description: "..."
+      exception_approved_by: "§11 门槛 N 或 §X.Y 显式批准"
+
+  # 选填：与该 task 存在语义重叠的其他 task
+  semantic_overlaps: ["task-NNN", ...]
+
+  # 选填：该 task 依赖的外部 API 版本信息
+  api_versions:
+    - library: "ai"
+      version: "^4.1.54"
+      deprecated_apis: ["StreamingTextResponse"]
+      compatible_apis: ["toDataStreamResponse()", "pipeDataStreamToResponse()"]
+```
+
+### 3.8 依赖完整性校验
+
+DAG 校验通过后，执行依赖完整性检查：
+
+| 校验规则 | 检查方法 |
+|----------|----------|
+| 目录结构依赖 | 任何创建文件的 task 必须依赖 task-001（目录结构） |
+| 配置依赖 | 任何使用 env 变量的 task 必须依赖 task-002（环境配置） |
+| 基础设施依赖 | 任何使用 Drizzle 的 task 必须依赖 task-005；使用 Redis 的必须依赖 task-009 |
+| 类型依赖 | 任何定义 API 类型的 task 必须依赖 task-004（错误/API 类型） |
+
+**输出**：`dependency-suggestions.json`，由人工确认后合并到 task-list.json。
+
+```json
+{
+  "suggestions": [
+    {
+      "task_id": "task-014",
+      "suggested_dependency": "task-001",
+      "reason": "task-014 创建文件，需依赖目录结构",
+      "rule": "directory_structure_dependency"
+    }
+  ]
+}
+```
+
+### 3.9 AC-测试点映射校验
+
+拆解后检查 TESTSET 覆盖完整性：
+
+```
+TESTSET 中的每个测试点（HP-01~07, BC-01~12, ARC-01~04, ...）
+  → 是否至少被一个 task 的 AC 覆盖？→ 未覆盖标记为 ORPHAN
+  → 是否有 task 的 AC 覆盖了 TESTSET 之外的内容？→ 标记为 EXTRA
+```
+
+**作用**：
+- 检测测试范围模糊：如果 PERF-04/05 未被任何 task 显式排除或覆盖，标记为 GAP
+- 检测测试点遗漏：如果 TESTSET 中有测试点未被任何 task 的 AC 引用，标记为 ORPHAN
+
+### 3.10 源文档交叉一致性校验
+
+Phase 0 在拆解前执行源文档交叉一致性扫描，检查以下维度：
+
+| 扫描维度 | 检查方法 | 阻断级别 |
+|----------|----------|----------|
+| 数量一致性 | ARCH §11 门槛数字 vs TESTSET 细化数字 | BLOCK |
+| 语义明确性 | 表格行是否包含多个语义不同的值 | BLOCK |
+| 例外显式化 | "排除项"是否在 ARCH 中有显式批准 | WARN |
+| 路径一致性 | 文件路径在不同文档中是否一致 | BLOCK |
+| 版本一致性 | 依赖版本号表述是否一致 | BLOCK |
+| **PRD↔TECH/ARCH ENUM 值集合对齐** | 提取 PRD 中所有 ENUM 定义，与 TECH/ARCH 逐字段比对。PRD 为权威源 | **FAIL** |
+| **PRD↔TECH/ARCH 数值常量对齐** | 扫描所有源文档（含 ASCII 流程图）中的数值描述，以 PRD FR 为准 | **FAIL** |
+| **PRD↔TECH 字段存在性对齐** | PRD 引用的字段名是否在 TECH 数据模型中定义 | WARN |
+| **TECH 编码格式对齐** | TECH 标题描述与实际映射表/API 是否一致 | WARN |
+
+**约束溯源图**：记录 §11 门槛与 §X.Y 具体约束的映射关系，当 TESTSET 细化约束时自动检测 ARCH §11 是否需要同步更新。
+
+**PRD↔TECH/ARCH 对齐规则**：当 TECH 定义的枚举比 PRD 多出值时，标记为 WARN 并要求人工确认。impl 文档以 TECH 为准（更细粒度），但必须在 consistency report 中体现差异。当 PRD 与 TECH/ARCH 的 ENUM 值集合不一致时，以 PRD 为准生成 impl 内容。
+
 ---
 
 ## 4. 产物规范
@@ -455,7 +692,7 @@ status: draft
 created: "{YYYY-MM-DD}"
 updated: "{YYYY-MM-DD}"
 layer: "L3 实现层"
-priority: "{P0 必须有 | P1 应该有 | P2 可以延后}"
+priority: "{P0/P1/P2}"
 related_docs: []
 relationships:
   depends_on: []
@@ -530,23 +767,23 @@ context_policy:
 
 ```
 {output_dir}/
-├── IMPL-INDEX.md                         # 全局索引（跨 Feature 依赖 + 全局 DAG）
+├── IMPL-INDEX.md                                    # 全局索引（跨 Feature 依赖 + 全局 DAG）
 │
 ├── impl-user-registration-M01/
-│   ├── SUMMARY.md                        # 汇总报告
-│   ├── INDEX.md                          # Feature 索引（Task 清单 + 依赖 DAG）
-│   ├── feature-context.md                # Feature 聚合上下文
-│   ├── task-001-data-model.md            # Task 1 实施文档
-│   ├── task-002-service-layer.md         # Task 2 实施文档
-│   ├── task-003-api-endpoint.md          # Task 3 实施文档
-│   └── task-004-unit-tests.md            # Task 4 实施文档
+│   ├── SUMMARY.md                                   # 汇总报告
+│   ├── INDEX.md                                     # Feature 索引（Task 清单 + 依赖 DAG）
+│   ├── IMPL-M01-user-registration.md                # Feature 聚合上下文
+│   ├── IMPL-TASK-001-data-model.md                  # Task 1 实施文档
+│   ├── IMPL-TASK-002-service-layer.md               # Task 2 实施文档
+│   ├── IMPL-TASK-003-api-endpoint.md                # Task 3 实施文档
+│   └── IMPL-TASK-004-unit-tests.md                  # Task 4 实施文档
 │
 ├── impl-login-flow-M02/
 │   ├── SUMMARY.md
 │   ├── INDEX.md
-│   ├── feature-context.md
-│   ├── task-001-auth-service.md
-│   └── task-002-login-api.md
+│   ├── IMPL-M02-login-flow.md
+│   ├── IMPL-TASK-001-auth-service.md
+│   └── IMPL-TASK-002-login-api.md
 │
 └── ...
 ```
@@ -557,7 +794,8 @@ context_policy:
 |------|------|------|
 | **目录名** | `impl-{kebab-case-feature-name}-{PRD Feature ID}` | `impl-user-registration-M01` |
 | **全局索引** | `{output_dir}/IMPL-INDEX.md`（跨 Feature） | `IMPL-INDEX.md` |
-| **Task 文件名** | `task-{3位序号}-{kebab-case-slug}.md` | `task-001-data-model.md` |
+| **Feature 上下文** | `IMPL-{PRD-ID}-{kebab-case-feature-slug}.md` | `IMPL-M01-user-registration.md` |
+| **Task 文件名** | `IMPL-TASK-{3位序号}-{kebab-case-slug}.md` | `IMPL-TASK-001-data-model.md` |
 | **Feature ID** | 从 PRD 的 Feature/Milestone 编号继承 | `M01`, `M02`, `M03` |
 | **Task 序号** | 从 001 开始，按 Feature 内顺序递增 | `001`, `002`, `003` |
 | **slug** | Task 核心内容的 kebab-case 摘要（≤ 5 词） | `data-model`, `api-endpoint-post-register` |
@@ -637,6 +875,34 @@ context_policy:
 |------|------|---------|
 | 依赖 Task-001 的 Type 定义 | Task-002/003 阻塞 | Task-001 优先执行 |
 | UX Spec 缺少平台差异 | 可能遗漏小程序适配 | 实施时确认 |
+
+## DAG 校验结果
+
+**状态**: PASS
+
+## 依赖完整性校验
+
+**状态**: PASS
+
+## AC-测试点覆盖率
+
+| 指标 | 数值 |
+|------|------|
+| TESTSET 测试点总数 | 40 |
+| 被 Task AC 覆盖数 | 38 |
+| 孤立测试点 | PERF-04, PERF-05 |
+| 覆盖率 | 95% |
+
+## 源文档交叉一致性
+
+**状态**: PASS
+
+## 文档状态变更
+
+| 文档 | 原状态 | 新状态 | 变更时间 |
+|------|--------|--------|---------|
+| PRD-M01.md | approved | frozen | {timestamp} |
+| ARCH-M01.md | approved | frozen | {timestamp} |
 ```
 
 #### INDEX.md — 索引文档
@@ -671,10 +937,10 @@ context_policy:
 
 | Task ID | 文件 | 名称 | 优先级 | 状态 | 预估工时 | 依赖 |
 |---------|------|------|--------|------|---------|------|
-| task-001 | task-001-data-model.md | 数据模型定义 | P0 | TODO | 4h | 无 |
-| task-002 | task-002-service-layer.md | Service 层实现 | P0 | TODO | 6h | task-001 |
-| task-003 | task-003-api-endpoint.md | API 端点实现 | P0 | TODO | 4h | task-001, task-002 |
-| task-004 | task-004-unit-tests.md | 单元测试 | P0 | TODO | 2h | task-002, task-003 |
+| task-001 | IMPL-TASK-001-data-model.md | 数据模型定义 | P0 | TODO | 4h | 无 |
+| task-002 | IMPL-TASK-002-service-layer.md | Service 层实现 | P0 | TODO | 6h | task-001 |
+| task-003 | IMPL-TASK-003-api-endpoint.md | API 端点实现 | P0 | TODO | 4h | task-001, task-002 |
+| task-004 | IMPL-TASK-004-unit-tests.md | 单元测试 | P0 | TODO | 2h | task-002, task-003 |
 
 ## 依赖关系图
 
@@ -865,7 +1131,7 @@ context_policy:
 - {从 PRD 提取的排除项}
 ```
 
-#### task-{n}-{slug}.md — Task 实施文档
+#### IMPL-TASK-{nnn}-{slug}.md — Task 实施文档
 
 ```markdown
 ---
@@ -897,17 +1163,50 @@ context_policy:
 <!-- Generated by zeng-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
 # Task-{nnn}: {Task Name}
 
+## 文档定位
+
+本文定义 Task `{task_id}` 的实施范围、验收标准和完整上下文，回答"这个 Task 做什么、怎么算完成、需要哪些背景信息"。
+
+## 关联文档
+
+| 文档 | 关系 | 说明 |
+|------|------|------|
+| [{feature_context_filename}]({feature_context_relative_path}) | 上游 | Feature 聚合上下文 |
+| [{related_prd_filename}]({related_prd_relative_path}) | 上游 | 用户故事、AC、业务规则 |
+| [{related_arch_filename}]({arch_relative_path}) | 上游 | 技术约束、架构分层 |
+| [{related_api_filename}]({api_relative_path}) | 上游 | API 端点、Schema |
+
+## 范围边界
+
+### In Scope
+
+- {in_scope_1}
+- {in_scope_2}
+
+### Out of Scope
+
+- {out_of_scope_1}
+
+---
+
 **Feature**: {Feature Name}（{feature_number}）
 **优先级**: {P0/P1/P2}
 **预估工时**: {hours}h
 **依赖**: {无 | task-{nnn}（{依赖描述}）}
 **产出物**: {简要列出本 Task 的产出文件}
+**例外理由**: {无 | 超 8h 原因说明}
 
 ## 验收标准
 
 1. {AC 编号或具体验收条件}
 2. {可观察的测试通过条件}
 3. {接口/行为的具体预期}
+
+## 溯源链
+
+| 来源 | 门槛/约束编号 | 说明 |
+|------|-------------|------|
+| {gate_or_constraint_id} | {section_reference} | {what_it_constrains} |
 
 ## 完整上下文
 
@@ -943,8 +1242,18 @@ context_policy:
 
 ## 排除项
 
-- {Out of Scope 中与本 Task 相关的排除项}
-- （若无相关排除项，填写"无"）
+| 排除内容 | 例外来源 |
+|---------|---------|
+| {Out of Scope 中与本 Task 相关的排除项} | {§11 门槛 N 或 §X.Y 显式批准} |
+| （若无相关排除项，填写"无"） | — |
+
+## API 版本信息
+
+| 库名 | 版本 | 已废弃 API | 兼容 API |
+|------|------|-----------|---------|
+| {library} | {version} | {deprecated_apis} | {compatible_apis} |
+
+> 若本 Task 不涉及外部 API 依赖，填写"无"。
 
 ## 实施指引
 
@@ -1006,6 +1315,70 @@ context_policy:
 <!-- Generated by zeng-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
 ```
 
+### 4.6 交付报告格式
+
+I2I Phase 5 生成 `delivery-report.json`，记录全流程质量指标：
+
+```json
+{
+  "feature_id": "ARCH-LITE-XXX",
+  "generated_at": "...",
+  "i2i_version": "v1.5",
+  "source_consistency": {
+    "status": "PASS | FAIL",
+    "issues": [
+      {
+        "dimension": "quantity_consistency",
+        "status": "FAIL",
+        "details": "ARCH §11 写 4 条约束，TESTSET 细化为 7 条，未同步"
+      }
+    ]
+  },
+  "dependency_validation": {
+    "status": "PASS | WARN",
+    "suggestions": [
+      {
+        "task_id": "task-014",
+        "suggested_dependency": "task-001",
+        "reason": "task-014 创建文件，需依赖目录结构"
+      }
+    ]
+  },
+  "ac_coverage": {
+    "total_test_points": 40,
+    "covered_by_tasks": 38,
+    "orphan_test_points": ["PERF-04", "PERF-05"],
+    "coverage_rate": "95%"
+  },
+  "semantic_drift": {
+    "total_acs": 64,
+    "flagged": 2,
+    "details": [
+      {
+        "task_id": "task-003",
+        "ac_id": "AC5",
+        "source_text": "在新 Provider factory 验证 Mock 模式通过后执行移除",
+        "task_text": "移除旧 ai-config.ts",
+        "drift_type": "SEMANTIC_DRIFT",
+        "description": "丢失了'验证后'的安全顺序约束"
+      }
+    ]
+  },
+  "pre_delivery_checks": {
+    "passed": 8,
+    "failed": 0,
+    "warnings": 1,
+    "details": [
+      {
+        "check": "ac_test_point_coverage",
+        "status": "PASS",
+        "message": "所有 task AC 均引用了 TESTSET 测试点"
+      }
+    ]
+  }
+}
+```
+
 ---
 
 ## 5. 触发方式
@@ -1020,8 +1393,11 @@ zeng-i2i --dir docs/mvp-lite/ --feature M01
 # 最小输入（PRD + Arch）
 zeng-i2i --prd docs/prds/PRD-M01.md --arch docs/arch/ARCH-M01.md
 
+# 指定源代码根路径（确保文件路径使用项目根相对的完整路径）
+zeng-i2i --dir docs/mvp-lite/ --src apps/ai-coach-skill/src
+
 # 指定输出目录
-zeng-i2i --dir docs/mvp-lite/ --output-dir .impl
+zeng-i2i --dir docs/mvp-lite/ --output-dir docs/mvp-lite/impl
 
 # 仅校验输入（不生成 Task）
 zeng-i2i --dir docs/mvp-lite/ --validate-only
@@ -1039,12 +1415,18 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 6. **Out of Scope 不纳入**：设计文档明确排除的内容不生成对应 Task
 7. **不修改源文档**：只读取设计文档，不修改任何输入文件（状态冻结除外，见 §3.3 阶段 4.5）
 8. **可追溯**：每个 Task 的信息必须可追溯到源设计文档的具体章节
-9. **命名规范**：目录 `impl-{feature}-{PRD-ID}/`，文件 `task-{nnn}-{slug}.md`，严格遵循 §4.1 命名规则
+9. **命名规范**：目录 `impl-{feature}-{PRD-ID}/`，文件 `IMPL-TASK-{nnn}-{slug}.md`，严格遵循 §4.1 命名规则
 10. **全局索引必出**：多 Feature 时必须生成 `{output_dir}/IMPL-INDEX.md`，映射跨 Feature 依赖
 11. **版本戳必加**：所有生成文件必须包含 §4.5 定义的版本戳头部
 12. **工时例外记录**：超过 8h 的 Task 必须记录例外理由
 13. **文档状态准入**：I2I 仅接受 `approved` 或 `frozen` 状态的输入文档，`draft` / `reviewing` 状态的文档 BLOCK 并提示需先通过评审
 14. **执行后冻结**：I2I 成功生成全部 Task 文档后，将所有输入文档状态置为 `frozen`，防止实施转化后文档被意外修改
+15. **DOC-WRITING-GUIDE 对齐**：所有生成的产物文档必须包含 YAML frontmatter（§4.0）和标准章节（文档定位、关联文档、范围边界、验收/检查点），遵循 DOC-WRITING-GUIDE 的结构规范
+16. **源文档交叉一致性**：Phase 0 执行源文档交叉一致性校验，BLOCK 级冲突要求源文档澄清后重跑，不进入拆解
+17. **依赖完整性**：Phase 3 执行依赖完整性校验，自动检测缺失依赖并输出建议
+18. **交付前审核**：Phase 5 执行交付前自动审核清单，BLOCK 级问题不交付
+19. **交付报告必出**：每次执行必须生成 `delivery-report.json`，记录校验覆盖率和质量指标
+20. **文件路径完整性**：Task 文档中所有文件路径必须使用项目根目录相对的完整路径（如 `apps/ai-coach-skill/src/handlers/register.ts`），禁止使用简写路径（如 `src/handlers/register.ts`）。如指定了 `--src` 参数，Phase 0 规范化所有路径后传递到 Phase 4
 
 ---
 
@@ -1085,6 +1467,11 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 11. **DAG 确定性保证**：环检测和拓扑排序由确定性脚本执行，不依赖 LLM 的图算法能力
 12. **跨 Feature 全局视图**：IMPL-INDEX.md 提供跨 Feature 依赖关系和全局执行顺序
 13. **文档状态生命周期**：通过 `approved` / `frozen` 准入 + 执行后冻结，防止设计文档在实施转化后被意外修改，确保设计意图与实施任务的一致性
+14. **源文档一致性校验**：Phase 0 在拆解前拦截源文档内部不一致（数量/语义/路径/版本），避免 CRITICAL 级问题流入实施
+15. **约束溯源链**：每个 Task 携带 §11 门槛 → §X.Y 约束 → TESTSET 测试点的完整溯源链，防止约束丢失
+16. **依赖完整性自动检测**：基于关键词匹配自动发现缺失依赖（如创建文件的 task 缺少目录结构依赖），输出建议供人工确认
+17. **交付前质量门禁**：Phase 5 自动审核 AC 覆盖率、排除项一致性、API 版本标注等，BLOCK 级问题不交付
+18. **交付可观测性**：delivery-report.json 记录全流程质量指标，便于追踪改进效果
 
 ### 8.2 代价
 
@@ -1093,8 +1480,11 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 3. **颗粒度主观性**：最小可验收颗粒度的判定仍有一定主观性（通过规则约束缓解）
 4. **维护成本**：Task 模板和索引格式需随团队实践迭代
 5. **DAG 校验脚本**：需维护 `validate-dag.py`（~100 行 Python），但换来环检测的确定性保证
-5. **大型项目挑战**：超过 50 个 Task 时需分层处理——每个 Feature 独立执行 Phase 2-4，全局索引（IMPL-INDEX.md）聚合跨 Feature 视图
-6. **文档状态管理开销**：Phase 1 需额外检查文档状态，Phase 4.5 需更新输入文档状态，增加少量执行时间
+6. **大型项目挑战**：超过 50 个 Task 时需分层处理——每个 Feature 独立执行 Phase 2-4，全局索引（IMPL-INDEX.md）聚合跨 Feature 视图
+7. **文档状态管理开销**：Phase 1 需额外检查文档状态，Phase 4.5 需更新输入文档状态，增加少量执行时间
+8. **源文档一致性校验开销**：Phase 0 新增交叉一致性扫描，增加 3-5 分钟执行时间，但能拦截 CRITICAL 级源文档问题
+9. **依赖完整性校验维护**：§3.8 的依赖规则需要随项目实践迭代更新（如新增基础设施依赖类型）
+10. **语义偏移检测复杂度**：§5.2 的语义对比依赖 LLM 判断，存在一定误报率（通过人工确认缓解）
 
 ### 8.3 度量指标
 
@@ -1150,6 +1540,7 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 | 依赖项 | 依赖分析产出 | 是（无依赖填"无"） |
 | 产出物 | LLM 生成 | 是 |
 | 验收标准 | 从 AC + 测试设计提取 | 是 |
+| **溯源链** | **Phase 0 约束溯源图** | **是**（v1.5 新增） |
 | 完整上下文 | 跨文档聚合 | 是 |
 | 业务规则 | 从 PRD 提取 | 是（有则填） |
 | 技术约束 | 从 Architecture/Tech 提取 | 是（有则填） |
@@ -1157,7 +1548,8 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 | 交互要求 | 从 UX Spec/Prototype 提取 | 否（有则填） |
 | 数据模型 | 从 DDD/Data Flow 提取 | 否（有则填） |
 | 测试要点 | 从 Test Design 提取 | 否（有则填） |
-| 排除项 | 从 Out of Scope 提取 | 否（有则填） |
+| **排除项（含例外来源）** | **从 Out of Scope 提取 + §3.7 模板** | **否（有则填，v1.5 增强）** |
+| **API 版本信息** | **从 §3.7 模板提取** | **否（有则填，v1.5 新增）** |
 | 实施指引 | LLM 生成（仅基于设计文档已明确信息） | 否（有则填） |
 
 ## 附录 B: 与 Design Check 的衔接协议
@@ -1199,6 +1591,8 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 
 | 版本 | 日期 | 变更摘要 |
 |------|------|---------|
+| **v1.5** | 2026-05-28 | 源文档一致性校验 + 交付质量门禁（基于 I2I-IMPROVE-001 改进建议）：(1) 新增 Phase 0 源文档交叉一致性校验：ARCH ↔ TESTSET 数量/语义/路径/版本一致性扫描、约束溯源图构建、术语/命名预扫描；(2) Phase 3 新增 §3.6 Task 上下文注入模板（acceptance_gates/source_constraints/exclusions/api_versions）、§3.7 依赖完整性校验、§3.8 AC-测试点映射校验；(3) 新增 Phase 5 交付前审核 + 交付报告：自动审核清单（AC 覆盖率/排除项/API 版本/DAG 完整性/上下文字段/配置示例）、语义偏移检测、delivery-report.json；(4) task-list.json schema 新增 acceptance_gates/source_constraints/exclusions/api_versions 字段；(5) Non-Negotiable Rules 新增 #15 源文档交叉一致性、#16 依赖完整性、#17 交付前审核、#18 交付报告必出；(6) 新增 §4.6 交付报告格式规范 |
+| **v1.6** | 2026-05-29 | 源代码路径规范化：(1) 新增 `--src` 参数，指定项目源代码根路径（如 `apps/ai-coach-skill/src`）；(2) Phase 0 新增 §0.4 源代码路径规范化步骤，将设计文档中的简写路径（如 `src/`）转换为项目根相对的完整路径；(3) source-consistency-report.json 新增 `path_normalization` 字段；(4) Phase 4 新增路径应用步骤，从规范化结果中读取完整路径生成 Task 文档；(5) Task 模板"关键文件"和"产出物"字段增加路径规范说明；(6) Non-Negotiable Rules 新增 #20 文件路径完整性 |
 | **v1.4** | 2026-05-28 | 输出文档结构规范对齐 DOC-WRITING-GUIDE：(1) 新增 §4.0 输出文档结构规范，定义 frontmatter、标准章节、命名、交叉引用、中英文规则；(2) 所有产物模板新增 YAML frontmatter（title/status/layer/priority/related_docs/relationships/context_policy）；(3) 所有产物模板新增标准章节（文档定位、关联文档、范围边界、验收/检查点）；(4) Task 文件命名改为 `IMPL-TASK-{nnn}-{slug}.md`，Feature 上下文改为 `IMPL-{ID}-{slug}.md`；(5) 新增 frontmatter 字段取值规则表；(6) 新增交叉引用格式规范 |
 | **v1.3** | 2026-05-28 | 新增文档状态生命周期管理：(1) I2I 仅接受 `approved` / `frozen` 状态的输入文档，`draft` / `reviewing` 状态 BLOCK；(2) 成功执行后将所有输入文档置为 `frozen`，防止实施转化后文档被意外修改；(3) Phase 1 新增文档状态检查步骤；(4) 新增 Phase 4.5 文档状态冻结步骤（含文件名后缀不更新说明）；(5) Non-Negotiable Rules 新增 #13 文档状态准入 + #14 执行后冻结；(6) 重跑语义新增已冻结文档场景；(7) 修复 Rule #7 交叉引用 |
 | **v1.2** | 2026-05-28 | 架构评审修复（15 项）：(1) CRITICAL: 新增 CONDITIONAL 路径（§3.3 Phase 1 三态判定）；CRITICAL: DAG 确定性校验脚本 validate-dag.py 替代 LLM 环检测；(2) HIGH: T09/T10 合并规则明确定义（静态结构 vs 动态行为分开展示）；HIGH: Design Check 集成方式决策为内嵌 Gate Rubric（附录 B）；HIGH: 8h 工时上限允许有理由的例外（§3.4）；HIGH: 新增全局索引 IMPL-INDEX.md（§4.1 + 模板）；(3) MEDIUM: T07 内容特征兜底规则补充；MEDIUM: 实施指引边界定义（仅基于设计文档已明确信息）；MEDIUM: 重跑幂等语义（§4.4）；MEDIUM: 版本戳规范（§4.5）；MEDIUM: 术语表新增"必输要素"和"CONDITIONAL"；(4) LOW: 目录命名改用 PRD Feature ID（`impl-{feature}-{M01}/`）；LOW: Mermaid 图标注表格为权威源；LOW: 工时校准机制（§8.3） |
@@ -1207,5 +1601,5 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 
 ---
 
-*文档版本：v1.4*
+*文档版本：v1.6*
 *创建日期：2026-05-28*
