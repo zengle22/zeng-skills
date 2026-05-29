@@ -44,8 +44,8 @@ context_policy:
 | 文档 | 关系 | 说明 |
 |------|------|------|
 | [ITERATION-DOCUMENT-CHECKLIST](../docs/ITERATION-DOCUMENT-CHECKLIST.md) | 上游 | 定义 6 大维度必输文档与必输要素 |
-| [zeng-doc-quality-loop](../zeng-doc-quality-loop/) | 平行互补 | Doc Quality Loop 侧重文档结构和可读性 |
-| [zeng-code-review-deep](../zeng-code-review-deep/) | 上下游 | Deep Code Review 在编码阶段拦截代码缺陷 |
+| [zdoc-quality-loop](../zdoc-quality-loop/) | 平行互补 | Doc Quality Loop 侧重文档结构和可读性 |
+| [zcode-review-deep](../zcode-review-deep/) | 上下游 | Deep Code Review 在编码阶段拦截代码缺陷 |
 | [ADR-004](ADR-004-设计文档到实施任务拆分技能-I2I-Impl-Skill-设计规范.md) | 下游 | 校验通过后的设计文档进入任务拆分 |
 
 ## 范围边界
@@ -60,8 +60,8 @@ context_policy:
 ### Out of Scope
 
 - SSOT 阶段的形式化文档生成
-- 编码阶段的代码质量检查（由 zeng-code-review-deep 负责）
-- 文档结构和可读性检查（由 zeng-doc-quality-loop 负责）
+- 编码阶段的代码质量检查（由 zcode-review-deep 负责）
+- 文档结构和可读性检查（由 zdoc-quality-loop 负责）
 
 ## 验收/检查点
 
@@ -100,9 +100,9 @@ ITERATION-DOCUMENT-CHECKLIST v2.1 已定义 6 大维度的必输文档与必输�
 
 | 技能 | 关系 | 说明 |
 |------|------|------|
-| `zeng-code-review-deep` | 上下游 | Design Check 在 SSOT 之前拦截文档缺陷；Deep Code Review 在编码阶段拦截代码缺陷 |
-| `zeng-doc-quality-loop` | 平行互补 | Doc Quality Loop 侧重文档结构和可读性；Design Check 侧重业务设计输入的充分性与可形式化性 |
-| `zeng-safe-code` | 无直接关系 | Safe Code 是安全扫描，Design Check 是流程门控 |
+| `zcode-review-deep` | 上下游 | Design Check 在 SSOT 之前拦截文档缺陷；Deep Code Review 在编码阶段拦截代码缺陷 |
+| `zdoc-quality-loop` | 平行互补 | Doc Quality Loop 侧重文档结构和可读性；Design Check 侧重业务设计输入的充分性与可形式化性 |
+| `zcode-safe-dev` | 无直接关系 | Safe Code 是安全扫描，Design Check 是流程门控 |
 
 ---
 
@@ -146,7 +146,7 @@ ITERATION-DOCUMENT-CHECKLIST v2.1 已定义 6 大维度的必输文档与必输�
 
 ### 3.1 总体决策
 
-引入 **`zeng-design-check`** 技能（Design Check Skill），作为 Pre-SSOT 阶段的结构化文档校验门控。采用 **纯 LLM + 结构化输出** 架构。
+引入 **`zdoc-design-check`** 技能（Design Check Skill），作为 Pre-SSOT 阶段的结构化文档校验门控。采用 **纯 LLM + 结构化输出** 架构。
 
 **架构选型决策**：Python 脚本层（scanner.py / reporter.py / 编排引擎 / 插件协议 / JSON 衔接）为解决"LLM 偶尔在确定性检查上不准确"的问题引入了大量复杂度（3 个 Python 文件 + 2 个 JSON schema + 插件加载协议），但实际准确率提升仅 ~2%。**去掉 Python 层**，将所有检查（包括确定性检查）交由 LLM 执行，通过结构化输出约束保证质量。
 
@@ -507,20 +507,20 @@ XC 检查项的触发取决于相关域的产物是否存在：
 
 ```bash
 # 单文档校验（D1 商业设计 + D2 产品设计，无 XC）
-zeng-design-check --input docs/prd/xxx-prd.md
+zdoc-design-check --input docs/prd/xxx-prd.md
 
 # 多文档校验（指定多个文件，触发 XC）
-zeng-design-check --input docs/prd/xxx-prd.md --input docs/ux/xxx-ux-spec.md --input docs/tech/xxx-tech.md
+zdoc-design-check --input docs/prd/xxx-prd.md --input docs/ux/xxx-ux-spec.md --input docs/tech/xxx-tech.md
 
 # 目录扫描（自动发现所有文档，触发全量检查）
-zeng-design-check --dir docs/ --project my-project
+zdoc-design-check --dir docs/ --project my-project
 
 # 仅校验特定域
-zeng-design-check --dir docs/ --domain business        # 仅 D1
-zeng-design-check --dir docs/ --domain architecture    # 仅 D4
+zdoc-design-check --dir docs/ --domain business        # 仅 D1
+zdoc-design-check --dir docs/ --domain architecture    # 仅 D4
 
 # 仅运行质量门（快速筛查，不执行域检查）
-zeng-design-check --dir docs/ --layer gate-only
+zdoc-design-check --dir docs/ --layer gate-only
 ```
 
 ### 3.8 实现路线
@@ -535,7 +535,7 @@ zeng-design-check --dir docs/ --layer gate-only
 |------|------|
 | **范围** | 仅 D1 商业设计（6 项 BD 检查 + 5 项通用质量门） |
 | **实现方式** | 纯 LLM Skill Prompt |
-| **产出** | `zeng-design-check/SKILL.md` + `domains/business-design/rubric.md` |
+| **产出** | `zdoc-design-check/SKILL.md` + `domains/business-design/rubric.md` |
 
 #### Phase 2: 域扩展 — D2–D6 + XC Rubric（已完成）
 
@@ -769,7 +769,7 @@ zeng-design-check --dir docs/ --layer gate-only
 
 **拒绝**。人工勾选遗漏率高（实测 > 30%），无法保证一致性，且无结构化记录可供追溯。
 
-### 7.2 与 zeng-doc-quality-loop 合并
+### 7.2 与 zdoc-quality-loop 合并
 
 **拒绝**。Doc Quality Loop 侧重文档结构、可读性、术语一致性等"文档质量"维度；Design Check 侧重业务设计输入的"充分性"和"可形式化性"。两者目标不同，合并会导致单个技能过于复杂。
 

@@ -2,7 +2,7 @@
 title: "设计文档到实施任务拆分技能（I2I — Design-to-Impl Skill）设计规范"
 status: draft
 created: "2026-05-28"
-updated: "2026-05-28"
+updated: "2026-05-29"
 layer: "L3 实现层"
 priority: "P0 必须有"
 related_docs:
@@ -16,7 +16,7 @@ relationships:
     - "DOC-WRITING-GUIDE v1.0 (输出文档结构规范)"
   implements: []
   constrains:
-    - "zeng-i2i SKILL.md — 执行层需遵循本文产物规范"
+    - "zdoc-i2i SKILL.md — 执行层需遵循本文产物规范"
   references: []
   supersedes: []
   superseded_by: []
@@ -52,7 +52,7 @@ context_policy:
 
 | 工具 / 技能 | 能力 | 缺口 |
 |------------|------|------|
-| `zeng-design-check` | 设计文档 6 维度校验 | 仅校验质量，不产出实施计划 |
+| `zdoc-design-check` | 设计文档 6 维度校验 | 仅校验质量，不产出实施计划 |
 | `gsd-plan-phase` | 阶段规划 | 面向 GSD 工作流，不直接消费设计文档 |
 | 人工拆分 | Tech Lead 经验驱动 | 粒度不一致，依赖关系靠记忆，上下文在传递中丢失 |
 
@@ -71,10 +71,10 @@ context_policy:
 
 | 技能 | 关系 | 说明 |
 |------|------|------|
-| `zeng-design-check` | **上游** | Design Check 校验文档质量 → 通过后 I2I 接手整合与拆分 |
-| `zeng-code-patrol` | **下游** | I2I 产出的实施任务完成后，Code Patrol 巡检代码质量 |
+| `zdoc-design-check` | **上游** | Design Check 校验文档质量 → 通过后 I2I 接手整合与拆分 |
+| `zcode-patrol` | **下游** | I2I 产出的实施任务完成后，Code Patrol 巡检代码质量 |
 | `gsd-plan-phase` | 平行 | GSD 面向里程碑规划，I2I 面向设计文档到任务的转化 |
-| `zeng-doc-quality-loop` | 无直接关系 | Doc Quality Loop 侧重文档可读性，I2I 侧重实施转化 |
+| `zdoc-quality-loop` | 无直接关系 | Doc Quality Loop 侧重文档可读性，I2I 侧重实施转化 |
 
 ---
 
@@ -106,7 +106,7 @@ context_policy:
 
 ### 3.1 总体决策
 
-引入 **`zeng-i2i`** 技能（I2I — Design-to-Impl Skill），作为设计文档校验通过后的**实施转化引擎**。采用 **纯 LLM + 结构化输出** 架构（与 zeng-design-check 同架构模式）。
+引入 **`zdoc-i2i`** 技能（I2I — Design-to-Impl Skill），作为设计文档校验通过后的**实施转化引擎**。采用 **纯 LLM + 结构化输出** 架构（与 zdoc-design-check 同架构模式）。
 
 核心设计：
 
@@ -187,7 +187,7 @@ context_policy:
 | **T04** | Business Design | `business/` | `BUSINESS-*.md` | 商业模型、用户画像、业务价值、成功指标 |
 | **T05** | Tech Design | `tech/` | `TECH-*.md` | 时序图、同步/异步策略、存储方案、实现细节 |
 | **T06** | UX Spec | `ux/` | `UX-*.md` | 交互流程、设计原则、状态表达、文案风格 |
-| **T07** | UX Prototype | `ux-prototypes/` | `*.md` | 设计系统、组件规范、交互原型描述 |
+| **T07** | UX Prototype | `ux-prototypes/` | `*.md`, `*.html` | 设计系统、组件规范、交互原型（含 HTML 原型） |
 | **T08** | Test Design | `testset/` | `TESTSET-*.md` | 测试范围、Happy Path、边界条件、测试用例 |
 | **T09** | Data Flow | `data/` | `DataFlow-*.md` | 数据流转、状态机、数据依赖关系 |
 | **T10** | DDD | `ddd/` | `DDD-*.md` | 领域模型、聚合根、值对象、仓储契约 |
@@ -310,7 +310,13 @@ I2I Phase 4 所有 Task 文档生成成功后，将所有输入文档的状态�
     │   ├── 对每个路径执行规范化（简写路径 → 完整项目根相对路径）
     │   └── 记录到 source-consistency-report.json 的 path_normalization 字段
     │
-    ├── 输出: source-consistency-report.json（含 path_normalization）
+    ├── 原型文件检测与索引:
+    │   ├── 扫描 ux-prototypes/ 目录下的非 Markdown 文件（HTML/Vue/React 等）
+    │   ├── 提取原型覆盖的交互阶段/Phase/模块信息
+    │   ├── 与 UX Spec 文档的 references 字段交叉比对，建立映射
+    │   └── 记录到 source-consistency-report.json 的 prototype_index 字段
+    │
+    ├── 输出: source-consistency-report.json（含 path_normalization + prototype_index）
     │
     ├── 判定:
     │   ├── FAIL（BLOCK 级冲突）→ 要求源文档澄清后重跑，不进入阶段 1
@@ -389,7 +395,14 @@ I2I Phase 4 所有 Task 文档生成成功后，将所有输入文档的状态�
     │   ├── 未覆盖 → ORPHAN
     │   └── task AC 覆盖 TESTSET 之外 → EXTRA
     │
-    ├── 输出: task-list.json（结构化任务清单 + 依赖关系）
+    ├── 原型感知上下文注入 [LLM]:
+    │   ├── 从 prototype_index 读取原型文件和阶段信息
+    │   ├── 对 UI 相关 Task，匹配原型对应阶段
+    │   ├── 注入 prototype_refs 到 task-list.json
+    │   ├── 追加原型对齐验收项到 Task AC
+    │   └── 在 Task 关联文档表格中增加原型引用行
+    │
+    ├── 输出: task-list.json（结构化任务清单 + 依赖关系 + prototype_refs）
     │
     ▼
 阶段 4: 文档生成 [LLM]
@@ -584,6 +597,7 @@ Phase 3 产出 `task-list.json`，作为 Phase 4 文档生成的数据源（Phas
 | `tasks[].exclusions` | object[] | 是 | 排除项与例外声明（空数组 = 无排除） |
 | `tasks[].api_versions` | object[] | 是 | 外部 API 版本信息（空数组 = 无） |
 | `tasks[].semantic_overlaps` | string[] | 否 | 与该 task 存在语义重叠的其他 task ID |
+| `tasks[].prototype_refs` | object[] | 否 | UI 相关 task 关联的原型引用（空数组 = 无原型）。含 `file`（原型路径）、`phase_id`（原型阶段）、`phase_description`（阶段描述）、`alignment_ac`（原型对齐验收项） |
 
 ### 3.7 Task 上下文注入模板
 
@@ -672,6 +686,53 @@ Phase 0 在拆解前执行源文档交叉一致性扫描，检查以下维度：
 **约束溯源图**：记录 §11 门槛与 §X.Y 具体约束的映射关系，当 TESTSET 细化约束时自动检测 ARCH §11 是否需要同步更新。
 
 **PRD↔TECH/ARCH 对齐规则**：当 TECH 定义的枚举比 PRD 多出值时，标记为 WARN 并要求人工确认。impl 文档以 TECH 为准（更细粒度），但必须在 consistency report 中体现差异。当 PRD 与 TECH/ARCH 的 ENUM 值集合不一致时，以 PRD 为准生成 impl 内容。
+
+### 3.11 原型感知上下文注入
+
+Phase 3 拆分 UI 相关 Task 时，自动检测并注入原型引用，确保实施者能直接找到对应的原型文件和具体阶段。
+
+**问题背景**：当前 Task 拆分中，UI 相关 Task 仅通过 UX Spec 间接引用原型（Task → UX Spec → Prototype），实施者无法直接找到原型文件。实际项目中（如 Task-011 onboarding-form-ui），原型包含表单布局、错误文案、loading 状态、sticky 按钮等可对照实现的细节，但这些信息在 Task 文档中丢失。
+
+**执行步骤**：
+
+1. 从 Phase 0 的 `source-consistency-report.json` 读取 `prototype_index`
+2. 对每个 Task，判断是否涉及 UI 实现（拆分策略为"页面"或涉及 T06 UX Spec / T07 UX Prototype）
+3. 若涉及 UI 且存在对应原型：
+   a. 根据 Task 的验收标准和 UX Spec 章节引用，匹配原型中的对应 Phase
+   b. 将原型文件路径 + 阶段信息注入 Task 上下文
+   c. 在 Task 的验收标准中自动追加一条**原型对齐验收项**
+   d. 在 Task 文档的"关联文档"表格中增加原型引用行
+4. 若涉及 UI 但无原型 → 不追加原型对齐验收项，但记录 WARNING
+
+**原型匹配规则**：
+
+| 匹配维度 | 方法 |
+|----------|------|
+| UX Spec 章节 | Task 的 `source_docs` 包含 `UX-*` 引用 → 查找 UX Spec `references` 中的原型 |
+| 原型阶段 | Task AC 中的交互描述 ↔ 原型 Phase 注释/标题（语义匹配） |
+| 原型文件 | `prototype_index` 中 `phases[].ux_spec_section` 与 Task 引用的 UX Spec 章节匹配 |
+
+**task-list.json 扩展字段**：
+
+```json
+{
+  "prototype_refs": [
+    {
+      "file": "ux-prototypes/proto-m12-onboarding.html",
+      "phase_id": "PHASE-B",
+      "phase_description": "5题身份建档表单",
+      "alignment_ac": "实现必须对齐 proto-m12-onboarding.html PHASE-B 的布局、文案、状态和交互，并提供截图或 Playwright 核对证据"
+    }
+  ]
+}
+```
+
+**原型对齐验收项格式**：
+
+```
+实现必须对齐 {prototype_file} 中 {phase_id} 的布局、文案、状态和交互，
+并提供截图或 Playwright 核对证据
+```
 
 ---
 
@@ -828,7 +889,7 @@ context_policy:
   max_tokens_hint: 3000
 ---
 
-<!-- Generated by zeng-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
+<!-- Generated by zdoc-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
 # {Feature Name} — 实施汇总报告
 
 **Feature 编号**: {number}
@@ -930,7 +991,7 @@ context_policy:
   max_tokens_hint: 2000
 ---
 
-<!-- Generated by zeng-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
+<!-- Generated by zdoc-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
 # {Feature Name} — 实施任务索引
 
 ## 任务清单
@@ -996,7 +1057,7 @@ context_policy:
   max_tokens_hint: 2000
 ---
 
-<!-- Generated by zeng-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
+<!-- Generated by zdoc-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
 # 全局实施索引
 
 **生成时间**: {timestamp}
@@ -1075,7 +1136,7 @@ context_policy:
   max_tokens_hint: 5000
 ---
 
-<!-- Generated by zeng-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
+<!-- Generated by zdoc-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
 # {Feature Name} — 设计上下文聚合
 
 ## 功能概述
@@ -1160,7 +1221,7 @@ context_policy:
   max_tokens_hint: 4000
 ---
 
-<!-- Generated by zeng-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
+<!-- Generated by zdoc-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
 # Task-{nnn}: {Task Name}
 
 ## 文档定位
@@ -1312,7 +1373,7 @@ context_policy:
 所有生成的文件必须包含以下元数据头部：
 
 ```markdown
-<!-- Generated by zeng-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
+<!-- Generated by zdoc-i2i v{version} | {timestamp} | source-hash: {md5 of input doc paths} -->
 ```
 
 ### 4.6 交付报告格式
@@ -1385,22 +1446,22 @@ I2I Phase 5 生成 `delivery-report.json`，记录全流程质量指标：
 
 ```bash
 # 全量输入（推荐）
-zeng-i2i --dir docs/mvp-lite/
+zdoc-i2i --dir docs/mvp-lite/
 
 # 指定 Feature 的设计文档
-zeng-i2i --dir docs/mvp-lite/ --feature M01
+zdoc-i2i --dir docs/mvp-lite/ --feature M01
 
 # 最小输入（PRD + Arch）
-zeng-i2i --prd docs/prds/PRD-M01.md --arch docs/arch/ARCH-M01.md
+zdoc-i2i --prd docs/prds/PRD-M01.md --arch docs/arch/ARCH-M01.md
 
 # 指定源代码根路径（确保文件路径使用项目根相对的完整路径）
-zeng-i2i --dir docs/mvp-lite/ --src apps/ai-coach-skill/src
+zdoc-i2i --dir docs/mvp-lite/ --src apps/ai-coach-skill/src
 
 # 指定输出目录
-zeng-i2i --dir docs/mvp-lite/ --output-dir docs/mvp-lite/impl
+zdoc-i2i --dir docs/mvp-lite/ --output-dir docs/mvp-lite/impl
 
 # 仅校验输入（不生成 Task）
-zeng-i2i --dir docs/mvp-lite/ --validate-only
+zdoc-i2i --dir docs/mvp-lite/ --validate-only
 ```
 
 ---
@@ -1427,6 +1488,7 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 18. **交付前审核**：Phase 5 执行交付前自动审核清单，BLOCK 级问题不交付
 19. **交付报告必出**：每次执行必须生成 `delivery-report.json`，记录校验覆盖率和质量指标
 20. **文件路径完整性**：Task 文档中所有文件路径必须使用项目根目录相对的完整路径（如 `apps/ai-coach-skill/src/handlers/register.ts`），禁止使用简写路径（如 `src/handlers/register.ts`）。如指定了 `--src` 参数，Phase 0 规范化所有路径后传递到 Phase 4
+21. **原型引用显式化**：UI 相关 Task 的验收标准必须包含原型对齐验收项（当存在对应原型时），原型文件路径和阶段信息必须直接写入 Task 文档的"关联文档"表格和 task-list.json 的 `prototype_refs` 字段，禁止仅通过 UX Spec 间接引用
 
 ---
 
@@ -1472,6 +1534,8 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 16. **依赖完整性自动检测**：基于关键词匹配自动发现缺失依赖（如创建文件的 task 缺少目录结构依赖），输出建议供人工确认
 17. **交付前质量门禁**：Phase 5 自动审核 AC 覆盖率、排除项一致性、API 版本标注等，BLOCK 级问题不交付
 18. **交付可观测性**：delivery-report.json 记录全流程质量指标，便于追踪改进效果
+19. **原型引用显式化**：UI 相关 Task 直接引用原型文件和阶段，实施者可直接对照原型实现，消除间接引用链的信息丢失
+20. **原型对齐可验收**：原型对齐验收项要求提供截图或 Playwright 核对证据，确保实现与原型一致
 
 ### 8.2 代价
 
@@ -1550,6 +1614,7 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 | 测试要点 | 从 Test Design 提取 | 否（有则填） |
 | **排除项（含例外来源）** | **从 Out of Scope 提取 + §3.7 模板** | **否（有则填，v1.5 增强）** |
 | **API 版本信息** | **从 §3.7 模板提取** | **否（有则填，v1.5 新增）** |
+| **原型引用（prototype_refs）** | **Phase 0 prototype_index + §3.10 原型感知注入** | **否（有则填，v1.7 新增）** |
 | 实施指引 | LLM 生成（仅基于设计文档已明确信息） | 否（有则填） |
 
 ## 附录 B: 与 Design Check 的衔接协议
@@ -1563,7 +1628,7 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 | 3 | 判定: BLOCK → 在 SUMMARY.md 中记录缺失清单，停止 | 不补充任何新内容 |
 | 4 | 判定: CONDITIONAL → 记录 WARN 项，带标注继续 | WARN 写入 SUMMARY.md，不阻塞 |
 | 5 | 判定: PASS → 继续 I2I 流程 | — |
-| 6 | （可选）全量域校验 → 引用 Design Check Rubric 文件 | 读取 `zeng-design-check/domains/*/rubric.md`，按域校验 |
+| 6 | （可选）全量域校验 → 引用 Design Check Rubric 文件 | 读取 `zdoc-design-check/domains/*/rubric.md`，按域校验 |
 
 ## 附录 C: 文档类型完整映射表
 
@@ -1575,7 +1640,7 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 | T04 | `business/` | `BUSINESS-*.md` | 用户画像、业务价值、成功指标 |
 | T05 | `tech/` | `TECH-*.md` | 时序图、同步/异步、存储方案、降级策略 |
 | T06 | `ux/` | `UX-*.md` | 交互流程、设计原则、状态表达、文案风格 |
-| T07 | `ux-prototypes/` | `*.md` | 设计系统、组件规范、交互原型 |
+| T07 | `ux-prototypes/` | `*.md`, `*.html` | 设计系统、组件规范、交互原型（含 HTML 原型） |
 | T08 | `testset/` | `TESTSET-*.md` | 测试范围、Happy Path、边界条件、Mock |
 | T09 | `data/` | `DataFlow-*.md` | 数据流转、状态机、数据依赖 |
 | T10 | `ddd/` | `DDD-*.md` | 领域模型、聚合根、值对象、仓储契约 |
@@ -1593,6 +1658,7 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 |------|------|---------|
 | **v1.5** | 2026-05-28 | 源文档一致性校验 + 交付质量门禁（基于 I2I-IMPROVE-001 改进建议）：(1) 新增 Phase 0 源文档交叉一致性校验：ARCH ↔ TESTSET 数量/语义/路径/版本一致性扫描、约束溯源图构建、术语/命名预扫描；(2) Phase 3 新增 §3.6 Task 上下文注入模板（acceptance_gates/source_constraints/exclusions/api_versions）、§3.7 依赖完整性校验、§3.8 AC-测试点映射校验；(3) 新增 Phase 5 交付前审核 + 交付报告：自动审核清单（AC 覆盖率/排除项/API 版本/DAG 完整性/上下文字段/配置示例）、语义偏移检测、delivery-report.json；(4) task-list.json schema 新增 acceptance_gates/source_constraints/exclusions/api_versions 字段；(5) Non-Negotiable Rules 新增 #15 源文档交叉一致性、#16 依赖完整性、#17 交付前审核、#18 交付报告必出；(6) 新增 §4.6 交付报告格式规范 |
 | **v1.6** | 2026-05-29 | 源代码路径规范化：(1) 新增 `--src` 参数，指定项目源代码根路径（如 `apps/ai-coach-skill/src`）；(2) Phase 0 新增 §0.4 源代码路径规范化步骤，将设计文档中的简写路径（如 `src/`）转换为项目根相对的完整路径；(3) source-consistency-report.json 新增 `path_normalization` 字段；(4) Phase 4 新增路径应用步骤，从规范化结果中读取完整路径生成 Task 文档；(5) Task 模板"关键文件"和"产出物"字段增加路径规范说明；(6) Non-Negotiable Rules 新增 #20 文件路径完整性 |
+| **v1.7** | 2026-05-29 | 原型引用显式化：(1) Phase 0 新增 §0.6 原型文件检测与索引，扫描 ux-prototypes/ 目录下的 HTML/Vue/React 等非 Markdown 原型文件，建立 UX Spec ↔ Prototype 映射，记录到 source-consistency-report.json 的 prototype_index 字段；(2) Phase 3 新增 §3.10 原型感知上下文注入，UI 相关 Task 自动匹配原型阶段并注入 prototype_refs；(3) task-list.json schema 新增 prototype_refs 字段（file/phase_id/phase_description/alignment_ac）；(4) Task 模板新增"原型参考"章节和原型对齐验收项；(5) T07 UX Prototype 扩展支持 HTML 原型文件识别；(6) Non-Negotiable Rules 新增 #21 原型引用显式化 |
 | **v1.4** | 2026-05-28 | 输出文档结构规范对齐 DOC-WRITING-GUIDE：(1) 新增 §4.0 输出文档结构规范，定义 frontmatter、标准章节、命名、交叉引用、中英文规则；(2) 所有产物模板新增 YAML frontmatter（title/status/layer/priority/related_docs/relationships/context_policy）；(3) 所有产物模板新增标准章节（文档定位、关联文档、范围边界、验收/检查点）；(4) Task 文件命名改为 `IMPL-TASK-{nnn}-{slug}.md`，Feature 上下文改为 `IMPL-{ID}-{slug}.md`；(5) 新增 frontmatter 字段取值规则表；(6) 新增交叉引用格式规范 |
 | **v1.3** | 2026-05-28 | 新增文档状态生命周期管理：(1) I2I 仅接受 `approved` / `frozen` 状态的输入文档，`draft` / `reviewing` 状态 BLOCK；(2) 成功执行后将所有输入文档置为 `frozen`，防止实施转化后文档被意外修改；(3) Phase 1 新增文档状态检查步骤；(4) 新增 Phase 4.5 文档状态冻结步骤（含文件名后缀不更新说明）；(5) Non-Negotiable Rules 新增 #13 文档状态准入 + #14 执行后冻结；(6) 重跑语义新增已冻结文档场景；(7) 修复 Rule #7 交叉引用 |
 | **v1.2** | 2026-05-28 | 架构评审修复（15 项）：(1) CRITICAL: 新增 CONDITIONAL 路径（§3.3 Phase 1 三态判定）；CRITICAL: DAG 确定性校验脚本 validate-dag.py 替代 LLM 环检测；(2) HIGH: T09/T10 合并规则明确定义（静态结构 vs 动态行为分开展示）；HIGH: Design Check 集成方式决策为内嵌 Gate Rubric（附录 B）；HIGH: 8h 工时上限允许有理由的例外（§3.4）；HIGH: 新增全局索引 IMPL-INDEX.md（§4.1 + 模板）；(3) MEDIUM: T07 内容特征兜底规则补充；MEDIUM: 实施指引边界定义（仅基于设计文档已明确信息）；MEDIUM: 重跑幂等语义（§4.4）；MEDIUM: 版本戳规范（§4.5）；MEDIUM: 术语表新增"必输要素"和"CONDITIONAL"；(4) LOW: 目录命名改用 PRD Feature ID（`impl-{feature}-{M01}/`）；LOW: Mermaid 图标注表格为权威源；LOW: 工时校准机制（§8.3） |
@@ -1601,5 +1667,5 @@ zeng-i2i --dir docs/mvp-lite/ --validate-only
 
 ---
 
-*文档版本：v1.6*
+*文档版本：v1.7*
 *创建日期：2026-05-28*

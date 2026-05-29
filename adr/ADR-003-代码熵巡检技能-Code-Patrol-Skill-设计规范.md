@@ -79,7 +79,7 @@
 ### 3.2 文件结构
 
 ```
-zeng-code-patrol/
+zcode-patrol/
 ├── SKILL.md                        # 主文档
 ├── validate.py                     # 输出契约验证脚本
 ├── agents/
@@ -263,7 +263,7 @@ initializing → scanning → aggregating → reporting → completed
 | `--format` | enum | `markdown` | 输出格式：`markdown` \| `json` |
 | `--max-files` | int | 500 | 最大扫描文件数 |
 | `--max-file-size` | int | 1048576 | 单文件大小限制（字节） |
-| `--output-dir` | string | `.zeng-code-patrol` | 输出目录 |
+| `--output-dir` | string | `.zcode-patrol` | 输出目录 |
 | `--min-severity` | enum | `P3` | 最低严重级别 |
 | `--baseline` | string | null | 基线报告路径 |
 | `--ruleset` | string | null | 自定义规则集路径 |
@@ -278,7 +278,7 @@ initializing → scanning → aggregating → reporting → completed
 
 ```bash
 # 验证整个巡检结果
-python validate.py .zeng-code-patrol/20260527-120000-abc123def456
+python validate.py .zcode-patrol/20260527-120000-abc123def456
 
 # 安装依赖
 pip install jsonschema
@@ -297,13 +297,13 @@ pip install jsonschema
 
 ```bash
 # 全量扫描
-/zeng-code-patrol --paths src/ --scope full
+/zcode-patrol --paths src/ --scope full
 
 # 增量扫描 + 基线对比
-/zeng-code-patrol --paths src/ --scope delta --baseline .zeng-code-patrol/20260527-120000-xxx/report.json
+/zcode-patrol --paths src/ --scope delta --baseline .zcode-patrol/20260527-120000-xxx/report.json
 
 # CI 模式（发现 P0/P1 失败）
-/zeng-code-patrol --paths src/ --min-severity P1 --format json --non-interactive --fail-on-p0p1
+/zcode-patrol --paths src/ --min-severity P1 --format json --non-interactive --fail-on-p0p1
 ```
 
 ---
@@ -334,11 +334,11 @@ pip install jsonschema
 ## 12. 与现有技能的关系
 
 ```
-bmad-code-review（快速扫描）          zeng-code-patrol（周期巡检）
+bmad-code-review（快速扫描）          zcode-patrol（周期巡检）
         │                                      │
         ├── 日常 PR 审查 ──────────────────────→ 用 bmad-code-review
-        ├── 代码库健康度检查 ──────────────────→ 用 zeng-code-patrol
-        └── 发现架构腐化趋势 ─────────────────→ 触发 zeng-code-patrol 深度扫描
+        ├── 代码库健康度检查 ──────────────────→ 用 zcode-patrol
+        └── 发现架构腐化趋势 ─────────────────→ 触发 zcode-patrol 深度扫描
 ```
 
 ---

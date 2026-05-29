@@ -31,11 +31,11 @@
 1. **`bmad-code-review`**：对抗式三层评审（Blind Hunter / Edge Case Hunter / Acceptance Auditor），适合快速扫描，但维度单一、无修复能力、无结构化产物。
 2. **人工 PR Review**：依赖开发者经验，覆盖度不可控，对 AI 生成代码的特殊风险（mock 数据残留、TODO 未实现、平行实现等）缺乏系统性检查清单。
 
-`zeng-doc-quality-loop` 已证明**多角色并行评审 + 独立审计 + 独立报告**的方法论在文档场景有效（ADR-049/050 治理框架下），但尚未迁移到代码审查场景。
+`zdoc-quality-loop` 已证明**多角色并行评审 + 独立审计 + 独立报告**的方法论在文档场景有效（ADR-049/050 治理框架下），但尚未迁移到代码审查场景。
 
 ### 1.3 核心洞察
 
-代码审查与文档审查存在本质差异，不能直接复用 `zeng-doc-quality-loop`：
+代码审查与文档审查存在本质差异，不能直接复用 `zdoc-quality-loop`：
 
 | 差异维度 | 文档评审 | 代码评审 |
 |---------|---------|---------|
@@ -135,7 +135,7 @@ Python、TypeScript、Go 各自有独特的高频风险模式：
 
 ### 3.1 总体决策
 
-引入 **`zeng-code-review-deep`** 技能（Deep Code Review Skill），核心设计：
+引入 **`zcode-review-deep`** 技能（Deep Code Review Skill），核心设计：
 
 ```text
 多 Agent 并行专项审查 → 去重合并 → 冲突仲裁 → 修复任务生成 → 合成报告
@@ -341,7 +341,7 @@ Python、TypeScript、Go 各自有独特的高频风险模式：
 - **Confidence = high** 且无副作用评估时，补丁写入 `auto-patch.diff`
 - **Confidence < high** 或涉及跨文件修改时，标记 `MANUAL_REQUIRED`，提供详细修复指导
 - 自动补丁必须附带 `affected_tests`，用于快速验证
-- 自动补丁不直接应用，由开发者在 `zeng-code-review-deep --apply-patches` 时选择性应用
+- 自动补丁不直接应用，由开发者在 `zcode-review-deep --apply-patches` 时选择性应用
 
 ### 3.6 冲突仲裁机制
 
@@ -385,12 +385,12 @@ Conflict-Arbiter 判断:
 
 ```bash
 # 在 Claude Code 中通过 Skill 调用（推荐）
-/zeng-code-review-deep --mode commit --ref HEAD~1
-/zeng-code-review-deep --mode pr --base main --head feature/x
-/zeng-code-review-deep --mode module --path src/services/order/
+/zcode-review-deep --mode commit --ref HEAD~1
+/zcode-review-deep --mode pr --base main --head feature/x
+/zcode-review-deep --mode module --path src/services/order/
 
 # 验证输出产物（可选）
-cd zeng-code-review-deep
+cd zcode-review-deep
 pip install jsonschema
 python validate.py .cr-deep/CR-20260527-001
 ```
@@ -620,17 +620,17 @@ P3：低风险（风格、注释、轻微重构建议）
 ### 8.1 与 `bmad-code-review` 的关系
 
 ```
-快速扫描（bmad-code-review）          深度审查（zeng-code-review-deep）
+快速扫描（bmad-code-review）          深度审查（zcode-review-deep）
         │                                      │
         ├── 日常小变更、文档修改、配置调整 ───────→ 用 bmad-code-review（轻量）
-        ├── 核心模块、安全敏感、AI 生成代码 ───────→ 用 zeng-code-review-deep（深度）
-        └── 发现高风险 ───────────────────────────→ 触发 zeng-code-review-deep
+        ├── 核心模块、安全敏感、AI 生成代码 ───────→ 用 zcode-review-deep（深度）
+        └── 发现高风险 ───────────────────────────→ 触发 zcode-review-deep
 ```
 
 ### 8.2 与 ADR-055 Bug 流转的关系
 
 ```
-zeng-code-review-deep 发现 P0 问题
+zcode-review-deep 发现 P0 问题
     ↓
 生成 fix-tasks.json（status=PENDING）
     ↓
@@ -643,9 +643,9 @@ zeng-code-review-deep 发现 P0 问题
 
 ### 8.3 与 LL v2 `impl-verify` 的关系
 
-`impl-verify`（ADR-056 §7.4）在验收阶段检查"功能是否做完"。`zeng-code-review-deep` 在开发阶段检查"代码质量是否达标"。两者互补：
+`impl-verify`（ADR-056 §7.4）在验收阶段检查"功能是否做完"。`zcode-review-deep` 在开发阶段检查"代码质量是否达标"。两者互补：
 
-- `zeng-code-review-deep` → 开发阶段的代码质量门
+- `zcode-review-deep` → 开发阶段的代码质量门
 - `impl-verify` → 交付阶段的功能完成度验收
 
 ---
