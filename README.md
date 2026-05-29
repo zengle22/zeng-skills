@@ -1,6 +1,6 @@
 # Zeng Skills
 
-[![Skills](https://img.shields.io/badge/skills-5-blue)](./)
+[![Skills](https://img.shields.io/badge/skills-8-blue)](./)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 个人全局自定义 AI Agent Skill 集合，主要用于Claude Code/Codex/Kimi CLI及其他兼容 Agent Skill 协议的运行时。
@@ -11,13 +11,30 @@
 
 ## Skill 目录
 
+> 详细使用说明请参阅 [docs/SKILL-USAGE-GUIDE.md](./docs/SKILL-USAGE-GUIDE.md)
+
+### 设计与实施流水线
+
 | Skill | 描述 | 适用场景 |
 |-------|------|----------|
-| [`zeng-safe-code`](./zeng-safe-code) | 临时安全编码助手 —— 修改 LEE 项目代码时的安全约束与自检清单 | 在 L3/L2 治理未完全到位前，作为编码阶段的硬约束与自检流程 |
-| [`zeng-doc-quality-loop`](./zeng-doc-quality-loop) | 多文档质量收敛流水线 | 对多份文档执行 BMAD 多角色并行评审、冲突讨论、修复与验证的完整质量闭环 |
-| [`zeng-code-patrol`](./zeng-code-patrol) | 代码库自动化巡检 | 定期扫描代码库，发现风格漂移、架构腐化、安全漏洞、性能陷阱等问题，生成结构化报告 |
-| [`zeng-code-review-deep`](./zeng-code-review-deep) | 多智能体深度代码审查 | 对 Commit/PR/模块执行多维度并行专项审查，生成结构化修复任务与最终报告 |
-| [`zgsd-bootstrap-milestone`](./zgsd-bootstrap-milestone) | 从预设计文档包引导生成 GSD Milestone | 当设计文档包（PRD、UX、技术设计等）已完成，直接转换为可执行的 GSD 里程碑与阶段计划 |
+| [`zeng-design-check`](./zeng-design-check) | Pre-SSOT 文档校验（6 大维度 + 跨维度一致性，55 项检查） | 设计文档写完后、进入 SSOT 前，校验输入质量 |
+| [`zeng-i2i`](./zeng-i2i) | 设计文档到实施任务转化引擎（15+ 种设计文档输入） | 设计文档校验通过后，拆分为可执行的实施任务 |
+| [`zgsd-bootstrap-milestone`](./zgsd-bootstrap-milestone) | 从预设计文档包引导生成 GSD Milestone | 设计文档包完成，直接转换为 GSD 里程碑与阶段计划 |
+| [`zgsd-plan-phase`](./zgsd-plan-phase) | 桥接 I2I 任务包到 GSD PLAN 格式 | I2I 产出的任务包需转换为 GSD 可执行的 PLAN |
+
+### 文档质量
+
+| Skill | 描述 | 适用场景 |
+|-------|------|----------|
+| [`zeng-doc-quality-loop`](./zeng-doc-quality-loop) | 多文档质量收敛流水线（BMAD 多角色评审团） | 对多份文档执行并行评审、冲突讨论、修复与验证的完整质量闭环 |
+
+### 代码质量
+
+| Skill | 描述 | 适用场景 |
+|-------|------|----------|
+| [`zeng-safe-code`](./zeng-safe-code) | 临时安全编码助手（6 条硬约束 + 自检清单） | 修改项目代码时，作为编码阶段的硬约束与自检流程 |
+| [`zeng-code-patrol`](./zeng-code-patrol) | 代码库自动化巡检（8 大维度） | 定期扫描代码库，发现风格漂移、架构腐化、安全漏洞等问题 |
+| [`zeng-code-review-deep`](./zeng-code-review-deep) | 多智能体深度代码审查（Commit/PR/模块并行专项审查） | 关键 PR 的深度审查，生成结构化修复任务与报告 |
 
 ---
 
