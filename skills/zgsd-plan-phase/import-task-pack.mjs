@@ -28,7 +28,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const PROJECT_ROOT = resolve(__dirname, '../../..');
+let PROJECT_ROOT = process.cwd(); // Default to cwd, override with --project-root
 let APP_DIR = '.'; // Set by --app-dir or auto-detected
 
 // ─── CLI Argument Parsing ──────────────────────────────────────────────────────
@@ -39,6 +39,7 @@ function parseArgs(argv) {
     phase: null,
     impl: null,
     appDir: null,
+    projectRoot: null,
     dryRun: false,
     force: false,
     append: false,
@@ -71,6 +72,9 @@ function parseArgs(argv) {
         break;
       case '--app-dir':
         result.appDir = args[++i];
+        break;
+      case '--project-root':
+        result.projectRoot = args[++i];
         break;
       default:
         if (!result.phase && /^\d+$/.test(args[i])) {
@@ -353,7 +357,7 @@ function buildRequirementMapping(taskPack, phase) {
 
 // ─── Task Grouping ─────────────────────────────────────────────────────────────
 
-function buildTaskGrouping(taskPack, phase, implDir) {
+function buildTaskGrouping(taskPack, phase, implDir, padded) {
   info('Building task grouping...');
 
   const args = parseArgs(process.argv);
@@ -368,29 +372,29 @@ function buildTaskGrouping(taskPack, phase, implDir) {
   }
 
   if (phase === '0') {
-    return buildPhase0Grouping(taskPack);
+    return buildPhase0Grouping(taskPack, padded);
   }
 
-  return buildGenericGrouping(taskPack);
+  return buildGenericGrouping(taskPack, padded);
 }
 
-function buildPhase0Grouping(taskPack) {
+function buildPhase0Grouping(taskPack, padded) {
   const tasks = taskPack.taskList.tasks;
   const taskIds = new Set(tasks.map(t => t.id));
 
   const grouping = {
     plans: [
-      { planId: '00-01', name: 'App skeleton 与目录占位', sourceTasks: ['task-001'], requirements: ['FOUND-1'], description: 'Create directory structure and placeholder files' },
-      { planId: '00-02', name: 'Env/runtime 与 API/error 类型', sourceTasks: ['task-002', 'task-004'], requirements: ['FOUND-2'], description: 'Environment config, runtime constants, error types, and API types' },
-      { planId: '00-03', name: 'ESLint 架构约束', sourceTasks: ['task-012'], requirements: ['FOUND-6'], description: 'ESLint architecture constraint configuration' },
-      { planId: '00-04', name: 'AI Provider factory 与单元测试', sourceTasks: ['task-003', 'task-013'], requirements: ['FOUND-4'], description: 'AI Provider factory implementation and unit tests' },
-      { planId: '00-05', name: 'Drizzle / Supabase / Redis clients', sourceTasks: ['task-005', 'task-006', 'task-009'], requirements: ['FOUND-3'], description: 'Database, Supabase, and Redis infrastructure clients' },
-      { planId: '00-06', name: '架构测试入口', sourceTasks: ['task-014'], requirements: ['FOUND-6'], description: 'Architecture test entry point and violation detection' },
-      { planId: '00-07', name: 'service_role audit 与 middleware', sourceTasks: ['task-007', 'task-008'], requirements: ['FOUND-3'], description: 'Service role audit wrapper and Supabase middleware' },
-      { planId: '00-08', name: 'Health endpoint vertical slice', sourceTasks: ['task-010'], requirements: ['FOUND-5'], description: 'Health endpoint layered implementation' },
-      { planId: '00-09', name: 'Chat endpoint layered migration', sourceTasks: ['task-011'], requirements: ['FOUND-4', 'FOUND-5'], description: 'Chat endpoint layered migration' },
-      { planId: '00-10', name: 'Integration tests', sourceTasks: ['task-015'], requirements: ['FOUND-3'], description: 'Integration tests for infrastructure clients' },
-      { planId: '00-11', name: 'Performance baseline', sourceTasks: ['task-016'], requirements: ['FOUND-3', 'FOUND-5'], description: 'Performance baseline tests' },
+      { planId: `${padded}-01`, name: 'App skeleton 与目录占位', sourceTasks: ['task-001'], requirements: ['FOUND-1'], description: 'Create directory structure and placeholder files' },
+      { planId: `${padded}-02`, name: 'Env/runtime 与 API/error 类型', sourceTasks: ['task-002', 'task-004'], requirements: ['FOUND-2'], description: 'Environment config, runtime constants, error types, and API types' },
+      { planId: `${padded}-03`, name: 'ESLint 架构约束', sourceTasks: ['task-012'], requirements: ['FOUND-6'], description: 'ESLint architecture constraint configuration' },
+      { planId: `${padded}-04`, name: 'AI Provider factory 与单元测试', sourceTasks: ['task-003', 'task-013'], requirements: ['FOUND-4'], description: 'AI Provider factory implementation and unit tests' },
+      { planId: `${padded}-05`, name: 'Drizzle / Supabase / Redis clients', sourceTasks: ['task-005', 'task-006', 'task-009'], requirements: ['FOUND-3'], description: 'Database, Supabase, and Redis infrastructure clients' },
+      { planId: `${padded}-06`, name: '架构测试入口', sourceTasks: ['task-014'], requirements: ['FOUND-6'], description: 'Architecture test entry point and violation detection' },
+      { planId: `${padded}-07`, name: 'service_role audit 与 middleware', sourceTasks: ['task-007', 'task-008'], requirements: ['FOUND-3'], description: 'Service role audit wrapper and Supabase middleware' },
+      { planId: `${padded}-08`, name: 'Health endpoint vertical slice', sourceTasks: ['task-010'], requirements: ['FOUND-5'], description: 'Health endpoint layered implementation' },
+      { planId: `${padded}-09`, name: 'Chat endpoint layered migration', sourceTasks: ['task-011'], requirements: ['FOUND-4', 'FOUND-5'], description: 'Chat endpoint layered migration' },
+      { planId: `${padded}-10`, name: 'Integration tests', sourceTasks: ['task-015'], requirements: ['FOUND-3'], description: 'Integration tests for infrastructure clients' },
+      { planId: `${padded}-11`, name: 'Performance baseline', sourceTasks: ['task-016'], requirements: ['FOUND-3', 'FOUND-5'], description: 'Performance baseline tests' },
     ],
   };
 
@@ -410,7 +414,7 @@ function buildPhase0Grouping(taskPack) {
   return grouping;
 }
 
-function buildGenericGrouping(taskPack) {
+function buildGenericGrouping(taskPack, padded) {
   const tasks = taskPack.taskList.tasks;
 
   const taskWave = {};
@@ -438,7 +442,7 @@ function buildGenericGrouping(taskPack) {
 
     for (let i = 0; i < waveTasks.length; i += 3) {
       const group = waveTasks.slice(i, i + 3);
-      const planId = `00-${String(planCounter).padStart(2, '0')}`;
+      const planId = `${padded}-${String(planCounter).padStart(2, '0')}`;
 
       plans.push({
         planId,
@@ -685,8 +689,8 @@ ${taskPack.index ? taskPack.index.split('## 关键路径')[1] || 'See INDEX.md' 
 | Agents | \`AGENTS.md\` |
 `;
 
-  writeFileSync(join(phaseDir, '00-CONTEXT.md'), content);
-  success('Generated 00-CONTEXT.md');
+  writeFileSync(join(phaseDir, `${padded}-CONTEXT.md`), content);
+  success(`Generated ${padded}-CONTEXT.md`);
 }
 
 function generateTaskBridge(phase, phaseDir, taskPack, planMap, requirementMapping, padded, slug, implDir) {
@@ -772,8 +776,8 @@ function generateTaskBridge(phase, phaseDir, taskPack, planMap, requirementMappi
     },
   };
 
-  writeFileSync(join(phaseDir, '00-TASK-BRIDGE.json'), JSON.stringify(bridge, null, 2));
-  success('Generated 00-TASK-BRIDGE.json');
+  writeFileSync(join(phaseDir, `${padded}-TASK-BRIDGE.json`), JSON.stringify(bridge, null, 2));
+  success(`Generated ${padded}-TASK-BRIDGE.json`);
   return bridge;
 }
 
@@ -874,7 +878,7 @@ Read the following before execution:
 - \`AGENTS.md\` — Project agent orchestration rules
 - \`AI_CONSTITUTION.md\` — Project constitution and principles
 - \`rules/agent-coding-guardrails.md\` — Coding guardrails
-- \`00-CONTEXT.md\` — Phase context and locked decisions
+- \`${padded}-CONTEXT.md\` — Phase context and locked decisions
 
 ## Tasks
 
@@ -999,8 +1003,8 @@ function generateQualityMap(phase, phaseDir, taskPack, planMap, requirementMappi
     test_tasks: testTasks,
   };
 
-  writeFileSync(join(phaseDir, '00-QUALITY-MAP.json'), JSON.stringify(qualityMap, null, 2));
-  success('Generated 00-QUALITY-MAP.json');
+  writeFileSync(join(phaseDir, `${padded}-QUALITY-MAP.json`), JSON.stringify(qualityMap, null, 2));
+  success(`Generated ${padded}-QUALITY-MAP.json`);
 }
 
 function generateValidation(phase, phaseDir, taskPack, requirementMapping, padded, slug) {
@@ -1031,7 +1035,7 @@ function generateValidation(phase, phaseDir, taskPack, requirementMapping, padde
 phase: ${padded}-${slug}
 status: planned
 source: zgsd-plan-phase
-quality_map: 00-QUALITY-MAP.json
+quality_map: ${padded}-QUALITY-MAP.json
 nyquist_compliant: pending
 ---
 
@@ -1048,8 +1052,8 @@ ${rows}
 None at planning time. \`$gsd-validate-phase\` must update this section after execution.
 `;
 
-  writeFileSync(join(phaseDir, '00-VALIDATION.md'), content);
-  success('Generated 00-VALIDATION.md');
+  writeFileSync(join(phaseDir, `${padded}-VALIDATION.md`), content);
+  success(`Generated ${padded}-VALIDATION.md`);
 }
 
 // ─── Validation Gates ──────────────────────────────────────────────────────────
@@ -1186,8 +1190,9 @@ async function main() {
     console.error('Usage: node import-task-pack.mjs --phase <n> --impl <dir> [options]');
     console.error('');
     console.error('Options:');
-    console.error('  --app-dir <path>   App directory for file inference (default: auto-detect)');
-    console.error('  --dry-run          Output mapping without writing files');
+    console.error('  --project-root <path>  Project root (default: cwd)');
+    console.error('  --app-dir <path>       App directory for file inference (default: auto-detect)');
+    console.error('  --dry-run              Output mapping without writing files');
     console.error('  --force            Overwrite existing plans');
     console.error('  --append           Keep existing plans, append new');
     console.error('  --skip-review      Skip review gate (not recommended)');
@@ -1198,6 +1203,12 @@ async function main() {
   console.log('\n\x1b[1m═══════════════════════════════════════════════════════════════\x1b[0m');
   console.log('\x1b[1m  zgsd-plan-phase: Impl Task Pack → GSD PLAN Bridge\x1b[0m');
   console.log('\x1b[1m═══════════════════════════════════════════════════════════════\x1b[0m\n');
+
+  // Override PROJECT_ROOT if --project-root is specified
+  if (args.projectRoot) {
+    PROJECT_ROOT = resolve(args.projectRoot);
+    info(`Project root: ${PROJECT_ROOT}`);
+  }
 
   validatePreflight(args);
 
@@ -1229,7 +1240,7 @@ async function main() {
 
   const requirementMapping = buildRequirementMapping(taskPack, args.phase);
 
-  const grouping = buildTaskGrouping(taskPack, args.phase, args.impl);
+  const grouping = buildTaskGrouping(taskPack, args.phase, args.impl, padded);
 
   const planMap = computePlanMetadata(grouping, taskPack);
 
