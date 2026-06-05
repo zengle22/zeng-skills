@@ -327,9 +327,9 @@ function main() {
   let allValid = true;
 
   // Validate TASK-BRIDGE.json
-  const bridgePath = join(phaseDir, '00-TASK-BRIDGE.json');
+  const bridgePath = join(phaseDir, `${padded}-TASK-BRIDGE.json`);
   if (!fileExists(bridgePath)) {
-    fail('00-TASK-BRIDGE.json not found');
+    fail(`${padded}-TASK-BRIDGE.json not found`);
     allValid = false;
   } else {
     const { valid } = validateBridgeManifest(bridgePath);

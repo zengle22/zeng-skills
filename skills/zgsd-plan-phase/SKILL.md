@@ -37,7 +37,7 @@ zgsd-plan-phase/
 Extract from user message:
 - `<phase>` — phase number (e.g., `0`)
 - `<impl-dir>` — path to impl task pack directory
-- Optional flags: `--dry-run`, `--force`, `--append`, `--skip-review`, `--app-dir <path>`
+- Optional flags: `--dry-run`, `--force`, `--append`, `--skip-review`, `--app-dir <path>`, `--project-root <path>`
 
 ### Step 1.5: Determine App Directory
 
@@ -106,8 +106,8 @@ Files in `.planning/phases/{padded-phase}-{phase-slug}/`:
 
 | File | Purpose |
 |------|---------|
-| `00-CONTEXT.md` | Locked implementation decisions |
-| `00-TASK-BRIDGE.json` | Machine-readable bridge manifest |
-| `00-01-PLAN.md` ... `00-NN-PLAN.md` | GSD-executable plans |
-| `00-QUALITY-MAP.json` | Requirement-to-test mapping |
-| `00-VALIDATION.md` | Validation strategy skeleton |
+| `{padded}-CONTEXT.md` | Locked implementation decisions |
+| `{padded}-TASK-BRIDGE.json` | Machine-readable bridge manifest |
+| `{padded}-01-PLAN.md` ... `{padded}-NN-PLAN.md` | GSD-executable plans |
+| `{padded}-QUALITY-MAP.json` | Requirement-to-test mapping |
+| `{padded}-VALIDATION.md` | Validation strategy skeleton |
