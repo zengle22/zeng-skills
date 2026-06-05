@@ -71,6 +71,7 @@ Canonical bundle: `zdoc-write/`
 | `review` | 审查与对齐报告 | `reviews/` | `Review-{scope}.md` |
 | `ux-proto` | UX 原型 | `ux-prototypes/` | `proto-m{编号}-{slug}.html` |
 | `impl` | 实施设计 | `tech/` | `IMPL-M{编号}-{Slug}.md` |
+| `req` | 需求来源文档 | `reqs/` | `REQ-{source}-{YYYYMMDD}-{Slug}.md` 或 `REQ-M{编号}-{Slug}.md` |
 
 ---
 
@@ -166,6 +167,9 @@ Canonical bundle: `zdoc-write/`
 | 商业问题、用户画像、成功指标 | `business` |
 | 战略规划、产品原则 | `stg` |
 | 审查结论、一致性报告 | `review` |
+| 用户反馈、访谈纪要、工单、需求收集 | `req` |
+| 行业知识、专家输入、流程描述、法规要求 | `req` |
+| 竞品分析、市场调研、数据发现的问题 | `req` |
 
 ### 1.3 必输章节加载
 
@@ -416,6 +420,22 @@ relationships:
 - 验收或检查点：判断本文描述成立的条件
 
 **类型特定章节**：参见 `references/doc-type-requirements.md`
+
+**req 类型章节生成规则**：
+
+req 文档按以下结构生成章节：
+
+| 章节 | 内容 | 说明 |
+|------|------|------|
+| §1 需求来源 | 来源类型、提供方、获取方式、原始出处、获取日期 | 保留需求原始出处信息 |
+| §2 原始需求描述 | 直接记录原始语言、上下文背景、相关方 | 不翻译为产品术语 |
+| §3 痛点或机会分析 | 痛点描述、机会描述、现有替代方案 | 分析价值空间 |
+| §4 初步价值判断 | 用户价值、商业价值、技术可行性、合规/风险 | 四维度快速评估 |
+| §5 转化为 PRD 的关键问题 | 需要在 PRD 阶段回答的问题清单 | 作为 PRD 撰写输入 |
+| §6 关联文档 | 上下游文档引用 | 主要是未来的 PRD |
+| §7 范围边界 | In Scope / Out of Scope | 初步范围判断 |
+| §8 验收或检查点 | 需求来源确认、完整性、转化决策 | 可勾选的检查项 |
+| §9 变更日志 | 日期/变更/变更人 | 版本追踪 |
 
 **testset 类型章节生成规则**：
 
@@ -708,4 +728,4 @@ zdoc-write api --module M12 --output-dir docs/mvp-lite/api/ --project .
 
 ## Compatibility Note
 
-本技能遵循 DOC-WRITING-GUIDE v1.0 和 ITERATION-DOCUMENT-CHECKLIST v2.1 的全部规范。输出文档可直接被 `zdoc-design-check` 校验、被 `zdoc-i2i` 转化为实施任务。文档类型覆盖 `docs/mvp-lite/` 下全部 16 个子目录。
+本技能遵循 DOC-WRITING-GUIDE v1.0 和 ITERATION-DOCUMENT-CHECKLIST v2.1 的全部规范。输出文档可直接被 `zdoc-design-check` 校验、被 `zdoc-i2i` 转化为实施任务。文档类型覆盖 `docs/mvp-lite/` 下全部 17 个子目录。

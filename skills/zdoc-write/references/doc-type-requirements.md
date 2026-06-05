@@ -343,6 +343,43 @@
 
 ---
 
+### Req — 需求来源文档 (`reqs/`)
+
+**命名**: `REQ-{source}-{YYYYMMDD}-{Slug}.md` 或 `REQ-M{编号}-{Slug}.md`
+
+**必须包含**:
+- 文档定位：一句话说明本文记录什么需求来源及其核心价值主张
+- 需求来源：来源类型、提供方、获取方式、原始出处、获取日期（表格形式）
+- 原始需求描述：保留原始语言（不翻译为产品术语），包含上下文背景和相关方
+- 痛点或机会分析：痛点描述、机会描述、现有替代方案
+- 初步价值判断：用户价值、商业价值、技术可行性、合规/风险因素（四维度表格）
+- 转化为 PRD 的关键问题：需要在 PRD 阶段回答的问题清单
+- 关联文档：主要是下游 PRD 的引用
+- 范围边界：In Scope / Out of Scope（初步范围判断，Out of Scope 至少 3 项）
+- 验收或检查点：需求来源确认、完整性、转化决策（可勾选检查项）
+- 变更日志：日期/变更/变更人
+
+**Frontmatter 特殊字段**:
+- `source_type`: `user_feedback` | `expert_knowledge` | `market_research` | `competitor` | `internal` | `regulatory` | `process` | `data_driven`
+- `source_url`: 外部链接（如有）
+- `source_contact`: 需求提供方
+- `confidence`: `high` | `medium` | `low`（需求可信度）
+- `urgency`: `high` | `medium` | `low`（紧急程度）
+- `related_prd`: 已转化的 PRD 列表
+
+**可选包含**: 访谈纪要原文、用户原话引用、截图/录屏描述、数据支撑、竞品对标细节
+
+**边界**: reqs/ 回答"我们听到了什么、为什么值得做"；prd/ 回答"我们要做什么、怎么做"
+
+**不包含**: 用户故事（用 PRD）、AC（用 PRD）、API 字段、技术实现方案、视觉设计
+
+**与 PRD 的关系**:
+- 一个 req 可转化为 1 个或多个 PRD
+- PRD 的 `relationships.depends_on` 应指向关联的 req
+- req 的状态流转：`draft` → `reviewed`（已评估） → `converted`（已转 PRD） / `rejected`（不转化）
+
+---
+
 ### Review — 审查与对齐报告 (`reviews/`)
 
 **命名**: `Review-{scope}.md` 或 `Cross-Review-{scope}-Round{n}.md`
@@ -415,6 +452,7 @@
 | `job` | `jobs/` | L3 实现层 |
 | `business` | `business/` | L1 业务层 |
 | `stg` | `stg/` | L0 战略层 |
+| `req` | `reqs/` | L0.5 需求层 |
 | `review` | `reviews/` | — |
 | `ux-proto` | `ux-prototypes/` | L2 设计层 |
 | `impl` | `tech/` | L3 实现层 |
