@@ -57,10 +57,10 @@ git clone git@github.com:zengle22/zeng-skills.git
 mkdir -p ~/.claude/skills
 
 # 方式 A：符号链接（推荐，自动同步更新）
-ln -s /path/to/zeng-skills/* ~/.claude/skills/
+ln -s /path/to/zeng-skills/skills/* ~/.claude/skills/
 
 # 方式 B：直接复制
-cp -r /path/to/zeng-skills/* ~/.claude/skills/
+cp -r /path/to/zeng-skills/skills/* ~/.claude/skills/
 ```
 
 或在项目级 `.claude/settings.json` 中指定：
@@ -68,7 +68,7 @@ cp -r /path/to/zeng-skills/* ~/.claude/skills/
 ```json
 {
   "skills": {
-    "paths": ["/path/to/zeng-skills"]
+    "paths": ["/path/to/zeng-skills/skills"]
   }
 }
 ```
@@ -82,7 +82,7 @@ cp -r /path/to/zeng-skills/* ~/.claude/skills/
 codex skills path
 
 # 将本仓库添加到 skills 路径
-codex skills add /path/to/zeng-skills
+codex skills add /path/to/zeng-skills/skills
 ```
 
 或在配置文件中指定：
@@ -91,7 +91,7 @@ codex skills add /path/to/zeng-skills
 # ~/.codex/config.yaml
 skills:
   paths:
-    - /path/to/zeng-skills
+    - /path/to/zeng-skills/skills
 ```
 
 ### 3. 调用 Skill
