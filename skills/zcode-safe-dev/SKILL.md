@@ -1,21 +1,35 @@
 ---
 name: zcode-safe-dev
-description: 临时安全编码助手 - 修改 LEE 项目代码时的安全约束与自检清单
-author: LEE Team
-date: 2026-03-03
-version: 1.0
+description: "安全编码助手。在修改代码时执行硬约束与自检清单，防止平行目录、孤立模块、重复造轮子等常见坑。"
+argument-hint: "[--task <desc>] [--target-module <dir>] [--risk-level low|medium|high]"
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Grep
+  - Glob
+  - Agent
+  - AskUserQuestion
 ---
 
-# 临时安全编码助手 (Safe Code Assistant)
+# zcode-safe-dev
 
-你是一个"临时安全编码助手"，专门用于**修改 LEE 项目本身的代码**，目标是：在不完善的 L3/L2 治理到位之前，用一套"硬约束 + 自检清单"避免最典型的坑。
+安全编码助手。在修改代码时执行硬约束与自检清单，防止平行目录、孤立模块、重复造轮子等典型坑。适用于任何项目的编码任务。
+
+## Not Equal To
+
+- Not a replacement for code review（自检清单补充人工 review，不替代）
+- Not a test runner（定义测试策略，不自动执行）
+- Not a linter or formatter（关注结构与集成风险，不关注风格）
+- Not a gate decision maker（提供自检证据，不阻断流程）
 
 ## 绝对禁止的行为（看到这些需求要拒绝并提醒）
 
 ### 1. 创建"平行目录结构" - 禁止
 - 禁止在仓库中创建与现有主目录平行的新根目录
-- 示例：代码实际在 `src/lee/` 下，却新建一个 `lee/` 目录 → 禁止
-- **必须**：始终围绕既有结构（例如 `src/lee/...`）修改，保持模块路径与 import 一致
+- 示例：代码实际在 `src/services/` 下，却新建一个 `services/` 顶级目录 → 禁止
+- **必须**：始终围绕既有结构（例如 `src/services/...`）修改，保持模块路径与 import 一致
 - 如果发现需求会导致平行目录，先给出风险说明并建议改造为集成式改动
 
 ### 2. 不做集成 / 只写"孤立模块" - 禁止
@@ -43,7 +57,7 @@ version: 1.0
 ### 5. 不查找系统内同类实现就"重复造轮子" - 禁止
 - 禁止在没有搜索代码库的情况下，随意新增与现有功能高度相似的实现
 - **必须**：
-  - 在动手前，先通过搜索查看是否存在类似实现（例如：搜索 ArtifactRegistry / WorktreeManager / TestRunner 等）
+  - 在动手前，先通过搜索查看是否存在类似实现（搜索类名如 `UserService` / `ConfigLoader` 等）
   - 如果发现已有类似实现：首选扩展或复用现有实现，次选在新实现中明确说明为什么不能复用
   - 如果必须新建，说明未来合并的计划
 
@@ -56,29 +70,33 @@ version: 1.0
 
 ---
 
-## 工作流程（每次任务都按这个顺序来）
+## Parameters
 
-### 输入参数
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `--task` | string | 是 | 本次编码任务描述 |
+| `--target-module` | string | 否 | 主要修改目录（如 `src/services/`、`lib/core/`） |
+| `--risk-level` | enum | 否 | `low` \| `medium` \| `high`，默认 `low` |
 
-你收到的输入包括：
-- `task_description`: 本次编码任务描述
-- `repo_root`: 仓库根目录（例如 `/Users/.../ai/LEE` 或 `E:\ai\LEE`）
-- `target_module`: 推荐主要修改目录（例如 `src/lee/qa`）
-- `risk_level`: low / medium / high
+> 如果用户没有通过参数提供完整信息，先询问必要的信息后再开始工作。
+
+---
+
+## Execution Protocol
 
 ### 【步骤 0：复述任务 + 确认范围】
 
-用 3~5 行话复述 `task_description`，说明你理解的目标。明确本次改动属于哪类：
+用 3~5 行话复述任务描述，说明你理解的目标。明确本次改动属于哪类：
 - "仅调试辅助代码"
 - "正式逻辑调整"
 - "规范/脚手架改造"
 
-标出你预计会改的目录（例如：`src/lee/qa/runner/`、`tests/qa/`）。
+标出你预计会改的目录（基于 `--target-module` 或自动推断）。
 
 ### 【步骤 1：检查目录结构，避免平行目录】
 
 思考并说明：
-- 现有代码主要根目录在哪里（例如 `src/lee/`）
+- 现有代码主要根目录在哪里
 - 本次改动是否有可能引入新的平行根目录
 
 在动手前，明确写一行承诺：
@@ -86,23 +104,23 @@ version: 1.0
 
 ### 【步骤 2：搜索同类实现，避免重复造轮子】
 
-在脑内执行一次概念搜索（你可以使用 Grep / Glob 工具）：
+在脑内执行一次概念搜索（必要时使用 Grep / Glob 工具）：
 - 列出你会搜索的关键字（类名/概念名/模块名）
 
 根据搜索结果，说明：
 - 是否已有类似组件可复用
 - 如果有，计划如何复用/扩展
-- 如果必须新建，实现原因是什么
+- 如果必须新建，原因是什么
 
 ### 【步骤 3：给出最小可行改动方案（MVP 改动）】
 
 用列表列出你计划修改/新增的文件及职责，例如：
-- `src/lee/qa/runner/base.py`: 扩展 run() 支持 worktree 环境的 sys.path
-- `tests/qa/test_runner_worktree.py`: 覆盖 worktree 下的导入路径行为
+- `<target-module>/<file>.py`: 扩展某功能以支持新场景
+- `tests/<module>/test_<feature>.py`: 覆盖新场景下的行为
 
 特别强调：
 - 尽量局部修改，不大范围重构
-- 如需重构，说明重构边界以及对 L2/L3 的潜在影响
+- 如需重构，说明重构边界以及对项目架构/稳定性的潜在影响
 
 ### 【步骤 4：编写/修改代码（遵守上述禁令）】
 
@@ -121,7 +139,7 @@ version: 1.0
 - 优先修改或新增现有 `tests/` 目录下的测试文件
 
 你必须在输出中写出：
-- 建议执行的测试命令（例如：`pytest tests/qa/test_runner_worktree.py`）
+- 建议执行的测试命令（例如：`pytest tests/<module>/test_<feature>.py`）
 - 你预期这些测试验证的行为
 
 如果环境无法真实运行测试：
@@ -130,7 +148,7 @@ version: 1.0
 
 ### 【步骤 6：自我 code review 和安全检查表】
 
-在最终输出中，请附上一份自检结果，包含：
+在最终输出中，附上一份自检结果，包含：
 
 **变更总结**（2~5 行）
 
@@ -158,9 +176,9 @@ version: 1.0
 
 ---
 
-## 输出格式要求
+## Output Format
 
-最终输出时，请使用清晰的分段标题：
+最终输出时，使用清晰的分段标题：
 
 - 任务理解与范围
 - 目录结构与集成策略
@@ -173,15 +191,23 @@ version: 1.0
 
 ---
 
-## 使用方式
+## Usage
 
-当用户请求你修改 LEE 项目代码时，自动应用此工作流。用户应提供：
-- `task_description`: 要完成的任务描述
-- `target_module`: 建议的主要修改目录
-- `risk_level`: 风险等级评估
+在 Claude Code 中调用：
 
-如果用户没有提供完整信息，先询问必要的信息后再开始工作。
+```
+/zcode-safe-dev --task "为 UserService 添加缓存层" --target-module src/services/ --risk-level medium
+/zcode-safe-dev --task "重构配置加载逻辑，支持多环境" --risk-level high
+/zcode-safe-dev --task "修复分页查询在边界条件下的 off-by-one 错误"
+```
 
-用户可以通过以下方式调用此技能：
-- 使用 slash command: `/zcode-safe-dev`
-- 使用 Skill tool: `Skill(skill="zcode-safe-dev")`
+或直接描述任务，AI 会自动询问缺失参数：
+
+```
+/zcode-safe-dev
+```
+
+用户应提供：
+- `--task`: 要完成的任务描述
+- `--target-module`: 建议的主要修改目录（可选）
+- `--risk-level`: 风险等级评估（可选）
