@@ -68,6 +68,19 @@ node "$SKILL_DIR/import-task-pack.mjs" --phase <phase> --impl <impl-dir>
 
 Add flags if user requested them (e.g., `--dry-run`, `--app-dir apps/my-app`).
 
+### Step 2.5: Context Assembly Integration
+
+If the project contains `doc/dev/DEV-002-Context-Assembly.md` and `scripts/docs/assemble-context.mjs`, the bridge automatically enables Context Assembly integration:
+
+1. Generate or refresh `.planning/phases/<phase-id>/AI-CONTEXT-PACK.md` and `.json`.
+2. Insert `## 0. Context Assembly Gate` into every generated `*-PLAN.md`.
+3. Record `context_assembly` metadata in `{padded}-TASK-BRIDGE.json`.
+4. Make bridge validation fail if the phase Context Pack reports blocking `missing` or `conflicts`.
+
+The generated gate infers `--task` from target files (`api_change`, `data_change`, `business_rule_change`, `backend_implementation`, `skill_change`) and falls back to `phase_execution` when no narrower task type is detected.
+
+This is a semi-integrated DEV-002 path: it does not modify GSD executor/core, but it gives every PLAN an explicit context gate before execution.
+
 ### Step 3: Display Results
 
 Show the user:
@@ -89,7 +102,7 @@ To validate existing bridge output:
 
 ```bash
 SKILL_DIR=$(find . -path "*/zgsd-plan-phase/validate-bridge.mjs" -not -path "*/node_modules/*" | head -1 | xargs dirname)
-node "$SKILL_DIR/validate-bridge.mjs" --phase <n>
+node "$SKILL_DIR/validate-bridge.mjs" --phase <n> [--project-root <path>]
 ```
 
 ## Prerequisites
@@ -107,7 +120,8 @@ Files in `.planning/phases/{padded-phase}-{phase-slug}/`:
 | File | Purpose |
 |------|---------|
 | `{padded}-CONTEXT.md` | Locked implementation decisions |
-| `{padded}-TASK-BRIDGE.json` | Machine-readable bridge manifest |
-| `{padded}-01-PLAN.md` ... `{padded}-NN-PLAN.md` | GSD-executable plans |
+| `AI-CONTEXT-PACK.md` / `.json` | DEV-002 phase Context Pack generated when assembler is available |
+| `{padded}-TASK-BRIDGE.json` | Machine-readable bridge manifest, including `context_assembly` metadata |
+| `{padded}-01-PLAN.md` ... `{padded}-NN-PLAN.md` | GSD-executable plans with `## 0. Context Assembly Gate` |
 | `{padded}-QUALITY-MAP.json` | Requirement-to-test mapping |
 | `{padded}-VALIDATION.md` | Validation strategy skeleton |
