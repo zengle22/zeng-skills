@@ -2,19 +2,21 @@
 title: "Pre-SSOT 文档校验技能（Design Check Skill）基线"
 status: draft
 created: "2026-05-27"
-updated: "2026-05-28"
+updated: "2026-06-15"
 layer: "L3 实现层"
 priority: "P0 必须有"
 related_docs:
   - "../docs/ITERATION-DOCUMENT-CHECKLIST.md"
   - "ADR-004-设计文档到实施任务拆分技能-I2I-Impl-Skill-设计规范.md"
+  - "ADR-006-zdoc-write最小Spec模式-Minimal-Spec-Mode-设计决策.md"
 relationships:
   depends_on:
     - "ITERATION-DOCUMENT-CHECKLIST v2.1（§2.1 商业设计 + §二 Pre-SSOT 质量门 + PRD 可测性预审）"
   implements: []
   constrains:
     - "ADR-004 (I2I Skill) — 校验通过后的设计文档进入任务拆分"
-  references: []
+  references:
+    - "ADR-006 (zdoc-write Minimal Spec Mode) — 定义 spec 默认产物与下游兼容要求"
   supersedes: []
   superseded_by: []
 context_policy:
@@ -26,8 +28,8 @@ context_policy:
 # ADR-002：Pre-SSOT 文档校验技能（Design Check Skill）基线
 
 > **SSOT ID**: ADR-002
-> **Version**: v2.1
-> **Scope**: 文档质量治理 / Pre-SSOT 准入门控 / 6 维度文档校验 / 纯 LLM Skill 架构
+> **Version**: v2.2
+> **Scope**: 文档质量治理 / Pre-SSOT 准入门控 / Minimal Spec 校验 / 6 维度文档校验 / 纯 LLM Skill 架构
 > **Owner**: 产品流程 / QA 治理 / 架构
 > **Governance Kind**: NEW
 > **Audience**: AI 实施代理、产品文档作者、Tech Lead、QA
@@ -37,7 +39,12 @@ context_policy:
 
 ## 文档定位
 
-本文档定义 Pre-SSOT 阶段 6 大维度文档校验技能的架构基线，回答"如何在 SSOT 形式化之前，用结构化规则拦截不充分的输入"。
+本文档定义 Pre-SSOT 阶段文档校验技能的架构基线，回答"如何在 SSOT 形式化之前，用结构化规则拦截不充分的输入"。
+
+自 ADR-006 起，`zdoc-write` 未显式指定详细文档类型时默认输出 **Minimal Spec (`doc_type: spec`)**。因此 Design Check 必须同时支持两类输入：
+
+1. **Minimal Spec 准入检查**：确认轻量 Spec 是否足以供人类审核和 AI 稳定实施，不得按完整 PRD/API/TECH/TESTSET 标准误判。
+2. **详细 SSOT 文档检查**：继续按 D1–D6 + XC 校验 PRD、UX、架构、测试、工程实施等详细设计文档。
 
 ## 关联文档
 
@@ -47,12 +54,14 @@ context_policy:
 | [zdoc-quality-loop](../zdoc-quality-loop/) | 平行互补 | Doc Quality Loop 侧重文档结构和可读性 |
 | [zcode-review-deep](../zcode-review-deep/) | 上下游 | Deep Code Review 在编码阶段拦截代码缺陷 |
 | [ADR-004](ADR-004-设计文档到实施任务拆分技能-I2I-Impl-Skill-设计规范.md) | 下游 | 校验通过后的设计文档进入任务拆分 |
+| [ADR-006](ADR-006-zdoc-write最小Spec模式-Minimal-Spec-Mode-设计决策.md) | 上游 | 定义 `zdoc-write` 默认 Minimal Spec 模式，要求下游识别轻量 Spec 与详细 SSOT 的差异 |
 
 ## 范围边界
 
 ### In Scope
 
-- Pre-SSOT 阶段 6 大维度文档校验规则定义（D1–D6 + XC）
+- Minimal Spec (`doc_type: spec`) 的轻量准入校验规则定义（MS）
+- Pre-SSOT 阶段 6 大维度详细文档校验规则定义（D1–D6 + XC）
 - 纯 LLM + 结构化输出架构设计
 - 校验严重级别（BLOCK/WARN/PASS/N/A）
 - 产物规范（JSON + Markdown + Verdict）
@@ -67,10 +76,11 @@ context_policy:
 
 本文档描述的设计成立的条件：
 
-1. 6 大维度校验规则（BD-1–BD-6, PD-1–PD-7, UX-1–UX-7, AD-1–AD-9, TD-1–TD-8, EI-1–EI-5）全部定义完成
-2. 跨维度一致性检查项（XC-1–XC-8）定义完成
-3. 产物规范（JSON Schema + Markdown 模板）定义完成
-4. 实现路线（Phase 1 MVP + Phase 2 域扩展）规划完成
+1. Minimal Spec 校验规则（MS-1–MS-8）定义完成，并明确不套用完整 PRD/API/TECH/TESTSET 标准
+2. 6 大维度详细文档校验规则（BD-1–BD-6, PD-1–PD-7, UX-1–UX-7, AD-1–AD-9, TD-1–TD-8, EI-1–EI-5）全部定义完成
+3. 跨维度一致性检查项（XC-1–XC-8）定义完成，且对单个 Minimal Spec 默认 SKIPPED
+4. 产物规范（JSON Schema + Markdown 模板）定义完成
+5. 实现路线（Phase 1 MVP + Phase 2 域扩展 + Phase 3 Minimal Spec 兼容）规划完成
 
 ## 1. 背景
 
@@ -140,6 +150,20 @@ ITERATION-DOCUMENT-CHECKLIST v2.1 已定义 6 大维度的必输文档与必输�
 2. 预审结果没有结构化记录，无法追溯
 3. 不通过的 PRD 退回后缺乏重新提交机制
 
+### 2.4 Minimal Spec 默认模式带来的兼容缺口
+
+ADR-006 决定 `zdoc-write` 默认输出 Minimal Spec 后，Design Check 如果仍按完整 SSOT 文档规则运行，会产生以下误判：
+
+| 缺口 | 表现 | 后果 |
+|------|------|------|
+| **无法识别 `spec`** | `doc_type: spec`、`SPEC-M...`、`# Goal/# Scope` 不在文档→域映射中 | Minimal Spec 被误判为 PRD/Tech 或未知文档 |
+| **Gate 结构规则不兼容** | G1 仍要求至少 3 个二级标题 | 采用一级 canonical headings 的 Minimal Spec 被错误 BLOCK |
+| **详细域 Rubric 误套用** | PD/AD/TD/EI 要求用户故事、API、测试用例、实施范围 | 轻量 Spec 被误判为缺少完整工程文档 |
+| **AI 假设边界未校验** | 无规则检查 AI 是否把推断内容写成正式事实 | Minimal Spec 重新膨胀，破坏 ADR-006 的低维护目标 |
+| **Review Card 未纳入检查** | Design Check 只看文档正文 | 缺失待确认决策、假设和风险的轻量审核入口 |
+
+因此 Design Check 必须新增 Minimal Spec 兼容层：识别 `spec`，执行 MS 专用 Rubric，并明确跳过不适用于轻量 Spec 的详细域检查。
+
 ---
 
 ## 3. 决策
@@ -160,12 +184,14 @@ ITERATION-DOCUMENT-CHECKLIST v2.1 已定义 6 大维度的必输文档与必输�
 │  LLM Agent（单一执行者）                                      │
 │  ────────────────────                                       │
 │  1. 读取输入文档                                             │
-│  2. 按 Rubric 逐项校验（G1–G5 → BD/UX/AD/TD/EI → XC）       │
-│  3. 输出结构化 JSON（每项: check_id + status + evidence）     │
-│  4. 输出人可读 Markdown 报告                                  │
+│  2. 识别文档族：Minimal Spec 或详细 SSOT 文档                 │
+│  3. 按 Rubric 逐项校验（G1–G5 → MS 或 D1–D6 → XC）           │
+│  4. 输出结构化 JSON（每项: check_id + status + evidence）     │
+│  5. 输出人可读 Markdown 报告                                  │
 │                                                             │
 │  域知识内嵌于 Prompt                                          │
 │  ────────────────────                                       │
+│  domains/minimal-spec/rubric.md     → 内嵌到 Prompt          │
 │  domains/business-design/rubric.md  → 内嵌到 Prompt          │
 │  domains/product-design/rubric.md   → 内嵌到 Prompt          │
 │  domains/ux-design/rubric.md        → 内嵌到 Prompt          │
@@ -195,25 +221,35 @@ ITERATION-DOCUMENT-CHECKLIST v2.1 已定义 6 大维度的必输文档与必输�
 关键原则：
 1. **只检不改**：校验技能只产出诊断报告，不修改文档内容
 2. **结构化输出**：每个检查项输出 check_id + status(PASS/WARN/BLOCK) + evidence + suggestion
-3. **MAC 驱动**：使用 ITERATION-DOCUMENT-CHECKLIST 定义的 Minimum Acceptable Criteria 作为判定阈值
-4. **分阶段执行**：先质量门（快速筛查，任一 BLOCK 则停止），再域检查，再跨维度一致性
+3. **MAC 驱动**：详细文档使用 ITERATION-DOCUMENT-CHECKLIST 定义的 Minimum Acceptable Criteria；Minimal Spec 使用 ADR-006 定义的轻量准入标准
+4. **分阶段执行**：先质量门（快速筛查，任一 BLOCK 则停止），再按文档族执行 MS 或详细域检查，再按需执行跨维度一致性
 5. **Prompt 即配置**：域的 Rubric 直接写在 Prompt 中，无需额外配置文件
+6. **不误判轻量 Spec**：`spec` 不要求用户故事、API 契约、技术设计、测试用例或实施范围；这些只在用户显式提交详细文档时检查
 
 ### 3.1.4 输入模型（Input Model）
 
-校验的输入粒度决定了可执行的检查范围。核心规则：**域检查需要对应文档，跨维度检查需要多文档**。
+校验的输入粒度决定了可执行的检查范围。核心规则：**先识别文档族，再选择 Rubric；Minimal Spec 走 MS 专用检查，详细文档走 D1–D6 + XC**。
 
 #### 输入模式
 
 | 模式 | 输入 | 可执行的检查 | 不可执行的检查 |
 |------|------|------------|--------------|
-| **单文档** | 1 个文件（如 PRD） | 通用质量门 G1–G5 + 该文档对应的域检查 | 跨维度一致性 XC（数据不足） |
-| **多文档** | 2+ 个不同域的文件 | 通用质量门 G1–G5 + 各域检查 + 跨维度一致性 XC | 无（全量检查） |
+| **Minimal Spec 单文档** | 1 个 `doc_type: spec` 或 `SPEC-M...` 文件 | 通用质量门 G1–G5（spec 兼容）+ MS-1–MS-8 | 详细域检查 D1–D6、跨维度一致性 XC |
+| **详细单文档** | 1 个 PRD/UX/Tech/TESTSET 等详细文档 | 通用质量门 G1–G5 + 该文档对应的域检查 | 跨维度一致性 XC（数据不足） |
+| **多文档** | 2+ 个不同域的文件，可包含 spec | 通用质量门 G1–G5 + MS（如有）+ 各详细域检查 + 可触发的 XC | 缺少相关域产物的 XC 项 |
 | **目录扫描** | `--dir docs/` | 自动发现所有文档，等同多文档模式 | 无 |
 
 #### 文档→域映射规则
 
-输入文档通过文件路径/内容自动识别所属域：
+输入文档通过文件路径/内容自动识别文档族与所属域：
+
+**Minimal Spec 识别（最高优先级）**：
+
+| 文档特征 | 识别规则 | 映射到域 |
+|---------|---------|---------|
+| Minimal Spec (`spec`) | `frontmatter.doc_type == spec` 或文件名以 `SPEC-M` 开头，或同时包含 `# Goal`、`# Scope`、`# Business Rules` 三个顶级英文标题 | MS Minimal Spec 域 |
+
+**详细 SSOT 文档识别**（非 spec）：
 
 | 文档特征 | 识别规则 | 映射到域 |
 |---------|---------|---------|
@@ -257,6 +293,7 @@ XC 检查项的触发取决于相关域的产物是否存在：
 
 | 域 ID | 域名称 | Checklist 章节 | Check ID 前缀 | 必输文档 | 状态 |
 |-------|--------|---------------|---------------|---------|------|
+| **MS** | Minimal Spec 准入检查 | ADR-006 | `MS-*` | Minimal Spec + Review Card | **计划** |
 | **D1** | 商业设计 | §2.1 | `BD-*` | 产品愿景、范围声明、成功指标 | **v2.0 已实现** |
 | **D2** | 产品设计 | §2.2 | `PD-*` | PRD、用户旅程地图 | **v2.0 已实现** |
 | **D3** | UX 设计 | §2.3 | `UX-*` | UX 规格说明书、用户旅程原型 | **v2.0 已实现** |
@@ -269,11 +306,24 @@ XC 检查项的触发取决于相关域的产物是否存在：
 
 | Gate ID | 检查项 | 校验规则 | 判定标准 |
 |---------|--------|---------|---------|
-| **G1** | 文档存在性 | 必输文档至少各有 1 份 | 文件存在 + 非空 + 非模板占位符 |
+| **G1** | 文档存在性 | 必输文档至少各有 1 份 | 文件存在 + 非空 + 非模板占位符<br>**spec 兼容**：接受一级 canonical headings（`# Goal/# Scope`），不强求至少 3 个二级标题 |
 | **G2** | 决策可追溯性 | 关键决策有依据说明 | 含"依据"/"基于"/"参考"或标注"暂定" |
-| **G3** | 异常覆盖度 | 异常流程含三层结构 | 错误码 + 系统行为 + 用户感知 |
-| **G4** | 可测试性 | AC 有 GWT 或可观察指标 | 至少 1 条通过模式匹配 |
+| **G3** | 异常覆盖度 | 异常流程含三层结构 | 错误码 + 系统行为 + 用户感知<br>**spec 兼容**：无要求（SKIPPED） |
+| **G4** | 可测试性 | AC 有 GWT 或可观察指标 | 至少 1 条通过模式匹配<br>**spec 兼容**：接受 Acceptance 下的草案或 Review Card 中的内容 |
 | **G5** | 一致性 | 跨文档概念一致 | 术语和数值匹配 |
+
+#### MS: Minimal Spec 准入检查项（计划）
+
+| Check ID | 检查项 | MAC 标准 |
+|----------|--------|---------|
+| **MS-1** | 固定章节完整性 | 必含 `# Goal`、`# Scope`、`# Business Rules`、`# Constraints`、`# Acceptance` 五个一级标题 |
+| **MS-2** | 禁止实现内容 | 无类设计、函数设计、伪代码、数据库表设计、接口定义、任务拆解、实现步骤、技术选型细节 |
+| **MS-3** | Goal 存在性 | Goal 非空，表达 3–10 行的目标与边界 |
+| **MS-4** | 不推断关键事实 | Business Rules、Constraints、Acceptance 不把 AI 推断内容写成正式事实；候选约束、草案 AC 放入 `# Acceptance > Draft` 或 Review Card |
+| **MS-5** | Review Card 合规性 | 有 Review Card，不超过 1 页，最多 3 个决策、5 个假设、5 个风险 |
+| **MS-6** | 长度合规性 | 小需求 ≤ 1 页，中需求 ≤ 3 页，大需求 ≤ 5 页 |
+| **MS-7** | 输出目录合规性 | 在 `docs/mvp-lite/specs/` 正式批准前，spec 不自动写入其他固定目录，除非用户显式指定 `--output-dir` |
+| **MS-8** | 无模糊的占位内容 | 不含 `TODO`/`TBD`/`占位`/`待补充` 等占位符；缺失内容在 Review Card 提问，或标注 `Draft` |
 
 #### D1: 商业设计检查项（v1.0 已定义）
 
@@ -376,30 +426,37 @@ XC 检查项的触发取决于相关域的产物是否存在：
     │
     ├── 读取输入文档路径（单个/多个/目录扫描）
     ├── 读取文档内容
+    ├── 识别文档族：先检查是否为 Minimal Spec（最高优先级），否则按详细文档识别
     ├── 确定文档→域映射（路径关键词 + 内容特征）
     ├── 构建 LLM 上下文：文档内容 + 对应域 Rubric
     │
     ▼
 阶段 2: 通用质量门 — G1–G5 [LLM]
     │
-    ├── 按 Rubric 逐项校验
+    ├── 按 Rubric 逐项校验（spec 走兼容分支）
     ├── 判定: 任一 BLOCK → 停止，输出缺失项清单
     │
     ▼
-阶段 3: 领域检查 — 按域逐项校验 [LLM]
+阶段 3: 领域检查 — 按文档族分支 [LLM]
     │
-    ├── 对每个已识别的域:
-    │   ├── 内嵌该域的 Rubric 到 Prompt
-    │   ├── 按 Rubric 逐项检查
-    │   └── 输出该域的检查结果（check_id + status + evidence）
+    ├── 若为 Minimal Spec:
+    │   ├── 执行 MS-1–MS-8
+    │   ├── 输出 MS 检查结果
+    │   └── 跳过所有详细域 D1–D6 检查（注：只对单个 Minimal Spec）
     │
-    ├── 判定: 任一域有 BLOCK → 记录但继续其他域（不互相阻塞）
+    ├── 若为详细文档:
+    │   ├── 对每个已识别的域:
+    │   │   ├── 内嵌该域的 Rubric 到 Prompt
+    │   │   ├── 按 Rubric 逐项检查
+    │   │   └── 输出该域的检查结果（check_id + status + evidence）
+    │   └── 判定: 任一域有 BLOCK → 记录但继续其他域（不互相阻塞）
     │
     ▼
 阶段 4: 跨维度一致性 — XC [LLM]（仅多文档模式）
     │
     ├── 从各域结果中提取指标/故事/AC/Feature/Scope 列表
     ├── 按 cross-dimension/rubric.md 做语义对齐
+    ├── 仅单个 Minimal Spec 时，所有 XC 项标记 SKIPPED（原因：minimal_spec_single_mode）
     │
     ▼
 阶段 5: 结构化输出 [LLM]
@@ -550,19 +607,34 @@ zdoc-design-check --dir docs/ --layer gate-only
 | **D6 工程实施** | 5 | `domains/engineering/rubric.md` | **已完成** |
 | **XC 跨维度** | 8 | `cross-dimension/rubric.md` | **已完成** |
 
+#### Phase 3: Minimal Spec 兼容（计划）
+
+**目标**：适配 ADR-006 的默认 Minimal Spec 模式，避免误判轻量 Spec。
+
+| 事项 | 说明 | 状态 |
+|------|------|------|
+| **MS 域 Rubric 编写** | `domains/minimal-spec/rubric.md`，定义 MS-1–MS-8 | 计划 |
+| **Gate 规则更新** | G1 接受一级 canonical headings；G3 对 spec SKIPPED | 计划 |
+| **文档→域映射更新** | 优先识别 `doc_type: spec`、`SPEC-M`、`# Goal/# Scope` | 计划 |
+| **XC 触发规则更新** | 单个 Minimal Spec 时所有 XC 项 SKIPPED | 计划 |
+| **SKILL.md 更新** | 更新执行流程分支与 Prompt 约束 | 计划 |
+
 ---
 
 ## 4. 术语定义
 
 | 术语 | 定义 |
 |------|------|
-| **Design Check Skill** | Pre-SSOT 阶段的 6 大维度文档校验技能，采用纯 LLM + 结构化输出架构 |
+| **Design Check Skill** | Pre-SSOT 阶段的文档校验技能，支持 Minimal Spec 轻量准入和详细文档 6 维度检查，采用纯 LLM + 结构化输出架构 |
+| **文档族** | Minimal Spec 或详细 SSOT 文档两类输入类型，分别走 MS 或 D1–D6 检查 |
+| **Minimal Spec** | `zdoc-write` 默认输出的轻量规格文档，采用 `doc_type: spec` 或 `SPEC-M...` 命名，只含 Goal、Scope、Context Diagram、Business Rules、Constraints、Acceptance、Risks，不含实现细节 |
 | **域 Rubric** | 每个校验维度的检查规则定义，内嵌于 LLM Prompt 中 |
 | **MAC (Minimum Acceptable Criteria)** | 每个必输要素的最低可接受标准，达到即视为"已拍板" |
 | **质量门 (Gate)** | 快速筛查机制，任一不通过则停止详细检查 |
 | **迭代类型** | 功能迭代（现有框架内增改）vs 商业迭代（涉及收费/权限/合规/核心数据模型变更） |
 | **BLOCK** | 阻塞级别，必须补充后才能进入 SSOT |
 | **语义漂移** | SSOT 阶段因输入不足而自由发挥，导致产出偏离原始设计意图 |
+| **canonical headings** | Minimal Spec 采用的英文一级标题（`# Goal`、`# Scope`、`# Business Rules` 等），提升 Agent 读取稳定性 |
 
 ---
 
@@ -728,38 +800,90 @@ zdoc-design-check --dir docs/ --layer gate-only
 |------|------|
 | Out of Scope 内容未被任何 Feature 涵盖 | Out of Scope 内容被 Feature 涵盖 |
 
+### 5.5 Minimal Spec Rubric
+
+#### MS-1 — 固定章节完整性
+
+| PASS 条件 | FAIL 条件 |
+|----------|----------|
+| 包含 `# Goal`、`# Scope`、`# Business Rules`、`# Constraints`、`# Acceptance` 五个一级标题 | 缺少任一必含章节 |
+
+#### MS-2 — 禁止实现内容
+
+| PASS 条件 | FAIL 条件 |
+|----------|----------|
+| 文档中**不含**类设计、函数设计、伪代码、数据库表设计、接口定义、任务拆解、实现步骤、技术选型细节 | 出现任一禁止项 |
+
+#### MS-3 — Goal 存在性
+
+| PASS 条件 | FAIL 条件 |
+|----------|----------|
+| Goal 非空，3–10 行，清晰表达目标与边界 | Goal 为空或不足 2 行 |
+
+#### MS-4 — 不推断关键事实
+
+| PASS 条件 | FAIL 条件 |
+|----------|----------|
+| Business Rules、Constraints、Acceptance 仅记录用户明确提供内容；AI 候选内容放入 `# Acceptance > Draft` 或 Review Card 并标注为假设/待确认 | AI 推断内容被写成正式事实，无标注 |
+
+#### MS-5 — Review Card 合规性
+
+| PASS 条件 | FAIL 条件 |
+|----------|----------|
+| 存在 Review Card，不超过 1 页，最多 3 个决策、5 个假设、5 个风险 | 缺少 Review Card 或数量超限 |
+
+#### MS-6 — 长度合规性
+
+| PASS 条件 | FAIL 条件 |
+|----------|----------|
+| 小需求 ≤ 1 页，中需求 ≤ 3 页，大需求 ≤ 5 页 | 超过限制且未建议拆分或转为详细文档 |
+
+#### MS-7 — 输出目录合规性
+
+| PASS 条件 | FAIL 条件 |
+|----------|----------|
+| 在 `docs/mvp-lite/specs/` 正式批准前，spec 不自动写入其他固定目录；或用户显式指定 `--output-dir` | 未经用户显式指定，自动写入未批准的固定目录 |
+
+#### MS-8 — 无模糊占位内容
+
+| PASS 条件 | FAIL 条件 |
+|----------|----------|
+| 不含 `TODO`/`TBD`/`占位`/`待补充` 等占位符；缺失内容在 Review Card 提问，或标注 `Draft` | 出现占位符且未在 Review Card 中补充 |
+
 ---
 
 ## 6. Consequences
 
 ### 6.1 正向影响
 
-1. **全维度覆盖**：55 项检查覆盖 6 大维度 + 跨维度一致性，Pre-SSOT 输入质量全面可控
-2. **SSOT 语义漂移减少**：源头输入充分后，SSOT 自由发挥的概率显著降低
-3. **迭代类型差异化处理**：功能迭代与商业迭代的校验范围自动适配
+1. **全维度覆盖**：55 项检查覆盖 6 大维度 + 跨维度一致性，Pre-SSOT 输入质量全面可控；新增 8 项 Minimal Spec 检查，支持 ADR-006 的默认模式
+2. **SSOT 语义漂移减少**：源头输入充分后，SSOT 自由发挥的概率显著降低；MS-4 规则防止 AI 把推断内容写入正式 Spec，维护长期资产质量
+3. **迭代类型差异化处理**：功能迭代与商业迭代的校验范围自动适配；Minimal Spec 与详细文档的检查逻辑自动分支
 4. **可追溯**：每次检查产出结构化 JSON + 人可读报告，支持事后审计
-5. **与现有流程无缝衔接**：校验报告可直接作为 SSOT 启动的准入凭证
-6. **架构极简**：纯 LLM 架构，无 Python 脚本层、无 JSON 衔接、无插件加载协议，维护成本最低
+5. **与现有流程无缝衔接**：校验报告可直接作为 SSOT 启动的准入凭证；对单个 Minimal Spec 直接给出"可进入 AI 实施"的轻量判断
+6. **架构极简**：纯 LLM 架构，无 Python 脚本层、无 JSON 衔接、无插件加载协议，维护成本最低；新增 MS 域仅需新增一个 Rubric 文件，无需调整核心执行逻辑
 7. **渐进可扩展**：新增维度 = 新增 Rubric 文件 + Prompt 内嵌，核心逻辑不变
 8. **确定性检查 Prompt 约束**：通过"请逐项计数并输出数字"等 Prompt 指令缓解 LLM 在确定性检查上的偶尔偏差
 
 ### 6.2 代价
 
-1. **额外流程开销**：每次迭代增加 5–10 分钟的文档校验时间
-2. **文档作者负担**：Out of Scope 具体化、成功指标可量化化等要求提高了文档撰写标准
-3. **误报风险**：LLM 语义判断可能对自然语言描述产生误判
-4. **维护成本**：校验规则需随 ITERATION-DOCUMENT-CHECKLIST 版本更新同步维护
+1. **额外流程开销**：每次迭代增加 5–10 分钟的文档校验时间；Minimal Spec 快速准入可缩短至 2–3 分钟
+2. **文档作者负担**：详细文档仍要求 Out of Scope 具体化、成功指标可量化化；Minimal Spec 降低了作者负担，但要求严格区分正式事实与 AI 假设
+3. **误报风险**：LLM 语义判断可能对自然语言描述产生误判；在 Minimal Spec 的一级标题识别上可加规则锚定降低误报
+4. **维护成本**：校验规则需随 ITERATION-DOCUMENT-CHECKLIST 版本更新同步维护；同时需随 ADR-006 的调整同步维护 MS 规则
 5. **确定性检查准确率**：LLM 执行确定性检查（文件存在、计数、关键词匹配）偶尔有偏差（~2%），通过 Prompt 约束缓解
-6. **Token 成本**：确定性检查也消耗 LLM Token（~8K vs 混合架构的 ~4K），但省去了 Python 层的开发维护成本
+6. **Token 成本**：确定性检查也消耗 LLM Token（~8K vs 混合架构的 ~4K），但省去了 Python 层的开发维护成本；Minimal Spec 检查 Token 量约为 3–4K
 
 ### 6.3 度量指标
 
 | 指标 | 目标 | 度量方式 |
 |------|------|---------|
-| Pre-SSOT 一次通过率 | > 70% | 设计检查 PASS / 总检查次数 |
+| Pre-SSOT 一次通过率（详细文档） | > 70% | 设计检查 PASS / 总检查次数 |
+| Minimal Spec 快速准入一次通过率 | > 85% | MS-1–MS-8 全 PASS / 总检查次数 |
 | SSOT 语义漂移率 | < 10% | SSOT 产出中发现的漂移项 / 总产出项 |
 | 平均返工次数 | < 1.5 次 | 迭代从首次提交到通过的平均次数 |
 | 校验覆盖率 | 100% | 已校验的必输要素 / 总必输要素 |
+| Minimal Spec 误判率 | < 5% | 被错误 BLOCK/WARN 的 Minimal Spec 数量 / 总检查数量 |
 
 ---
 
@@ -816,6 +940,7 @@ zdoc-design-check --dir docs/ --layer gate-only
 | P4 | §二 PRD 可测性预审 P4 | AI 输出模式 |
 | P5 | §二 PRD 可测性预审 P5 | 阈值可追溯 |
 | XC-1–4 | §4.1 输入输出一致性校验 | 来源追溯规则 |
+| MS-1–MS-8 | ADR-006 | Minimal Spec 默认模式规范 |
 
 ## 附录 B: 模板 A 映射（全维度覆盖）
 
@@ -831,6 +956,7 @@ zdoc-design-check --dir docs/ --layer gate-only
 | 5.1–5.9 测试设计 | D5: TD-1–TD-8 | `domains/test-design/rubric.md` | **v2.0 已实现** |
 | 6.1–6.5 工程实施 | D6: EI-1–EI-5 | `domains/engineering/rubric.md` | **v2.0 已实现** |
 | §4.1 输入输出一致性 | XC: XC-1–XC-8 | `cross-dimension/rubric.md` | **v2.0 已实现** |
+| （Minimal Spec） | MS: MS-1–MS-8 | `domains/minimal-spec/rubric.md` | **计划** |
 
 ---
 
@@ -838,6 +964,7 @@ zdoc-design-check --dir docs/ --layer gate-only
 
 | 版本 | 日期 | 变更摘要 |
 |------|------|---------|
+| **v2.2** | 2026-06-15 | 适配 ADR-006 Minimal Spec 默认模式：新增 MS 域（MS-1–MS-8）；更新文档→域映射，优先识别 `doc_type: spec`/`SPEC-M`；Gate 规则兼容 spec 一级 canonical headings；单个 Minimal Spec 时 XC 默认 SKIPPED；新增 §2.4 兼容缺口；更新执行流程分支；新增 Phase 3 实现路线；新增 5.5 Minimal Spec Rubric；更新 Consequences 与度量指标；更新关联文档与附录映射 |
 | **v2.1** | 2026-05-28 | 文档结构升级：添加 YAML frontmatter（符合 DOC-WRITING-GUIDE 标准）；更新文档状态管理规则；添加 relationships 和 context_policy 字段；调整章节结构以符合通用章节要求；修复相对链接路径；补充 ADR-004 双向依赖关系；重新编号 §3.5–§3.8 章节 |
 | **v2.0** | 2026-05-27 | 架构简化为纯 LLM + 结构化输出；移除 Python 脚本层（scanner.py / reporter.py / 编排引擎）和插件加载协议；移除执行者矩阵（全部由 LLM 执行）；移除 Python↔LLM 衔接协议；产物简化为 3 个文件（JSON + Markdown + Verdict）；实现路线改为 2 阶段（MVP → 域扩展）；更新 Rejected Alternatives（混合架构 §7.6 替代纯 LLM 长期方案） |
 | **v1.2** | 2026-05-27 | 架构升级为 Skill 家族 + 领域插件（§3.1）；校验维度从 D1 扩展到 6 域 + 跨维度共 55 项检查（§3.2）；执行流程改为插件化编排（§3.4）；新增领域插件协议（§3.1.3）；新增输入模型定义（§3.1.4：单文档/多文档/目录扫描、文档→域映射、XC 触发条件）；新增 D2–D6 + XC 检查项定义；产物目录改为插件化结构（§3.6）；实现路线改为三阶段（§3.9）；新增 Rejected Alternatives §7.8–7.9（单体扩展/完全独立） |
@@ -846,6 +973,6 @@ zdoc-design-check --dir docs/ --layer gate-only
 
 ---
 
-*文档版本：v2.1*
+*文档版本：v2.2*
 *创建日期：2026-05-27*
-*最后更新：2026-05-28*
+*最后更新：2026-06-15*
