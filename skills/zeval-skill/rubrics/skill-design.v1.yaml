@@ -1,0 +1,113 @@
+id: skill-design
+version: 1.0.0
+description: 评估 skill 设计文档（SKILL.md）的结构与边界
+target_kinds:
+  - skill-design
+  - skill-impl
+
+dimensions:
+  - id: completeness
+    description: SKILL.md 是否覆盖必备章节
+    weight: 1.0
+    evidence_required: true
+    levels:
+      excellent:
+        min: 0.9
+        desc: 全部章节齐全且内容充实
+      good:
+        min: 0.7
+        desc: 主要章节齐全
+      acceptable:
+        min: 0.5
+        desc: 关键章节齐全，但有遗漏
+      poor:
+        min: 0.3
+        desc: 多处缺失
+      fail:
+        min: 0.0
+        desc: 几乎缺失
+    required_signals:
+      - "## 1. 目标与非目标 章节存在"
+      - "## 2. 输入/输出 章节存在"
+      - "## 3. 执行步骤 章节存在"
+      - "何时使用 / 何时不使用 区分明确"
+
+  - id: boundary-clarity
+    description: 是否清晰说明"做什么"与"不做什么"
+    weight: 1.5
+    evidence_required: true
+    levels:
+      excellent:
+        min: 0.9
+        desc: 目标/非目标二分明确，且非目标具体可验证
+      good:
+        min: 0.7
+        desc: 有目标/非目标，但非目标略抽象
+      acceptable:
+        min: 0.5
+        desc: 仅目标清晰，非目标缺失
+      poor:
+        min: 0.3
+        desc: 目标模糊
+      fail:
+        min: 0.0
+        desc: 无明确目标
+    fail_if:
+      - "未出现 '非目标' / 'NOT to use' / 'When NOT' 章节"
+    required_signals:
+      - "显式列出 '不做什么'"
+
+  - id: examples-runnable
+    description: 示例是否可独立执行
+    weight: 1.0
+    evidence_required: true
+    levels:
+      excellent:
+        min: 0.9
+        desc: 示例含完整命令、参数、预期输出
+      good:
+        min: 0.7
+        desc: 示例含命令与参数
+      acceptable:
+        min: 0.5
+        desc: 示例为伪代码
+      poor:
+        min: 0.3
+        desc: 示例残缺
+      fail:
+        min: 0.0
+        desc: 无示例
+    required_signals:
+      - "存在具体命令示例"
+
+  - id: pitfalls
+    description: 是否列出常见坑 / 反模式
+    weight: 0.8
+    evidence_required: false
+    levels:
+      excellent:
+        min: 0.9
+        desc: "≥3 条 pitfall 且每条带规避方法"
+      good:
+        min: 0.7
+        desc: "≥2 条 pitfall"
+      acceptable:
+        min: 0.5
+        desc: "≥1 条 pitfall"
+      poor:
+        min: 0.3
+        desc: 提及但未具体
+      fail:
+        min: 0.0
+        desc: 无 pitfall 章节
+
+adjudication:
+  strategy: weighted-mean
+  pass_threshold: 0.75
+  fail_threshold: 0.45
+  any_dimension_fail_blocks: false
+  conflict_threshold: 0.4
+
+baseline:
+  regression_threshold: 0.10
+  default_mode: compare

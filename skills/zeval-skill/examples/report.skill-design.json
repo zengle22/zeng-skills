@@ -1,0 +1,71 @@
+{
+  "run_id": "r-2026-06-10-001",
+  "request_hash": "sha256:7f3a9c2e1b8d4f5a...",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-corr",
+      "dimension": "completeness",
+      "score": 0.82,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "5/6 必备章节齐全，缺错误处理章节。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "SKILL.md", "quote": "## 3. 执行步骤" }
+      ]
+    },
+    {
+      "judge_id": "j-comp",
+      "dimension": "boundary-clarity",
+      "score": 0.90,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "目标/非目标二分清晰，非目标具体可验证。",
+      "evidence_refs": [
+        { "kind": "line", "ref": "SKILL.md:42", "quote": "## When NOT to use" }
+      ]
+    },
+    {
+      "judge_id": "j-clr",
+      "dimension": "examples-runnable",
+      "score": 0.65,
+      "level": "acceptable",
+      "weight": 1.0,
+      "rationale": "示例含命令但缺预期输出。",
+      "evidence_refs": [
+        { "kind": "line", "ref": "SKILL.md:78", "quote": "zdoc run --input ..." }
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.79,
+    "rationale": "completeness 与 boundary-clarity 良好；examples-runnable 待加强。",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "pass",
+    "code": "G000",
+    "message": "All clear"
+  },
+  "baseline": {
+    "baseline_id": "sha256:abc123...",
+    "delta": 0.03,
+    "regressed_dimensions": []
+  },
+  "artifacts": {
+    "report_path": ".zeval/runs/r-2026-06-10-001/report.json",
+    "raw_judgments": [".zeval/runs/r-2026-06-10-001/judgments/j-corr.json"],
+    "replay_bundle": ".zeval/runs/r-2026-06-10-001/replay_bundle/"
+  },
+  "meta": {
+    "created_at": "2026-06-10T16:50:00Z",
+    "duration_ms": 12340,
+    "model_versions": {
+      "j-corr": "claude-opus-4-6",
+      "j-comp": "claude-opus-4-6",
+      "j-clr":  "claude-sonnet-4-6"
+    }
+  }
+}

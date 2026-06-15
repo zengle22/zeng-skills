@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "zeval/EvalReport.schema.json",
+  "title": "EvalReport",
+  "description": "zeval-skill 的标准评估输出",
+  "type": "object",
+  "required": ["run_id", "request_hash", "rubric_id", "rubric_version", "scores", "verdict", "gate"],
+  "properties": {
+    "run_id":        { "type": "string" },
+    "request_hash":  { "type": "string" },
+    "rubric_id":     { "type": "string" },
+    "rubric_version":{ "type": "string" },
+    "scores": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["judge_id", "dimension", "score", "level", "evidence_refs"],
+        "properties": {
+          "judge_id":  { "type": "string" },
+          "dimension": { "type": "string" },
+          "score":     { "type": "number", "minimum": 0, "maximum": 1 },
+          "level":     { "enum": ["excellent", "good", "acceptable", "poor", "fail", "skip"] },
+          "weight":    { "type": "number" },
+          "rationale": { "type": "string" },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "ref"],
+              "properties": {
+                "kind":  { "enum": ["file", "line", "url", "tool-output", "agent-message"] },
+                "ref":   { "type": "string" },
+                "quote": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "required": ["verdict", "score"],
+      "properties": {
+        "verdict":   { "enum": ["pass", "pass-with-warn", "fail", "blocked", "conflicted"] },
+        "score":     { "type": "number" },
+        "rationale": { "type": "string" },
+        "conflicts": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "required": ["status", "code"],
+      "properties": {
+        "status":  { "enum": ["pass", "warn", "fail", "blocked"] },
+        "code":    { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "properties": {
+        "baseline_id": { "type": "string" },
+        "delta":       { "type": "number" },
+        "regressed_dimensions": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "report_path":   { "type": "string" },
+        "raw_judgments": { "type": "array" },
+        "replay_bundle": { "type": "string" }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "created_at":     { "type": "string", "format": "date-time" },
+        "duration_ms":    { "type": "integer" },
+        "model_versions": { "type": "object" }
+      }
+    }
+  }
+}
