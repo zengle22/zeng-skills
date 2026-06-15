@@ -2,7 +2,9 @@
 
 XC 跨维度一致性检查项。基于 ITERATION-DOCUMENT-CHECKLIST v2.1 §4.1。
 
-XC 检查项缺少任一相关域产物时标记 `SKIPPED`（原因：`missing_domain:{domain_id}`），不计入 BLOCK/WARN。
+XC 检查项缺少任一相关域产物时标记 `SKIPPED`，不计入 BLOCK/WARN。
+
+**重要规则**：仅输入单个 Minimal Spec 时，所有 XC 检查项默认标记 `SKIPPED`，原因 `minimal_spec_single_mode`。
 
 ---
 
