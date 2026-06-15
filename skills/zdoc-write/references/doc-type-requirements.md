@@ -5,9 +5,9 @@
 
 ---
 
-## 通用必填章节（所有类型）
+## 通用必填章节（详细类型）
 
-以下章节适用于除 `stg/`、`reviews/`、`ux-prototypes/` 之外的所有文档：
+以下章节适用于除 `spec`、`stg/`、`reviews/`、`ux-prototypes/` 之外的所有详细文档：
 
 | 章节 | 说明 |
 |------|------|
@@ -21,6 +21,50 @@
 ---
 
 ## 类型特定规范
+
+### Spec — 最小需求规格 (`spec`)
+
+**命名**: `SPEC-M{编号}-{Slug}.md`
+
+**目录**: 建议为 `docs/mvp-lite/specs/`；在 DOC-WRITING-GUIDE 批准前只能写入用户显式指定的 `--output-dir`。
+
+**必须包含**:
+- Goal：3~10 行说明为什么做、解决什么问题
+- Scope：In Scope / Out of Scope
+- Context Diagram：只表达用户已提供的实体关系；上下文不足时写“未提供足够上下文”
+- Business Rules：编号为 R1...Rn，仅填写用户明确提供或已确认的规则
+- Constraints：编号为 C1...Cn，仅填写用户明确提供或已确认的约束
+- Acceptance：编号为 A1...An，仅填写用户明确提供或已确认的验收标准
+- Risks：可选，仅复杂需求填写
+
+**缺失内容处理**:
+- Goal 缺失：停止并询问
+- Scope 缺失：在 Review Card 提问，不生成默认范围
+- Business Rules 缺失：列出需要补充的问题，不写入正式规则
+- Constraints 缺失：放入 Review Card 的 AI 假设，不写入正式约束
+- Acceptance 缺失：放入 Review Card；如写正文，只能作为 `# Acceptance` 下的 `Draft` 小节
+
+**禁止包含**:
+- 类设计
+- 函数设计
+- 伪代码
+- 数据库表设计
+- 接口定义
+- 任务拆解
+- 实现步骤
+- 技术选型细节
+
+**长度限制**:
+- 小需求 ≤ 1 页
+- 中需求 ≤ 3 页
+- 大需求 ≤ 5 页
+
+**Review Card**:
+- 使用 `templates/review-card.md`
+- 最多 1 页
+- 最多 3 个决策、5 个假设、5 个风险
+
+---
 
 ### PRD — 产品需求文档 (`prds/`)
 
@@ -439,6 +483,7 @@
 
 | 类型代码 | 目录 | 层级 |
 |---------|------|------|
+| `spec` | 用户显式 `--output-dir`；正式目录待批准 | L1 业务层 |
 | `prd` | `prds/` | L1 业务层 |
 | `arch` | `arch/` | L2 设计层 |
 | `api` | `api/` | L2 设计层 |
@@ -463,21 +508,22 @@
 
 ### 新增文档前检查
 
-1. 确定文档类型 → 加载对应必输章节
-2. 确定模块编号 → 填入 frontmatter `module_id`
-3. 确定层级 → 填入 frontmatter `layer`
-4. 确定优先级 → 填入 frontmatter `priority`
+1. 确定文档类型 → 未显式指定时默认为 `spec`
+2. 加载对应必输章节 → `spec` 加载 Minimal Spec；详细类型加载对应规范
+3. 确定模块编号 → 模块级文档填入 frontmatter `module_id`
+4. 详细类型确定层级和优先级 → 填入 frontmatter `layer` / `priority`
 
 ### 输出前检查
 
-1. Frontmatter 包含 title、status、created
-2. 所有必输章节已生成（无遗漏）
-3. 无占位符残留（`TODO`、`TBD`、`{placeholder}` 已处理）
-4. 命名符合 DOC-WRITING-GUIDE §0.6
-5. 交叉引用格式正确
-6. 不包含其他类型文档的专属内容
-7. Out of Scope 至少列出 3 项具体内容
-8. Open Questions / Assumptions 已记录（或明确无未决问题）
-9. **API 文档变更检测**：API 文档必须包含"变更说明"章节或"首次撰写"标注
-10. **破坏性变更确认**：检测到破坏性变更（删除端点、字段类型变更、行为变更）时，决策摘要中必须包含确认项
-11. **旧文档关联**：涉及变更时，frontmatter `related_docs` 和 `relationships.supersedes` 必须关联旧文档
+1. Frontmatter 包含 title、status、created；`spec` 还需 doc_id、doc_type
+2. `spec` 包含 Goal、Scope、Context Diagram、Business Rules、Constraints、Acceptance、Risks（可选）
+3. 详细类型所有必输章节已生成（无遗漏）
+4. 无占位符残留（`TODO`、`TBD`、`{placeholder}` 已处理）
+5. 命名符合 DOC-WRITING-GUIDE §0.6；`spec` 使用 `SPEC-M{编号}-{Slug}.md`
+6. 交叉引用格式正确
+7. 不包含其他类型文档的专属内容；`spec` 不包含实现设计、接口定义、伪代码或任务拆解
+8. Out of Scope 具体；`spec` 缺失 Scope 时不得自动生成默认范围
+9. Open Questions / Assumptions 已记录（或明确无未决问题）；`spec` 使用 Review Card 记录假设和待确认项
+10. **API 文档变更检测**：API 文档必须包含"变更说明"章节或"首次撰写"标注
+11. **破坏性变更确认**：检测到破坏性变更（删除端点、字段类型变更、行为变更）时，决策摘要中必须包含确认项
+12. **旧文档关联**：涉及变更时，frontmatter `related_docs` 和 `relationships.supersedes` 必须关联旧文档

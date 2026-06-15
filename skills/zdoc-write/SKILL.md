@@ -1,7 +1,7 @@
 ---
 name: zdoc-write
-description: "标准文档撰写引擎。根据用户输入撰写 16 种 SSOT 文档（PRD/Arch/API/UX/Tech/Test/Data/DDD/Skill/Adapter/Job/Business/Strategy/Review/Testset/UX-Prototype），自动填充必输章节、补充缺失内容、识别核心决策点和分歧点供用户确认，严格遵循 DOC-WRITING-GUIDE 和 ITERATION-DOCUMENT-CHECKLIST 完整性要求。"
-argument-hint: "<type> [--input PATH] [--module ID] [--output-dir DIR] [--project PATH]"
+description: "最小 Spec 优先的标准文档撰写引擎。未显式指定类型时默认生成人类 3 分钟可审核的 Minimal Spec；显式指定时仍支持 PRD/Arch/API/UX/Tech/Testset/Data/DDD/Skill/Adapter/Job/Business/Strategy/Review/UX-Prototype/Impl/Req 等详细 SSOT 文档。"
+argument-hint: "[spec|type] [--input PATH] [--module ID] [--output-dir DIR] [--project PATH]"
 allowed-tools:
   - Read
   - Write
@@ -14,7 +14,7 @@ allowed-tools:
 
 # zdoc-write
 
-标准文档撰写引擎 — 根据输入撰写符合 SSOT 规范的文档，自动补充缺失内容，识别核心决策点和分歧点供用户确认。
+最小 Spec 优先的标准文档撰写引擎 — 未显式指定类型时默认生成人类 3 分钟可审核、AI 可稳定执行的 Minimal Spec；显式指定类型时生成对应详细 SSOT 文档。
 
 ## Primary Abstraction
 
@@ -37,14 +37,14 @@ Canonical bundle: `zdoc-write/`
 
 ## Canonical Authority
 
-- DOC-WRITING-GUIDE v1.0 (`docs/mvp-lite/DOC-WRITING-GUIDE.md`)
+- DOC-WRITING-GUIDE v1.0 (`docs/DOC-WRITING-GUIDE.md`)
 - ITERATION-DOCUMENT-CHECKLIST v2.1 (`docs/ITERATION-DOCUMENT-CHECKLIST.md`)
 
 ## 关联文档
 
 | 文档 | 关系 | 说明 |
 |------|------|------|
-| [DOC-WRITING-GUIDE](../../docs/mvp-lite/DOC-WRITING-GUIDE.md) | 上游 | 文档类型、命名、必输章节规范 |
+| [DOC-WRITING-GUIDE](../../docs/DOC-WRITING-GUIDE.md) | 上游 | 文档类型、命名、必输章节规范 |
 | [ITERATION-DOCUMENT-CHECKLIST](../../docs/ITERATION-DOCUMENT-CHECKLIST.md) | 上游 | 完整性要求、MAC 标准 |
 | zdoc-design-check | 下游 | 写完后可调用做质量校验 |
 | zdoc-i2i | 下游 | 校验通过后可调用做实施转化 |
@@ -55,6 +55,7 @@ Canonical bundle: `zdoc-write/`
 
 | 类型代码 | 文档类型 | 目录 | 命名规范 |
 |---------|---------|------|---------|
+| `spec` | 最小 Spec | 用户显式 `--output-dir`；正式目录待 DOC-WRITING-GUIDE 批准 | `SPEC-M{编号}-{Slug}.md` |
 | `prd` | 产品需求文档 | `prds/` | `PRD-M{编号}-{Module-Slug}.md` |
 | `arch` | 架构设计 | `arch/` | `ARCH-LITE-{序号}-{Slug}.md` 或 `ARCH-M{编号}-{Slug}.md` |
 | `api` | API 契约 | `api/` | `API-M{编号}-{Slug}.md` 或 `API-{序号}-{slug}.md` |
@@ -85,8 +86,8 @@ Canonical bundle: `zdoc-write/`
 │  Phase 1: 输入分析与类型识别                                      │
 │  ──────────────────────────────                                  │
 │  1. 解析用户输入（文本/文件/混合）                                │
-│  2. 识别或推断文档类型                                            │
-│  3. 加载对应类型的必输章节规范                                     │
+│  2. 识别文档类型：显式类型优先，否则默认 spec                      │
+│  3. 加载对应类型的章节规范                                         │
 │  4. 分析已有内容 vs 缺失内容                                      │
 │  5. 确定模块编号和命名                                            │
 │                                                                  │
@@ -101,10 +102,10 @@ Canonical bundle: `zdoc-write/`
 │  Phase 2: 文档生成                                               │
 │  ──────────────────────────────                                  │
 │  1. 生成 YAML frontmatter                                        │
-│  2. 按类型模板生成完整章节结构                                     │
+│  2. spec 使用 Minimal Spec 模板；显式类型使用详细模板              │
 │  3. 填充用户提供内容                                              │
-│  4. 注入变更标注（来自 Phase 1.5）                                │
-│  5. 补充缺失章节（标记 [需确认]）                                 │
+│  4. spec 不自动补关键业务事实；详细类型按原规则处理                │
+│  5. spec 输出 Review Card；详细类型输出决策摘要                    │
 │  6. 建立交叉引用                                                  │
 │                                                                  │
 │  Phase 3: 核心决策点与分歧点摘要                                  │
@@ -121,7 +122,7 @@ Canonical bundle: `zdoc-write/`
 │  3. 输出最终文档                                                  │
 │                                                                  │
 │  输入: 用户描述 + 可选的现有文档/上下文                            │
-│  输出: 完整的标准文档 + 变更标注 + 决策摘要                       │
+│  输出: Minimal Spec + Review Card，或显式详细文档 + 决策摘要       │
 │                                                                  │
 └──────────────────────────────────────────────────────────────────┘
 ```
@@ -133,52 +134,63 @@ Canonical bundle: `zdoc-write/`
 > **执行步骤**：
 > 1. 解析 `{{args}}`，确定输入模式
 > 2. 读取输入内容
-> 3. 识别或推断文档类型
+> 3. 识别文档类型：类型代码前缀 > 明确详细文档意图 > 默认 `spec`
 > 4. 加载对应类型的结构规范
 > 5. 分析已有内容 vs 缺失内容
-> 6. 检测变更关键词（"修改""变更""升级""迁移""替换"等），标记是否需要旧文档对比
+> 6. `spec` 仅记录旧行为影响风险；详细类型按规则检测变更关键词
 
 ### 1.1 输入模式
 
 | 模式 | 触发条件 | 行为 |
 |------|---------|------|
-| **类型指定** | `{{args}}` 以类型代码开头（如 `prd`、`arch`） | 直接使用指定类型 |
-| **内容驱动** | 用户描述要写什么 | 从内容推断类型 |
-| **文件驱动** | `--input` 指向现有文件 | 分析文件内容确定类型和补充范围 |
+| **类型指定** | `{{args}}` 以类型代码开头（如 `spec`、`prd`、`arch`） | 直接使用指定类型 |
+| **内容驱动** | 用户描述要写什么，但未明确指定详细类型 | 默认使用 `spec` |
+| **文件驱动** | `--input` 指向现有文件，且未指定类型 | 默认生成 `spec`；仅当输入文件已有明确 `doc_type` / 类型元数据时沿用该类型 |
 | **混合** | 类型 + 输入文件 | 用文件内容填充指定类型的文档 |
 
 ### 1.2 文档类型识别规则
 
-当用户未明确指定类型时，按以下规则推断：
+类型识别优先级固定为：
 
-| 内容特征 | 推断类型 |
+```text
+1. 类型代码前缀（如 `spec`、`api`、`tech`、`prd`）
+2. 用户明确要求某类详细文档
+3. 其他情况默认 `spec`
+```
+
+明确 opt-in 信号：
+
+| 用户表达 | 推断类型 |
 |---------|---------|
-| 用户故事、AC、业务规则、验收标准 | `prd` |
-| 系统分层、技术选型、架构边界 | `arch` |
-| 端点、请求响应 Schema、错误码 | `api` |
-| 交互流程、设计原则、状态表达 | `ux` |
-| 数据模型、状态机、算法、同步/异步 | `tech` |
-| 测试范围、Happy Path、边界条件 | `testset` |
-| 数据实体、流转、Schema、值域 | `data` |
-| 领域模型、聚合根、值对象 | `ddd` |
-| Skill 定义、Prompt、工具链 | `skill` |
-| 外部协议适配、Provider 映射 | `adapter` |
-| 异步任务、定时任务、队列 | `job` |
-| 商业问题、用户画像、成功指标 | `business` |
-| 战略规划、产品原则 | `stg` |
-| 审查结论、一致性报告 | `review` |
-| 用户反馈、访谈纪要、工单、需求收集 | `req` |
-| 行业知识、专家输入、流程描述、法规要求 | `req` |
-| 竞品分析、市场调研、数据发现的问题 | `req` |
+| `api`、`API 契约`、`接口文档`、`端点定义` | `api` |
+| `tech`、`技术设计`、`实现设计` | `tech` |
+| `testset`、`测试用例集`、`测试策略文档` | `testset` |
+| `prd`、`完整 PRD`、`产品需求文档` | `prd` |
+| `arch`、`架构设计` | `arch` |
+| `ux`、`UX 规范`、`交互规范` | `ux` |
+| `req`、`需求来源`、`访谈纪要`、`用户反馈整理` | `req` |
+| `business`、`商业设计` | `business` |
+| `data`、`数据流设计`、`数据契约` | `data` |
+| `ddd`、`领域模型`、`领域设计` | `ddd` |
+| `skill`、`AI Skill 设计` | `skill` |
+| `adapter`、`适配器设计` | `adapter` |
+| `job`、`后台任务设计`、`定时任务设计` | `job` |
+| `stg`、`战略`、`商业宪法` | `stg` |
+| `review`、`审查报告`、`对齐报告` | `review` |
+| `ux-proto`、`UX 原型`、`HTML 原型` | `ux-proto` |
+| `impl`、`实施设计` | `impl` |
+
+非 opt-in 信号：普通需求中提到“可能需要 API / 数据库 / 测试 / 技术方案”，仍默认 `spec`。
 
 ### 1.3 必输章节加载
 
 根据识别的文档类型，加载对应的必输章节规范。详见 `references/doc-type-requirements.md`，其中按类型列出了：
 
-- **必须包含**的章节（来自 DOC-WRITING-GUIDE）
-- **可选包含**的章节
-- **不包含**的边界（防止越界）
-- **ITERATION-DOCUMENT-CHECKLIST** 中对应的完整性要求
+- `spec` 的 Minimal Spec 固定结构和禁止项
+- 详细类型必须包含的章节（来自 DOC-WRITING-GUIDE）
+- 详细类型可选包含的章节
+- 不包含的边界（防止越界）
+- ITERATION-DOCUMENT-CHECKLIST 中对应的完整性要求
 
 ### 1.4 内容差距分析
 
@@ -379,15 +391,30 @@ Phase 1.5 的产出：
 
 > **执行步骤**：
 > 1. 生成 YAML frontmatter
-> 2. 按类型模板生成章节结构
+> 2. `spec` 使用 `templates/minimal-spec.md`；详细类型使用对应章节规范
 > 3. 填充用户已有内容
-> 4. 注入变更标注（来自 Phase 1.5 的 `change-report.json`）
-> 5. 补充缺失内容（标记 [需确认]）
+> 4. `spec` 不注入完整变更报告，仅记录旧行为影响风险；详细类型按 Phase 1.5 注入变更标注
+> 5. `spec` 不自动补关键业务事实；详细类型缺失内容标记 [需确认]
 > 6. 建立与其他文档的交叉引用
 
 ### 2.1 Frontmatter 规范
 
-所有文档必须包含 YAML frontmatter：
+`spec` 使用最小 frontmatter：
+
+```yaml
+---
+title: "{中文标题}"
+doc_id: "SPEC-M{编号}-{Slug}"
+status: draft
+created: "{YYYY-MM-DD}"
+updated: "{YYYY-MM-DD}"
+doc_type: spec
+module_id: "{Mxx}"   # 非模块级 Spec 可省略
+related_docs: []
+---
+```
+
+详细类型使用标准 SSOT frontmatter：
 
 ```yaml
 ---
@@ -411,9 +438,18 @@ relationships:
 
 ### 2.2 章节生成规则
 
-按类型模板生成，每个文档类型遵循 DOC-WRITING-GUIDE 中定义的必输章节：
+按类型模板生成：
 
-**通用必填章节**（所有类型）：
+**Minimal Spec 固定章节**（`spec`）：
+- Goal
+- Scope
+- Context Diagram
+- Business Rules
+- Constraints
+- Acceptance
+- Risks（可选）
+
+**详细类型通用章节**：
 - 文档定位：一句话说明本文负责回答什么问题
 - 关联文档：列出上下游文档
 - 范围边界：In Scope / Out of Scope
@@ -458,13 +494,18 @@ testset 文档必须按以下 9 节标准结构生成章节（对齐 TD-8）：
 
 ### 2.3 内容填充策略
 
-| 内容来源 | 处理方式 |
-|---------|---------|
-| 用户明确提供 | 直接使用，保持原意 |
-| 用户暗示但未展开 | 适度补充，标记 [需确认] |
-| 完全缺失的必填章节 | 生成合理默认值，标记 [需确认] |
-| 可选章节 | 仅在用户提供相关内容时包含 |
-| Out of Scope | 必须至少列出 3 项，防止 scope creep |
+| 内容来源 | `spec` 处理方式 | 详细类型处理方式 |
+|---------|----------------|------------------|
+| 用户明确提供 | 直接使用，保持原意 | 直接使用，保持原意 |
+| 用户暗示但未展开 | 可整理表达，但不得写成关键事实 | 适度补充，标记 [需确认] |
+| Goal 缺失 | 停止并询问 | 标记 [需确认] 后补充 |
+| Scope 缺失 | 在 Review Card 提问，不生成默认范围 | 标记 [需确认] 后补充 |
+| Business Rules 缺失 | 列出需要补充的问题，不写入正式规则 | 标记 [需确认] 后补充 |
+| Constraints 缺失 | 放入 Review Card 的 AI 假设，不写入正式约束 | 标记 [需确认] 后补充 |
+| Acceptance 缺失 | 放入 Review Card；如写正文，只能作为 `# Acceptance` 下的 `Draft` 小节 | 标记 [需确认] 后补充 |
+| Context Diagram 缺失 | 仅根据用户明确实体关系绘制；不足时写“未提供足够上下文” | 可按详细类型补充图示 |
+| 可选章节 | 仅在用户提供相关内容时包含 | 仅在用户提供相关内容时包含 |
+| Out of Scope | 必须具体；缺失时提问 | 必须至少列出 3 项，防止 scope creep |
 
 ### 2.4 补充标记规范
 
@@ -564,9 +605,13 @@ relationships:
 
 ---
 
-## Phase 3: 核心决策点与分歧点摘要
+## Phase 3: Review Card / 决策摘要
 
 > **目的**：在生成文档后，识别需要用户确认的关键点，避免 AI 自行决策导致语义漂移。
+>
+> **spec 输出**：使用 `templates/review-card.md`，控制在 1 页内，最多 3 个待确认决策、5 个假设、5 个风险。
+>
+> **详细类型输出**：使用 `templates/decision-summary.md`，保留核心决策点、分歧点、变更检测和完整性自检。
 >
 > **核心原则**（来自 ITERATION-DOCUMENT-CHECKLIST）：凡是需要人类反复讨论、拍板、确认的内容，都必须明确标记，让用户决策。
 
@@ -600,6 +645,38 @@ relationships:
 文档中无法确定、需要后续决策的内容。
 
 ### 3.2 摘要输出格式
+
+#### spec Review Card
+
+```markdown
+# Review Card — {文档标题}
+
+## 1. 这份 Spec 要解决什么？
+
+{1-3 句话}
+
+## 2. 需要确认的决策
+
+- [ ] D1: {决策}
+- [ ] D2: {决策}
+- [ ] D3: {决策}
+
+## 3. AI 假设
+
+- H1: {假设}
+- H2: {假设}
+
+## 4. 主要风险
+
+- RISK1: {风险}
+
+## 5. 是否进入 AI 实施？
+
+- [ ] 可以进入实施
+- [ ] 需要补充后再实施：{原因}
+```
+
+#### 详细类型决策摘要
 
 ```markdown
 ## 文档摘要 — {文档标题}
@@ -660,20 +737,29 @@ relationships:
 
 | # | 检查项 | 规则 |
 |---|--------|------|
-| 1 | Frontmatter 完整 | title、status、created 必填 |
-| 2 | 通用章节完整 | 文档定位、关联文档、范围边界、验收标准 |
-| 3 | 类型必填章节完整 | 按类型要求检查 |
-| 4 | 无占位符残留 | `TODO`、`TBD`、`{placeholder}` 已清理或标注 |
-| 5 | 交叉引用有效 | 链接的目标文件存在或为已知文档 |
-| 6 | 命名规范 | 文件名、slug 符合规范 |
-| 7 | 无越界内容 | 不包含其他类型文档的专属内容 |
-| 8 | API 变更标注完整 | API 文档必须包含"变更说明"章节或"首次撰写"标注 |
-| 9 | 破坏性变更已确认 | 检测到破坏性变更时，决策摘要中必须包含确认项 |
+| 1 | Frontmatter 完整 | title、status、created 必填；`spec` 还需 doc_id、doc_type |
+| 2 | spec 章节完整 | Goal、Scope、Context Diagram、Business Rules、Constraints、Acceptance、Risks（可选） |
+| 3 | 详细类型通用章节完整 | 文档定位、关联文档、范围边界、验收标准 |
+| 4 | 类型必填章节完整 | 详细类型按类型要求检查 |
+| 5 | 无占位符残留 | `TODO`、`TBD`、`{placeholder}` 已清理或标注 |
+| 6 | 交叉引用有效 | 链接的目标文件存在或为已知文档 |
+| 7 | 命名规范 | 文件名、slug 符合规范 |
+| 8 | spec 无禁止项 | 不含类设计、函数设计、伪代码、数据库表设计、接口定义、任务拆解、实现步骤、技术选型细节 |
+| 9 | spec 关键事实未被 AI 静默补齐 | Goal 缺失必须停止；候选约束和 Draft Acceptance 不写成正式事实 |
+| 10 | API 变更标注完整 | API 文档必须包含"变更说明"章节或"首次撰写"标注 |
+| 11 | 破坏性变更已确认 | 检测到破坏性变更时，决策摘要中必须包含确认项 |
 
 ### 4.3 输出
 
 最终输出两个文件：
 
+**spec**：
+1. **文档本体**：`{output_dir}/SPEC-M{编号}-{Slug}.md`
+2. **Review Card**：`{output_dir}/.zdoc-write/SPEC-M{编号}-{Slug}-review-card.md`
+
+在 `docs/mvp-lite/specs/` 未被 DOC-WRITING-GUIDE 批准前，如果用户没有提供 `--output-dir`，先询问输出目录，或只在对话中返回 Minimal Spec 草案，不写文件。
+
+**详细类型**：
 1. **文档本体**：`{output_dir}/{type_prefix}-{module_id}-{slug}.md`
 2. **决策摘要**：`{output_dir}/.zdoc-write/{doc_id}-decisions.md`
 
@@ -682,7 +768,7 @@ relationships:
 ## Workflow Boundary
 
 - **Input**: 用户描述 + 可选的现有文档/上下文
-- **Output**: 完整的标准文档（符合 DOC-WRITING-GUIDE 规范）+ 决策摘要
+- **Output**: Minimal Spec + Review Card，或显式详细 SSOT 文档 + 决策摘要
 - **Out of scope**:
   - 不修改已有文档（除非用户明确要求更新）
   - 不校验文档质量（用 `zdoc-design-check`）
@@ -691,41 +777,50 @@ relationships:
 
 ## Non-Negotiable Rules
 
-1. **必填章节不跳过**：DOC-WRITING-GUIDE 定义的必填章节必须全部生成
-2. **补充内容必须标记**：AI 补充的内容必须标记 [需确认]，不得冒充用户输入
-3. **核心决策必须确认**：影响全局的设计选择不得自行决策，必须通过 Phase 3 摘要让用户确认
-4. **Out of Scope 必须具体**：至少列出 3 项具体的排除内容，不能写"无"或"暂无"
-5. **不越界**：不同类型文档的内容不混写（如 PRD 不写 API 端点细节）
-6. **命名规范**：严格遵循 DOC-WRITING-GUIDE §0.6 命名规则
-7. **中英文规则**：文件名英文 kebab-case，title 中文，章节标题中文为主
-8. **状态初始为 draft**：新文档 status 初始为 draft，不擅自设为 approved/frozen
-9. **可追溯**：补充内容应标注来源或推理依据
-10. **API 变更检测强制**：撰写 API 文档时，必须执行 Phase 1.5 搜索同模块旧 API 文档并生成变更标注。未搜索到旧文档时标注"首次撰写"，搜索到旧文档时必须生成完整变更清单和破坏性变更确认
-11. **其他类型变更检测**：撰写非 API 文档时，如果用户描述中包含变更/修改/升级/迁移等关键词，必须执行 Phase 1.5 搜索相关旧文档。未触发变更关键词时可跳过
+1. **默认 spec**：用户未显式指定类型时，默认生成 Minimal Spec，不按技术关键词推断为 PRD/API/TECH/TESTSET
+2. **详细类型 opt-in**：只有类型代码前缀或明确详细文档意图，才生成对应详细 SSOT 文档
+3. **spec 固定章节**：Goal、Scope、Context Diagram、Business Rules、Constraints、Acceptance、Risks（可选）
+4. **spec 禁止实现内容**：不得包含类设计、函数设计、伪代码、数据库表设计、接口定义、任务拆解、实现步骤、技术选型细节
+5. **spec 不猜关键事实**：AI 不得把自行推断的 Goal、Scope、Business Rules、Constraints、Acceptance 写成正式事实
+6. **Goal 缺失必须停止**：spec 缺失 Goal 时必须询问，不生成默认目标
+7. **Review Card 限长**：spec 的 Review Card 最多 1 页、3 个决策、5 个假设、5 个风险
+8. **详细类型必填章节不跳过**：显式详细类型必须按 DOC-WRITING-GUIDE / doc-type-requirements 生成必填章节
+9. **补充内容必须标记**：详细类型中 AI 补充的内容必须标记 [需确认]，不得冒充用户输入
+10. **Out of Scope 必须具体**：详细类型至少列出 3 项具体排除内容；spec 缺失范围时提问
+11. **不越界**：不同类型文档的内容不混写（如 PRD 不写 API 端点细节；spec 不写实现设计）
+12. **命名规范**：严格遵循 DOC-WRITING-GUIDE §0.6；spec 使用 `SPEC-M{编号}-{Slug}.md`
+13. **状态初始为 draft**：新文档 status 初始为 draft，不擅自设为 approved/frozen
+14. **API 变更检测强制**：撰写 API 文档时，必须执行 Phase 1.5 搜索同模块旧 API 文档并生成变更标注。未搜索到旧文档时标注"首次撰写"，搜索到旧文档时必须生成完整变更清单和破坏性变更确认
+15. **spec 变更检测轻量化**：spec 只记录旧行为影响风险，不输出完整变更检测报告
+16. **其他详细类型变更检测**：撰写非 API 详细文档时，如果用户描述中包含变更/修改/升级/迁移等关键词，必须执行 Phase 1.5 搜索相关旧文档。未触发变更关键词时可跳过
+17. **spec 输出目录受限**：在 `docs/mvp-lite/specs/` 未被 DOC-WRITING-GUIDE 批准前，未提供 `--output-dir` 时先询问或只返回对话内草案，不写文件
 
 ---
 
 ## Usage
 
 ```bash
-# 指定类型撰写
+# 默认：生成 Minimal Spec（需显式输出目录；否则只返回草案或询问目录）
+zdoc-write "支持根据最近 7 天训练情况自动调整训练计划" --module M12 --output-dir docs/drafts/specs/
+
+# 显式指定 spec
+zdoc-write spec --module M12 --output-dir docs/drafts/specs/
+
+# 显式指定详细 PRD
 zdoc-write prd --module M12 --output-dir docs/mvp-lite/prds/
 
-# 从内容推断类型
-zdoc-write "我需要写一个用户注册模块的架构文档，用 React + Go + PostgreSQL"
+# 明确要求 API 契约
+zdoc-write api --module M12 --output-dir docs/mvp-lite/api/ --project .
 
-# 从现有文件补充
-zdoc-write prd --input docs/drafts/prd-notes.md --output-dir docs/mvp-lite/prds/
-
-# 指定项目路径（用于交叉引用）
+# 明确要求技术设计
 zdoc-write tech --module M12 --project . --output-dir docs/mvp-lite/tech/
 
-# 完整参数
-zdoc-write api --module M12 --output-dir docs/mvp-lite/api/ --project .
+# 从现有文件补充详细 PRD
+zdoc-write prd --input docs/drafts/prd-notes.md --output-dir docs/mvp-lite/prds/
 ```
 
 ---
 
 ## Compatibility Note
 
-本技能遵循 DOC-WRITING-GUIDE v1.0 和 ITERATION-DOCUMENT-CHECKLIST v2.1 的全部规范。输出文档可直接被 `zdoc-design-check` 校验、被 `zdoc-i2i` 转化为实施任务。文档类型覆盖 `docs/mvp-lite/` 下全部 17 个子目录。
+本技能遵循 DOC-WRITING-GUIDE v1.0、ITERATION-DOCUMENT-CHECKLIST v2.1 和 ADR-006。默认输出 Minimal Spec；详细 SSOT 文档需显式 opt-in。`spec` 的正式目录 `docs/mvp-lite/specs/` 需先由 DOC-WRITING-GUIDE 批准，批准前只能写入用户显式指定目录或返回对话内草案。
