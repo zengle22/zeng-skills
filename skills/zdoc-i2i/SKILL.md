@@ -15,6 +15,87 @@ allowed-tools:
 
 Design-to-Impl Skill — 将设计文档转化为可执行的实施任务。纯 LLM + 结构化输出架构，复用 Design Check Gate Rubric 做输入校验。
 
+## 1. 目标与非目标
+
+### 1.1 目标
+
+- 将 15+ 种设计文档（PRD/Arch/API/UX/Tech/Test/Data/DDD/...）转化为可执行的实施任务
+- 执行源文档交叉一致性校验，确保输入文档之间无冲突
+- 按最小可验收颗粒度拆分 Task，产出带依赖 DAG 的独立 impl 文档
+- 交付前自动审核，产出 delivery-report.json 质量报告
+- 成功执行后自动冻结输入文档状态（approved → frozen）
+
+### 1.2 非目标
+
+- **不修改源文档**：只读取设计文档，不修改任何输入文件（状态冻结除外）
+- **不生成代码**：产出实施计划文档（task-*.md + INDEX.md + SUMMARY.md），不产出业务代码
+- **不做 gate 决策**：evidence-only，汇总报告供人工确认，不自动判定通过/不通过
+- **不替代 Design Check**：`zdoc-design-check` 校验设计质量，`zdoc-i2i` 做实施转化，两者互补
+- **不补充缺失信息**：不发明设计文档中没有的功能、技术方案或业务规则
+
+## 2. 输入/输出
+
+### 2.1 输入
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `--dir` | string | 条件必填 | 设计文档目录，自动扫描识别文档类型（与显式参数二选一） |
+| `--feature` | string | 否 | 仅处理指定 Feature ID（如 `M01`） |
+| `--prd` | string | 条件必填 | 显式指定 PRD 文件路径 |
+| `--arch` | string | 条件必填 | 显式指定 Architecture 文件路径 |
+| `--api` | string | 否 | 显式指定 API Design 文件路径 |
+| `--ux` | string | 否 | 显式指定 UX Spec 文件路径 |
+| `--tech` | string | 否 | 显式指定 Tech Design 文件路径 |
+| `--test` | string | 否 | 显式指定 Test Design 文件路径 |
+| `--data` | string | 否 | 显式指定 Data Flow 文件路径 |
+| `--ddd` | string | 否 | 显式指定 DDD 文件路径 |
+| `--src` | string | 否 | 项目源代码根路径，用于路径规范化 |
+| `--output-dir` | string | 否 | 输出目录，默认 `docs/mvp-lite/impl` |
+| `--validate-only` | flag | 否 | 仅执行输入校验，不生成 Task 文档 |
+
+**输入模式**：目录扫描（`--dir`）/ 显式指定（`--prd`/`--arch` 等）/ 混合（`--dir` + 覆盖）三种模式。
+
+**必输文档**：T01 PRD、T02 Architecture 缺失 → BLOCK。仅接受 `approved` 或 `frozen` 状态文档；`draft` / `reviewing` → BLOCK。
+
+### 2.2 输出
+
+| 产物 | 路径 | 说明 |
+|------|------|------|
+| Feature 实施目录 | `{output-dir}/impl-{feature}-{PRD-ID}/` | 单个 Feature 的全部产物 |
+| Task 实施文档 | `.../IMPL-TASK-{nnn}-{slug}.md` | 每个 Task 的独立可执行文档 |
+| Feature 上下文 | `.../IMPL-{PRD-ID}-{feature-slug}.md` | 跨文档聚合的 feature-context |
+| Feature 索引 | `.../INDEX.md` | Task 清单 + 依赖图 + 执行顺序 |
+| 汇总报告 | `.../SUMMARY.md` | 校验结果 + 统计 + 风险 + 状态变更日志 |
+| 全局索引 | `{output-dir}/IMPL-INDEX.md` | 多 Feature 时的全局索引 |
+| 交付报告 | `{output-dir}/delivery-report.json` | 覆盖率、质量指标、校验结果 |
+| 源一致性报告 | `{output-dir}/source-consistency-report.json` | Phase 0 交叉一致性结果 |
+| Task 清单 | `{output-dir}/task-list.json` | Phase 3→4 桥接文件 |
+| DAG 校验结果 | `{output-dir}/dag-validation.json` | 环检测 + 拓扑排序结果 |
+| 依赖建议 | `{output-dir}/dependency-suggestions.json` | 缺失依赖自动检测建议 |
+
+### 2.3 退出状态
+
+| 状态 | 含义 | 触发条件 |
+|------|------|----------|
+| **PASS** | 全部成功 | 所有 Gate PASS，无 BLOCK，产物完整生成 |
+| **CONDITIONAL** | 带警告通过 | 有 WARN 但无 BLOCK，产物已生成，WARN 项记录于 SUMMARY.md |
+| **BLOCK** | 阻断停止 | 任一 Gate FAIL / 必输文档缺失 / 文档状态不符 / 源文档交叉冲突 BLOCK 级 |
+
+## 3. 执行步骤
+
+I2I Pipeline 按以下 6 个 Phase 顺序执行：
+
+| Phase | 名称 | 核心动作 | 阻断点 |
+|-------|------|----------|--------|
+| **Phase 0** | 源文档交叉一致性校验 | ARCH↔TESTSET 扫描、约束溯源图、术语预扫描、原型索引、路径规范化 | BLOCK 级冲突 → 要求澄清后重跑 |
+| **Phase 1** | 输入校验 | 识别 15+ 文档类型、Gate 校验、三态判定（PASS/CONDITIONAL/BLOCK） | 必输缺失 / Gate FAIL / 状态不符 → BLOCK |
+| **Phase 2** | 内容整合 | 按 Feature 聚合跨文档信息 → feature-context.md | 无阻断 |
+| **Phase 3** | 任务拆分 | 最小颗粒度拆分 → task-list.json → DAG 校验 → 依赖完整性校验 → AC-测试点映射 → 原型注入 | CYCLE_DETECTED → 警告但不阻塞 |
+| **Phase 4** | 文档生成 | 应用路径规范化 → 按模板生成 task-*.md + INDEX.md + SUMMARY.md + IMPL-INDEX.md → 产物完整性检查 → 文档状态冻结 | 完整性检查 FAIL → 不冻结，允许修复后重跑 |
+| **Phase 5** | 交付前审核 + 交付报告 | 自动审核清单 → 语义偏移检测 → delivery-report.json | BLOCK 级问题 → 不交付 |
+
+> 详细执行步骤见下方各 Phase 章节。
+
 ## Primary Abstraction
 
 Skill (governed capability template)
@@ -26,13 +107,6 @@ Pipeline — LLM 4-phase validation + integration + decomposition + generation
 ## Authority
 
 Canonical bundle: `zdoc-i2i/`
-
-## Not Equal To
-
-- Not a document editor（只读取设计文档，不修改任何输入文件）
-- Not a code generator（产出实施计划文档，不产出代码）
-- Not a gate decision maker（evidence-only，汇总报告供人工确认）
-- Not a replacement for `zdoc-design-check`（Design Check 校验质量，I2I 做实施转化）
 
 ## Canonical Authority
 
@@ -341,27 +415,7 @@ This capability is a governed `Skill` for `Design Documents → Implementation T
 
 > **必输文档缺失 → BLOCK**；可选文档缺失 → 跳过，不影响判定。
 
-### 1.3 解析参数
-
-从 `{{args}}` 解析以下参数：
-
-| 参数 | 说明 |
-|------|------|
-| `--dir` | 设计文档目录（自动扫描） |
-| `--feature` | 仅处理指定 Feature ID（如 `M01`） |
-| `--prd` | 指定 PRD 文件路径 |
-| `--arch` | 指定 Architecture 文件路径 |
-| `--api` | 指定 API Design 文件路径 |
-| `--ux` | 指定 UX Spec 文件路径 |
-| `--tech` | 指定 Tech Design 文件路径 |
-| `--test` | 指定 Test Design 文件路径 |
-| `--data` | 指定 Data Flow 文件路径 |
-| `--ddd` | 指定 DDD 文件路径 |
-| `--src` | 项目源代码根路径（如 `apps/ai-coach-skill/src`），确保所有文件路径使用项目根相对路径 |
-| `--output-dir` | 输出目录（默认 `docs/mvp-lite/impl`） |
-| `--validate-only` | 仅校验，不生成 Task |
-
-### 1.4 文档发现与类型识别
+### 1.3 文档发现与类型识别
 
 使用 Glob 工具扫描输入目录，按以下优先级识别文档类型：
 
@@ -388,7 +442,7 @@ This capability is a governed `Skill` for `Design Documents → Implementation T
    含领域模型/聚合根      → T10  含数据流转/状态机  → T09
 ```
 
-### 1.5 Gate 校验（内嵌 Gate Rubric）
+### 1.4 Gate 校验（内嵌 Gate Rubric）
 
 读取 `gate/rubric.md`，对每个已识别的文档执行以下校验：
 
@@ -400,7 +454,7 @@ This capability is a governed `Skill` for `Design Documents → Implementation T
 | **G4** | 可测试性 | 至少 1 条 AC 含 Given/When/Then 或可观察指标 | AC 有指标但无可观察阈值 | 全部 AC 无结构 |
 | **G5** | 一致性 | 同一概念在不同文档中名称和数值一致 | 同义词表述但含义相同 | 名称不同导致歧义 |
 
-### 1.6 三态判定
+### 1.5 三态判定
 
 对每个文档的 Gate 结果做汇总判定：
 
@@ -428,7 +482,7 @@ This capability is a governed `Skill` for `Design Documents → Implementation T
 
 如果 `--validate-only`，到此停止，输出校验结果。
 
-### 1.7 文档状态检查
+### 1.6 文档状态检查
 
 在 Gate 校验之前，先检查每个输入文档的状态：
 
@@ -1151,24 +1205,44 @@ I2I Pipeline 在交付时附带 `delivery-report.json`：
 
 ---
 
+## Pitfalls / 常见坑与规避
+
+| 坑 | 影响 | 规避方法 |
+|----|------|----------|
+| **使用简写路径（如 `src/handlers/`）** | Task 文档中的文件路径被 Agent 错误解析，导致在错误位置创建目录 | 始终使用 `--src` 参数指定源代码根路径；Phase 0 会自动规范化所有路径 |
+| **忽略 `--validate-only` 提前发现问题** | 直接运行完整 Pipeline，因 Gate FAIL 或文档状态 BLOCK 浪费大量时间 | 首次执行新 Feature 时先跑 `--validate-only`，确认 PASS 后再生成 Task |
+| **draft 状态文档直接提交 I2I** | 文档尚未评审，I2I 执行到 Phase 1 即 BLOCK，需重新走评审流程 | 确保所有输入文档状态为 `approved` 或 `frozen`；使用 `zdoc-design-check` 前置校验 |
+| **Task 超 8h 未记录例外理由** | 产物完整性检查 FAIL，Phase 4 无法完成，文档状态不冻结 | 拆分策略阶段严格按 5 条件检查；超 8h 时在 `task-list.json` 的 `exception` 字段记录理由 |
+| **UI Task 未关联原型文件** | 实施者无法对照原型实现，导致布局/文案/状态偏差 | Phase 0 确保 `ux-prototypes/` 目录被扫描；Phase 3 自动注入原型引用到 Task 文档和验收标准 |
+| **多 Feature 时遗漏 IMPL-INDEX.md** | 全局索引缺失，跨 Feature 依赖不可见 | 非单 Feature 场景必须检查产物完整性第 8 项；多 Feature 时自动触发 IMPL-INDEX.md 生成 |
+| ** frozen 文档直接修改后重跑** | 违反文档生命周期，冻结状态被静默覆盖，历史追溯断裂 | 修改设计文档必须走 deprecated + 新建流程；I2I 对 frozen 文档是幂等的，不会自动解冻 |
+
+---
+
 ## Usage
 
 ```bash
 # 全量目录扫描（推荐）
+# 输出: docs/mvp-lite/impl/ 目录 + delivery-report.json
 zdoc-i2i --dir docs/mvp-lite/
 
 # 指定 Feature
+# 输出: docs/mvp-lite/impl/impl-user-registration-M01/ 目录 + delivery-report.json
 zdoc-i2i --dir docs/mvp-lite/ --feature M01
 
 # 最小输入
+# 输出: docs/mvp-lite/impl/impl-user-registration-M01/ 目录（含 IMPL-TASK-001-*.md, INDEX.md, SUMMARY.md）
 zdoc-i2i --prd docs/prds/PRD-M01.md --arch docs/arch/ARCH-M01.md
 
 # 指定源代码根路径（确保文件路径使用项目根相对的完整路径）
+# 输出: 所有 Task 文档中的路径自动规范化为 apps/ai-coach-skill/src/... 前缀
 zdoc-i2i --dir docs/mvp-lite/ --src apps/ai-coach-skill/src
 
 # 指定输出目录
-zdoc-i2i --dir docs/mvp-lite/ --output-dir docs/mvp-lite/impl
+# 输出: custom-impl/ 目录替代默认 docs/mvp-lite/impl/
+zdoc-i2i --dir docs/mvp-lite/ --output-dir custom-impl
 
-# 仅校验
+# 仅校验（不生成 Task）
+# 输出: stdout 打印 PASS / CONDITIONAL / BLOCK 判定 + 缺失清单
 zdoc-i2i --dir docs/mvp-lite/ --validate-only
 ```

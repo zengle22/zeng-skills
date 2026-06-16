@@ -27,15 +27,44 @@ zdoc-quality-loop 是一条有界、可追溯的文档质量收敛流水线，�
 - 一份或多份文档需要系统性修复并输出正式质量报告
 </Use_When>
 
-<Do_Not_Use_When>
-- 目标是代码文件 → 用 `gsd-code-review` + `gsd-code-fixer`
-- 只需要单轮评审无需修复 → 用 `code-reviewer`
-- 文档尚未写好 → 先写文档再运行
-</Do_Not_Use_When>
+## 1. 目标与非目标
+
+### 1.1 目标
+
+- 通过 BMAD 多角色评审团对文档执行多视角、结构化的质量审查，覆盖需求完整性、主流程可执行性、数据一致性、边界异常、SSOT 对齐等 10 个维度
+- 在有限轮次内驱动文档质量收敛，自动修复 P0/P1 问题，对 P2 按策略处理，P3 仅记录
+- 所有中间产物（评审、合并、讨论、共识、修复、验证）实时落盘，支持中断后 `--resume` 恢复
+- 由独立 Agent 从磁盘重建全过程并执行审计，确保过程客观、结果可追溯
+- 生成结构化质量报告和批次汇总，为人工闸门决策提供完整数据支撑
+
+### 1.2 非目标
+
+- 不用于代码文件评审 —— 代码审查请使用 `gsd-code-review` + `gsd-code-fixer`
+- 不用于单轮评审且无需修复的场景 —— 此类需求请使用 `code-reviewer`
+- 不用于尚未完成的文档 —— 文档必须先撰写完成后再运行本流水线
+- 不保证零问题收敛 —— 受限于轮次上限和修复能力，可能以 `PARTIAL_CONVERGENCE` 或 `NOT_CONVERGED` 终止
+- 不替代人类最终判断 —— 阶段 5 人工闸门保留用户对结果的接受/拒绝/扩展权
 
 ---
 
-## 输出目录结构
+## 2. 输入/输出
+
+### 2.1 输入
+
+| 参数 | 类型 | 必填 | 默认值 | 说明 |
+|------|------|------|--------|------|
+| `<doc1> [doc2 ...]` | 位置参数 | 是 | — | 待评审文档路径，支持直接路径、glob、混合输入 |
+| `--ssot <path>` | 命名参数 | 否 | — | SSOT 参考文件，可多次使用以传入多个 |
+| `--rubric <path>` | 命名参数 | 否 | 标准 10 维 | 自定义 Rubric，必须包含 R01–R10 |
+| `--max-rounds N` | 命名参数 | 否 | 5 | 单份文档最大评审轮次 |
+| `--p1-threshold N` | 命名参数 | 否 | 3 | P1 收敛阈值，P0=0 且 P1≤阈值时视为 `APPROVED` |
+| `--parallel` | 开关 | 否 | false | 并行处理所有文档 |
+| `--p2 <policy>` | 命名参数 | 否 | low-risk | P2 处理策略：`always` / `never` / `low-risk` |
+| `--no-verify` | 开关 | 否 | false | 跳过 Verifier，以 fix-log 中 FIXED 视为 RESOLVED |
+| `--output-dir <path>` | 命名参数 | 否 | `.quality-loop` | 输出根目录 |
+| `--resume <batch_id>` | 命名参数 | 否 | — | 恢复未完成的批次 |
+
+### 2.2 输出
 
 所有产物写入 `{output_dir}/{batch_id}/`，默认 `.quality-loop`。
 
@@ -72,6 +101,20 @@ zdoc-quality-loop 是一条有界、可追溯的文档质量收敛流水线，�
         └── quality-report.md          ← 独立报告 Agent 输出
 ```
 
+**关键文件速览**：
+
+| 文件 | 作用 | 权威阶段 |
+|------|------|----------|
+| `rubric-locked.md` | 锁定版 Rubric，所有评审轮次共用 | 初始化后只读 |
+| `role-panel.json` | 选角结果：评审角色 + Moderator | 阶段 1.0 |
+| `review-consensus.json` | 本轮最终问题清单 | 每轮 Review Pass 结束 |
+| `fix-log.json` | 修复记录，含引入风险 | 每轮 Fix Pass 结束 |
+| `verdicts.json` | 验证裁定 | 每轮 Verify Pass 结束 |
+| `final.md` | 质量确认后的正式文档 | 收敛后 |
+| `audit-report.json` | 独立审计结论 | 阶段 2 |
+| `quality-report.md` | 独立质量收敛报告 | 阶段 3 |
+| `batch-summary.md` | 批次汇总 | 阶段 4 |
+
 **写入时机总览**：
 
 | 文件 | 何时写入 | 写入方 |
@@ -93,6 +136,33 @@ zdoc-quality-loop 是一条有界、可追溯的文档质量收敛流水线，�
 | `report-manifest.json` | 进入报告阶段前 | 主流程 |
 | `quality-report.md` | 报告 Agent 返回后 | 报告 Agent |
 | `batch-summary.md` | 所有文档报告完成后 | 主流程 |
+
+### 2.3 退出状态
+
+| 状态 | 含义 | 触发条件 |
+|------|------|----------|
+| `APPROVED` | 完全收敛 | P0=0 且 P1 ≤ `--p1-threshold` |
+| `PARTIAL_CONVERGENCE` | 部分收敛 | P0=0 但 P1 > `--p1-threshold` |
+| `NOT_CONVERGED` | 未收敛 | 达最大轮次 / 连续 2 轮无新增 P0 且 P0>0 / 最近 2 轮问题总数下降 < 20% |
+| `ESCALATED` | 升级 | 某轮修复引入新 P0（`introduced_risk.severity=P0`） |
+| `HUMAN_BLOCKED` | 人工阻塞 | 共识达不成，人类选择"阻塞" |
+
+---
+
+## 3. 执行步骤
+
+**5 步总览**：
+
+| 阶段 | 名称 | 核心动作 | 产出 |
+|------|------|----------|------|
+| 0 | 初始化 | 参数解析、文件验证、目录创建、Rubric 锁定 | `batch-state.json`, `rubric-locked.md` |
+| 1 | 评审轮次循环 | 选角 → 并行评审 → 合并 → 讨论 → 共识 → 修复 → 验证 | 每轮 `review-consensus.json`, `fix-log.json`, `verdicts.json` |
+| 2 | 独立审计 | 独立 Agent 从磁盘重建全过程，执行 9 项一致性检查 | `audit-report.json`, `audit-findings.json` |
+| 3 | 独立报告 | 独立 Agent 从磁盘读取所有产物，生成质量收敛报告 | `quality-report.md` |
+| 4 | 批次汇总 | 汇总所有文档结果，生成 `batch-summary.md` | `batch-summary.md` |
+| 5 | 人工闸门 | 用户选择接受/修复/扩展/阻塞 | 用户决策 |
+
+**详细步骤**：
 
 ---
 
@@ -1043,7 +1113,6 @@ Spawn `documentation-analyst-writer` agent（model=sonnet），**无任何共享
 - **本报告由独立报告 Agent 生成，仅凭磁盘文件，无共享评审上下文**
 
 ## 收敛结论
-用 1-2 句话概括最终状态（APPROVED / PARTIAL_CONVERGENCE / NOT_CONVERGED / ESCALATED / HUMAN_BLOCKED）。
 
 ## 评审团组成
 
@@ -1052,50 +1121,10 @@ Spawn `documentation-analyst-writer` agent（model=sonnet），**无任何共享
 ## 冲突与解决摘要
 
 ## 问题轨迹（从磁盘重建）
-按时间线简述每轮发现、修复、验证的走向（2-3 句话/轮）。
 
-## 已修复问题清单（分类分级）
+## 已关闭问题
 
-> **说明**：以下列出所有 verdict=RESOLVED（或 --no-verify 下 action=FIXED）的问题，
-> 按 **Rubric 维度** 分组，每组内按严重级别降序（P0→P1→P2）排列。
-> 方便人类快速验收：逐条核对修复是否符合预期。
-
-### {dimension}（共 {n} 项：P0={n} P1={n} P2={n}）
-
-| # | 严重 | 问题简述 | 修复方案 | 验证结果 | 涉及章节 |
-|---|------|---------|---------|---------|---------|
-| 1 | P0 | {problem} | {fix_log.change_summary} | {verdicts.verdict} | {module} |
-
-（每个维度一个三级标题。若该维度无已修复问题，标题后注明"无"。）
-
----
-
-## 未修复问题清单（分类分级）
-
-> **说明**：以下列出所有最终状态仍为开放的问题（verdict ∈ {PARTIAL, NOT_RESOLVED}，
-> 以及未进入 Fix 的 P0/P1），按 **严重级别** 分组，同组内按维度归类。
-> 每条必须给出「不修复的风险与影响」，供人类做最终评审决策。
-
-### P0 — 阻塞实现（共 {n} 项）
-
-| # | 维度 | 问题简述 | 未修复风险与影响 | 建议后续处理 | 涉及章节 |
-|---|------|---------|----------------|-------------|---------|
-| 1 | R02 | {problem} | {impact}（如不修复，将导致...）| 建议人工修复 / 需求澄清 / 延期 | {module} |
-
-### P1 — 高歧义（共 {n} 项）
-（格式同上）
-
-### P2 — 中风险（共 {n} 项）
-（格式同上）
-
----
-
-## 跳过/不处理问题清单（P3，参考级）
-
-| # | 维度 | 问题简述 | 跳过理由 |
-|---|------|---------|---------|
-
----
+## 仍开放问题
 
 ## 过程产物索引
 
@@ -1131,10 +1160,7 @@ zdoc-quality-loop 完成
 ══════════════════════════════════════════════
 Batch ID：{batch_id}  输出根目录：{output_root}/
 
-══════════════════════════════════════════════
-一、批次概览（{N} 份文档）
-══════════════════════════════════════════════
-
+批次结果（{N} 份文档）：
   文档          别名     收敛状态                P0  P1  轮次  角色数  冲突  审计    报告
   ─────────────────────────────────────────────────────────────────────────────────
   spec.md       spec    ✓ APPROVED              0   2   3     3     0    PASSED  spec/quality-report.md
@@ -1143,187 +1169,12 @@ Batch ID：{batch_id}  输出根目录：{output_root}/
   auth.md       auth    ⛔ ESCALATED             1   2   2     3     0    PASSED  auth/quality-report.md
   api.md        api     ⏸ HUMAN_BLOCKED         0   3   1     2     1    PASSED  api/quality-report.md
 
-══════════════════════════════════════════════
-二、分文档详细总结（按收敛状态排序：APPROVED → PARTIAL → NOT_CONVERGED → ESCALATED → HUMAN_BLOCKED）
-══════════════════════════════════════════════
+全局残留风险：
+  ...
 
-──────────────────────────────────────────────
-[spec] 状态：✓ APPROVED    报告：spec/quality-report.md
-──────────────────────────────────────────────
-  ▶ 已修复问题（共 {n} 项）
-    按维度分类：
-      R01-需求完整性      P0=0  P1=1  P2=0  → 修复方案：补充用户故事 X、Y
-      R02-主流程可执行性   P0=0  P1=1  P2=1  → 修复方案：明确步骤 3-5 的输入输出
-      ...
-    （详细表格见 quality-report.md「已修复问题清单」章节）
-
-  ▶ 未修复问题（共 {n} 项）
-    按严重级别分类：
-      P0（阻塞实现）：0 项
-      P1（高歧义）：   2 项
-        - R07-测试可验证性：验收标准缺少边界值 → 风险：测试用例设计不完整，可能漏测
-        - R10-范围漂移：第 3 节超出目标范围 → 风险：实现范围膨胀，工期失控
-      P2（中风险）：   0 项
-
-  ▶ 引入风险：无
-  ▶ 建议：P1 问题建议产品侧补充后二次 review
-
-──────────────────────────────────────────────
-[design] 状态：⚠ PARTIAL_CONVERGENCE    报告：design/quality-report.md
-──────────────────────────────────────────────
-  ▶ 已修复问题（共 {n} 项）...（同上格式）
-  ▶ 未修复问题（共 {n} 项）
-    P0（阻塞实现）：0 项
-    P1（高歧义）：   5 项
-      - R03-数据模型一致性：... → 风险：...
-      ...
-    P2（中风险）：   3 项
-      ...
-  ▶ 引入风险：无
-  ▶ 建议：P1 数量超过阈值（{p1_threshold}），建议补充 1-2 轮继续收敛，或人工介入裁决
-
-──────────────────────────────────────────────
-[prd] 状态：✗ NOT_CONVERGED    报告：prd/quality-report.md
-──────────────────────────────────────────────
-  ▶ 已修复问题（共 {n} 项）...（同上格式）
-  ▶ 未修复问题（共 {n} 项）
-    P0（阻塞实现）：2 项 ⚠️ 必须人工处理
-      - R02-主流程可执行性：... → 风险：开发无法开始，阻塞迭代
-      - R05-异常处理路径：... → 风险：线上故障无恢复手段
-    P1（高歧义）：   4 项
-      ...
-    P2（中风险）：   2 项
-      ...
-  ▶ 引入风险：无
-  ▶ 建议：P0 未清零，严禁进入开发阶段。建议人工重写相关章节后再跑质量循环
-
-──────────────────────────────────────────────
-[auth] 状态：⛔ ESCALATED    报告：auth/quality-report.md
-──────────────────────────────────────────────
-  ▶ 已修复问题（共 {n} 项）...（同上格式）
-  ▶ 未修复问题（共 {n} 项）
-    P0（阻塞实现）：1 项 ⚠️ 由修复引入
-      - {escalation.description} → 风险：{impact}
-    P1（高歧义）：   2 项
-      ...
-  ▶ 引入风险：⛔ 1 项 P0（见 escalation.json）
-    详情：修复 issue-{id} 时引入了新 P0：{description}
-  ▶ 建议：立即人工审查 escalation.json 和对应 fix-log，回滚或重新设计修复方案
-
-──────────────────────────────────────────────
-[api] 状态：⏸ HUMAN_BLOCKED    报告：api/quality-report.md
-──────────────────────────────────────────────
-  ▶ 已修复问题（共 {n} 项）...（同上格式）
-  ▶ 未修复问题（共 {n} 项）
-    P0（阻塞实现）：0 项
-    P1（高歧义）：   3 项
-      ...
-  ▶ 阻塞原因：第 1 轮冲突 {conflict_id} 人类决策选择"阻塞此文档"
-  ▶ 建议：解除阻塞后重跑，或人工直接修改文档后重新触发质量循环
-
-══════════════════════════════════════════════
-三、全局残留风险与人工决策清单
-══════════════════════════════════════════════
-
-【必须人工处理（P0 未清零或 ESCALATED）】
-  - [ ] prd.md：2 项 P0 未修复（R02、R05）
-  - [ ] auth.md：1 项引入 P0（修复方案回滚风险）
-
-【建议人工处理（P1 超过阈值或 PARTIAL）】
-  - [ ] design.md：5 项 P1 未修复，建议补充 review
-  - [ ] spec.md：2 项 P1 未修复，建议产品侧补充
-
-【可接受（APPROVED 且 P0=0）】
-  - [x] spec.md：已收敛，剩余 P1=2 在可控范围
-
-【阻塞待解除】
-  - [ ] api.md：人类决策阻塞，需人工解除
-
+需要人工关注：...
 ══════════════════════════════════════════════
 ```
-
-> **生成说明**：batch-summary.md 由主流程读取每份文档的 quality-report.md 和 batch-state.json 生成，
-> 不是独立 Agent 产出。若某文档报告尚未生成，则该文档的「分文档详细总结」部分留空并标注"报告生成中"。
-
----
-
-## 阶段 4.5：合并确认（Merge Confirmation）
-
-**触发条件**：批次汇总完成后，进入人工闸门前。
-
-对每份存在 `{alias}/final.md` 且状态 ∈ {APPROVED, PARTIAL_CONVERGENCE} 的文档，逐个（或批量）询问用户是否将修复合并回原始目标文档。
-
-`AskUserQuestion`：
-
-```
-文档 [{alias}] 的修复版本已生成。
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-原始文档：{file.path}
-修复版本：{output_root}/{alias}/final.md
-收敛状态：{status}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-是否将修复后的内容合并回原始目标文档？
-```
-
-**选项**：
-- **Y. 是，覆盖原始文档** — 用 `final.md` 覆盖原始文档，并自动备份
-- **N. 否，保留原文件** — 不修改原始文档，修复版本仅保留在输出目录
-- **D. 查看差异** — 展示 final.md 与原始文档的关键差异摘要，再决定
-
----
-
-**选择"Y"（合并）**：
-```
-1. 备份原始文档：
-   cp {file.path} {file.path}.zdoc-backup-{YYYYMMDD-HHMMSS}
-   backup_path = {file.path}.zdoc-backup-{YYYYMMDD-HHMMSS}
-
-2. 覆盖写入原始文档：
-   cp {output_root}/{alias}/final.md {file.path}
-
-3. 更新 batch-state.json：
-   files[].merged = {
-     "merged_at": "<ISO>",
-     "backup_path": backup_path,
-     "source": "{output_root}/{alias}/final.md"
-   }
-
-4. 展示：
-   ✓ [{alias}] 已合并至 {file.path}
-     备份：{backup_path}
-```
-
-**选择"N"（跳过）**：
-```
-更新 batch-state.json：files[].merged = { "merged_at": null, "declined": true }
-展示：
-  ⊘ [{alias}] 已跳过合并
-    修复版本保留在：{output_root}/{alias}/final.md
-```
-
-**选择"D"（查看差异）**：
-```
-Spawn `analyst` agent（model=sonnet），读取原始文档和 final.md：
-
-"你是文档差异分析助手。对比原始文档和修复后文档，输出结构化的差异摘要。
-
-【原始文档】{file.path}
-【修复后文档】{output_root}/{alias}/final.md
-
-请输出：
-1. 新增章节/段落（如有）
-2. 重大修改章节（如有）
-3. 删除内容摘要（如有）
-4. 建议：此合并是否安全
-
-输出后，再次向用户弹出相同的合并确认选项。"
-```
-
-> **注意**：
-> - HUMAN_BLOCKED / NOT_CONVERGED / ESCALATED 状态的文档没有有效 `final.md`，不参与合并确认。
-> - PARTIAL_CONVERGENCE 状态的 `final.md` 开头带有 `<!-- WARNING: PARTIAL_CONVERGENCE -->` 注释，合并前须向用户明确提示"该文档仍有未修复 P1 问题"。
-> - 若用户选择"批量全部合并"，须额外确认一次"将覆盖 {N} 份原始文档且无法撤销（除备份外），是否继续？"
 
 ---
 
@@ -1357,19 +1208,104 @@ rubric-locked.md 在 batch 生命周期内永不变；role-panel.json 默认复�
 
 ---
 
-<Anti_Patterns>
-| 反模式 | 预防机制 |
-|--------|---------|
-| 自嗨收敛（Fixer 自我评价"已修复"） | Verifier 独立核对 + evidence 强制引用原文 |
-| 标准漂移（每轮 Rubric 变化） | 初始化时锁定 rubric-locked.md，每轮从文件读取传入 |
-| 角色互相认可（评审团互吹） | 讨论时每角色独立响应，Moderator 综合判断，人类作为最终裁判 |
-| 多数暴政（2 对 1 压倒少数角色） | 冲突判断基于证据质量，不基于角色数量；差异 ≥ 2 级必须讨论 |
-| 假共识（P0 被讨论降为 P1） | ID 追踪，审计 check 5 重建 closed_issue_ids；降级决策记录在 discussion/conflict-{id}-r{k}.json 中，agreed_severity 字段可追溯（仅人类升级决策写 human-decisions.json） |
-| 报告与实际不符 | 独立报告 Agent 无共享上下文，只读磁盘；报告中注明生成方式 |
-| 审计被流水线污染 | 独立审计 Agent 仅收到文件路径清单，无任何流水线上下文 |
-| 中断丢失状态 | 每阶段立即落盘，所有状态可从磁盘文件重建；支持 --resume <batch_id> 恢复 |
-| Token 爆炸 | 第 2 轮起 Reviewer 只传 open_issues JSON；各角色并行，不共享上下文 |
-</Anti_Patterns>
+## Pitfalls / 常见坑与规避
+
+| 坑 | 影响 | 规避措施 |
+|----|------|----------|
+| **自嗨收敛** — Fixer 自我评价"已修复"，但问题实际未解决 | 下一轮评审重新发现同一问题，浪费轮次，最终可能 `NOT_CONVERGED` | 强制引入独立 Verifier 核对；`evidence` 必须引用更新后文档原文；`--no-verify` 仅在低风险场景使用 |
+| **标准漂移** — 每轮 Rubric 或严重级别定义被悄悄修改 | 跨轮次问题不可比，收敛判断失真，审计无法通过 | 初始化时锁定 `rubric-locked.md`，每轮从文件读取传入，禁止任何 Agent 修改 Rubric 内容 |
+| **角色互相认可** — 评审团在讨论中放弃独立立场，形成"互吹" | 冲突被虚假解决，高风险问题被降级，遗漏真实缺陷 | 讨论时每角色独立 spawn 响应，不共享上下文；Moderator 综合判断而非简单多数；人类作为最终裁判 |
+| **多数暴政** — 2 对 1 用数量压倒少数角色的合理质疑 | 关键视角被压制，问题严重级别被低估 | 冲突判断基于证据质量，不基于角色数量；差异 ≥ 2 级必须讨论，相邻级别直接取高 |
+| **假共识** — P0 经讨论被降级为 P1，但实质风险未消除 | 高风险问题以较低优先级进入修复，可能被策略跳过 | ID 全程追踪，审计 check 5 重建 `closed_issue_ids`；降级决策记录在 `discussion/conflict-{id}-r{k}.json` 中，`agreed_severity` 字段可追溯 |
+| **报告与实际不符** — 报告 Agent 受共享上下文污染，美化结果 | 用户基于失真报告做错误决策 | 独立报告 Agent 无共享上下文，只读磁盘；报告中强制注明"本报告由独立 Agent 生成，仅凭磁盘文件，无共享评审上下文" |
+| **审计被流水线污染** — 审计 Agent 收到非文件路径的上下文提示 | 审计失去独立性，无法发现过程异常 | 审计 Agent 仅收到 `audit-manifest.json` 文件路径清单，无任何流水线上下文、状态摘要或提示词注入 |
+| **中断丢失状态** — 进程崩溃后无法恢复，已消耗轮次作废 | 时间浪费，需从头开始，大文档成本极高 | 每阶段立即落盘，所有状态可从磁盘文件重建；支持 `--resume <batch_id>` 恢复到中断位置继续 |
+| **Token 爆炸** — 多轮评审时上下文过长，导致成本激增或截断 | 评审质量下降，角色遗漏问题，输出被截断 | 第 2 轮起 Reviewer 只传 `open_issues` JSON 而非完整文档历史；各角色并行 spawn，不共享上下文 |
+
+---
+
+<Usage_Examples>
+
+## 用法示例
+
+### 示例 1：标准单文档评审
+
+```
+/zdoc-quality-loop prd.md
+```
+
+**预期输出**：
+
+```
+zdoc-quality-loop 启动
+══════════════════════════════════════════════
+Batch ID：20260615-143022-a3f2  输出目录：.quality-loop/20260615-143022-a3f2/
+文档：1 份，模式：串行
+配置：max-rounds=5  p1-threshold=3  p2=low-risk
+══════════════════════════════════════════════
+
+[prd] 评审团确定：product-manager / architect / developer + Moderator=analyst
+  依据：PRD，主要风险维度：R01 R02 R04 R07 R09 R10
+  → .quality-loop/20260615-143022-a3f2/prd/role-panel.json
+
+[prd] 第 1/5 轮 - Review 完成
+  角色：product-manager / architect / developer  Moderator：analyst
+  ─────────────────────────────────────────────
+  各角色问题数：product-manager=4  architect=5  developer=3
+  合并后：P0=1  P1=3  P2=2  P3=1
+  冲突：1 个（讨论解决 1 个，人类决策 0 个）
+  共识清单：.quality-loop/20260615-143022-a3f2/prd/r1/review-consensus.json
+  新增 +5  持续 =0  候选关闭 -0
+  → 继续 Fix Pass
+
+[prd] 第 1/5 轮 - Fix 完成 → 进入 Verify
+...
+[prd] 第 3/5 轮 - Review 完成
+  合并后：P0=0  P1=2  P2=1  P3=0
+  ⚑ 停止：P0=0 且 P1 ≤ 3，收敛通过 → APPROVED
+
+[prd] 独立审计完成（无共享上下文）
+  结果：PASSED
+  → .quality-loop/20260615-143022-a3f2/prd/audit-report.json
+
+[prd] 独立报告生成完成（无共享上下文）
+  → .quality-loop/20260615-143022-a3f2/prd/quality-report.md
+
+zdoc-quality-loop 完成
+══════════════════════════════════════════════
+Batch ID：20260615-143022-a3f2  输出根目录：.quality-loop/20260615-143022-a3f2/
+
+批次结果（1 份文档）：
+  文档          别名     收敛状态                P0  P1  轮次  角色数  冲突  审计    报告
+  ─────────────────────────────────────────────────────────────────────────────────
+  prd.md        prd     ✓ APPROVED              0   2   3     3     1    PASSED  prd/quality-report.md
+
+全局残留风险：无
+
+需要人工关注：无
+══════════════════════════════════════════════
+
+质量收敛完成。请选择下一步操作：
+  1. 全部接受 — 使用 final.md，承认剩余风险
+  2. 手动修复残留 — 用户自行处理 P0/P1
+  3. 扩展轮次继续 — 对 NOT_CONVERGED / ESCALATED / PARTIAL_CONVERGENCE 文档再跑 N 轮
+  4. 仅接受已收敛文档 — APPROVED 继续，其余暂停
+  5. 全部阻塞 — 直到 P0/P1=0
+```
+
+### 示例 2：多文档并行评审 + 自定义 Rubric
+
+```
+/zdoc-quality-loop spec.md api.md design.md --parallel --rubric ./custom-rubric.md --p1-threshold 5 --output-dir ./quality-reports
+```
+
+### 示例 3：恢复中断批次
+
+```
+/zdoc-quality-loop --resume 20260615-143022-a3f2
+```
+
+</Usage_Examples>
 
 ---
 
@@ -1454,16 +1390,9 @@ rubric-locked.md 在 batch 生命周期内永不变；role-panel.json 默认复�
 - [ ] quality-report.md 已写入
 - [ ] 报告含"独立 Agent 生成"声明
 - [ ] 报告含角色发现统计、冲突摘要、过程产物索引、审计结论、Rubric 内嵌内容
-- [ ] **报告「已修复问题清单」按维度分类，含修复方案和验证结果**
-- [ ] **报告「未修复问题清单」按 P0/P1/P2 分级，每条含风险与影响**
-- [ ] **报告「跳过问题清单」列出所有 P3（供参考）**
 
 阶段 4/5：
 - [ ] batch-summary.md 已写入（含所有 status 符号）
-- [ ] **batch-summary 含「分文档详细总结」：每文档的已修复（按维度）/ 未修复（按严重级别）分类清单**
-- [ ] **batch-summary 含「全局残留风险与人工决策清单」按优先级列出待办**
-- [ ] 合并确认：对存在 final.md 且状态 ∈ {APPROVED, PARTIAL_CONVERGENCE} 的文档询问用户是否合并
-- [ ] 合并操作已备份原始文档（backup_path 已记录于 batch-state.json）
 - [ ] 人工闸门通过 AskUserQuestion 呈现
 </Final_Checklist>
 

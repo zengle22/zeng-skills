@@ -28,13 +28,6 @@ Pipeline — LLM 4-phase: analyze → generate → summarize → finalize
 
 Canonical bundle: `zdoc-write/`
 
-## Not Equal To
-
-- Not a document editor（从零撰写，不修改已有文档）
-- Not a design check tool（不校验已有文档质量，用 `zdoc-design-check`）
-- Not a task decomposer（不拆分实施任务，用 `zdoc-i2i`）
-- Not a quality loop（不做多轮评审收敛，用 `zdoc-quality-loop`）
-
 ## Canonical Authority
 
 - DOC-WRITING-GUIDE v1.0 (`docs/mvp-lite/DOC-WRITING-GUIDE.md`)
@@ -48,8 +41,6 @@ Canonical bundle: `zdoc-write/`
 | [ITERATION-DOCUMENT-CHECKLIST](../../docs/ITERATION-DOCUMENT-CHECKLIST.md) | 上游 | 完整性要求、MAC 标准 |
 | zdoc-design-check | 下游 | 写完后可调用做质量校验 |
 | zdoc-i2i | 下游 | 校验通过后可调用做实施转化 |
-
----
 
 ## 1. 目标与非目标
 
@@ -773,21 +764,96 @@ relationships:
 ```bash
 # 指定类型撰写
 zdoc-write prd --module M12 --output-dir docs/mvp-lite/prds/
+```
 
+**预期输出（用户确认后落盘）**:
+
+```
+docs/mvp-lite/prds/
+├── PRD-M12-Onboarding-Identity.md
+└── .zdoc-write/
+    └── PRD-M12-Onboarding-Identity-decisions.md
+```
+
+---
+
+```bash
 # 从内容推断类型
 zdoc-write "我需要写一个用户注册模块的架构文档，用 React + Go + PostgreSQL"
+```
 
+**预期输出（用户确认后落盘）**:
+
+```
+{output-dir}/
+├── ARCH-M12-User-Registration.md          # 推断类型为 arch，模块编号需用户确认或后续指定
+└── .zdoc-write/
+    └── ARCH-M12-User-Registration-decisions.md
+```
+
+> 注：未指定 `--module` 和 `--output-dir` 时，文档摘要中会提示用户补全，确认后按用户指定路径落盘。
+
+---
+
+```bash
 # 从现有文件补充
 zdoc-write prd --input docs/drafts/prd-notes.md --output-dir docs/mvp-lite/prds/
+```
 
+**预期输出（用户确认后落盘）**:
+
+```
+docs/mvp-lite/prds/
+├── PRD-M12-Onboarding-Identity.md         # 从 prd-notes.md 提取内容，自动填充缺失章节
+└── .zdoc-write/
+    └── PRD-M12-Onboarding-Identity-decisions.md
+```
+
+> 决策摘要示例内容：
+> - 核心决策点：模块编号 M12 是否准确、Out of Scope 的 3 项排除内容
+> - 分歧点：用户故事采用 Given-When-Then 还是 Bullet AC 格式
+> - 开放问题：未提供业务规则，已标记 `[需确认]`
+
+---
+
+```bash
 # 指定项目路径（用于交叉引用）
 zdoc-write tech --module M12 --project . --output-dir docs/mvp-lite/tech/
+```
 
+**预期输出（用户确认后落盘）**:
+
+```
+docs/mvp-lite/tech/
+├── TECH-M12-Onboarding-Identity.md
+└── .zdoc-write/
+    └── TECH-M12-Onboarding-Identity-decisions.md
+```
+
+> 注：指定 `--project .` 后，Phase 1 会扫描项目内已有文档（如 `../prds/PRD-M12-*.md`、`../arch/ARCH-M12-*.md`），自动建立交叉引用并在决策摘要中列出关联文档清单。
+
+---
+
+```bash
 # 完整参数
 zdoc-write api --module M12 --output-dir docs/mvp-lite/api/ --project .
 ```
 
-> **预期输出**：上述命令不会立即落盘最终文档。执行后，`zdoc-write` 会先输出 `## 文档摘要` 供用户确认核心决策点；用户确认后进入 Phase 4 最终化，生成文档本体与决策摘要。
+**预期输出（用户确认后落盘）**:
+
+```
+docs/mvp-lite/api/
+├── API-M12-Onboarding-Identity.md
+└── .zdoc-write/
+    ├── API-M12-Onboarding-Identity-decisions.md
+    └── API-M12-Onboarding-Identity-change-report.json   # API 类型强制生成变更检测报告
+```
+
+> 注：API 类型强制触发 Phase 1.5 旧接口变更检测。若搜索到同模块旧 API 文档，决策摘要中会包含破坏性变更确认项；若未搜索到，文档中标注"首次撰写，无历史版本"。
+
+---
+
+> **执行流程说明**：上述命令不会立即落盘最终文档。执行后，`zdoc-write` 会先输出 `## 文档摘要` 供用户确认核心决策点；用户确认后进入 Phase 4 最终化，生成文档本体与决策摘要。
 
 ---
 

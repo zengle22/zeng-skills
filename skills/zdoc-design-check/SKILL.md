@@ -14,6 +14,63 @@ allowed-tools:
 
 Skill for Pre-SSOT document validation across 6 dimensions (Business Design, Product Design, UX Design, Architecture Design, Test Design, Engineering Implementation) + cross-dimension consistency. Pure LLM + structured output architecture — LLM handles all checks (deterministic + semantic), domain rubrics embedded in prompt.
 
+## 1. 目标与非目标
+
+### 1.1 目标
+
+- 对 Pre-SSOT 设计文档执行 6 大维度（商业/产品/UX/架构/测试/工程）+ 跨维度一致性检查。
+- 基于 ITERATION-DOCUMENT-CHECKLIST 和 ADR-002 的 55 项规则，产出 BLOCK / WARN / PASS 诊断报告。
+- 帮助团队在正式进入 SSOT 撰写前发现文档缺陷，降低下游返工成本。
+- 作为纯 LLM + 结构化输出技能运行，无需外部 linter 或人工逐项检查。
+
+### 1.2 非目标
+
+- **Not a replacement for `zdoc-quality-loop`**（互补；Quality Loop 负责文档结构/可读性/多轮收敛，Design Check 负责商业设计输入充分性）
+- **Not a document editor**（只产出诊断报告，绝不修改源文档）
+- **Not a gate decision maker**（只提供证据，最终 verdict 由人工确认）
+- **Not a SSOT formalization tool**（在 SSOT 之前运行，不参与 SSOT 规范化）
+- **Not a code review tool**（代码审查请使用 `zcode-review-deep` / `zcode-patrol`）
+
+## 2. 输入/输出
+
+### 2.1 输入
+
+| 输入项 | 形态 | 必填 | 说明 |
+|--------|------|------|------|
+| `--input` / `--dir` | 文件路径或目录 | 是 | 待校验的设计文档（单个/多个/目录扫描） |
+| `--domain` | `business\|product\|ux\|arch\|test\|eng\|all` | 否，默认 `all` | 指定校验域 |
+| `--layer` | `gate-only\|full` | 否，默认 `full` | 仅通用质量门或全量检查 |
+| `--output-dir` | 目录路径 | 否，默认 `.design-check` | 产物输出根目录 |
+| `--project` | 项目标识 | 否 | 用于跨文档一致性追踪 |
+
+### 2.2 输出
+
+| 输出项 | 路径约定 | 说明 |
+|--------|----------|------|
+| `design-check.json` | `{output_dir}/{check_id}/design-check.json` | 结构化检查结果（全量） |
+| `design-check-report.md` | `{output_dir}/{check_id}/design-check-report.md` | 人可读 Markdown 报告 |
+| `design-check-verdict.json` | `{output_dir}/{check_id}/design-check-verdict.json` | 人工确认后的 verdict |
+
+### 2.3 退出状态
+
+| 状态 | 含义 |
+|------|------|
+| `PASS` | 所有检查通过 |
+| `CONDITIONAL` | 有 WARN 但无 BLOCK，可带标注继续 |
+| `BLOCK` | 任一文档/域触发 FAIL，需修复后重跑 |
+
+## 3. 执行步骤
+
+```
+1. 参数解析      读取 --input/--dir/--domain/--layer/--output-dir 等参数
+2. 文档发现      扫描路径，按文件名/目录/内容特征识别文档类型与域映射
+3. Gate 校验     按 gate/rubric.md 执行 G1–G5；任一 BLOCK 则停止
+4. 域检查        对每个识别到的域执行对应 rubric.md（BD/PD/UX/AD/TD/EI）
+5. 跨维度一致性   多文档模式下执行 cross-dimension/rubric.md（XC）
+6. 结构化输出     生成 design-check.json + design-check-report.md
+7. 人工确认       展示摘要，用户确认或补充后写入 design-check-verdict.json
+```
+
 ## Primary Abstraction
 
 Skill (governed capability template)
@@ -25,13 +82,6 @@ Pipeline — LLM multi-layer validation with structured report output
 ## Authority
 
 Canonical bundle: `zdoc-design-check/`
-
-## Not Equal To
-
-- Not a replacement for `zdoc-quality-loop` (complements it; Doc Quality Loop for document structure/readability, Design Check for business design input sufficiency)
-- Not a document editor (produces diagnostic reports only, never modifies source documents)
-- Not a gate decision maker (evidence-only, human confirms verdict)
-- Not a SSOT formalization tool (runs BEFORE SSOT, not during)
 
 ## Canonical Authority
 
@@ -88,7 +138,7 @@ This capability is a governed `Skill` for `Business Design Document → Structur
 └───────────────────────────────────────────────────────────────────┘
 ```
 
-## 输入模型
+### 2.1.1 输入模式与文档识别
 
 | 模式 | 输入 | 可执行的检查 | XC 跨维度 |
 |------|------|------------|----------|
@@ -243,11 +293,25 @@ XC 检查项缺少任一相关域产物时标记 `SKIPPED`（原因：`missing_d
 | **PASS** | Element complete and meets MAC | Cleared |
 | **N/A** | Not applicable for this iteration type | Labeled with reuse source |
 
+## Pitfalls / 常见坑与规避
+
+| # | 常见坑 | 影响 | 规避方法 |
+|---|--------|------|----------|
+| 1 | 把 Design Check 当文档编辑器，要求它直接修改源文档 | 破坏已评审基线、引入未授权变更 | 明确只产出诊断报告；修改文档使用 `zdoc-write` 或手动编辑 |
+| 2 | 传入 `draft` / `reviewing` 状态文档并期望通过 | 检查结果无效，下游仍可能大幅变更 | 确保文档至少为 `approved` 状态再运行 Design Check |
+| 3 | 只跑单文档却期望触发跨维度一致性（XC）检查 | XC 被 SKIP，遗漏跨文档冲突 | 传入 2+ 个不同域文件或使用 `--dir` 目录扫描 |
+| 4 | 忽略 WARN 项直接进入 SSOT | 低质量文档进入下游，导致 I2I 任务缺陷 | 将 WARN 项视为必须修复或显式接受的风险 |
+| 5 | 自定义 rubric 未遵循 `rubric.md` 协议 | Check ID 不稳定、报告无法被工具消费 | 新增域 rubric 必须含 PASS/FAIL 条件和稳定 ID 格式 |
+
 ## Usage Examples
 
 ```bash
 # Validate all dimensions (full check)
 zdoc-design-check --dir docs/ --project my-project --domain all
+
+# 预期输出：
+# {output_dir}/DC-20260616-001/design-check.json
+# {output_dir}/DC-20260616-001/design-check-report.md
 
 # Validate only Business Design (D1)
 zdoc-design-check --input docs/prd/xxx-prd.md --domain business
