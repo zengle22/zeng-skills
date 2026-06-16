@@ -19,13 +19,70 @@ allowed-tools:
 > `zeval-skill` 是"裁判"与"基线守护者"——它**不**直接修复问题、不**直接**产出代码。
 > 修复动作由 `zcode-patrol` / `zcode-review-deep` / `zdoc-i2i` 等下游 skill 完成。
 
-## Not Equal To
+## 1. 目标与非目标
+
+### 1.1 目标
+
+- 对 skill 设计、agent run、文档、代码 diff、prompt 输出、多轮对话等对象执行结构化评估。
+- 通过多 Judge 并行评审 + Adjudicator 仲裁，输出带证据链的维度评分。
+- 输出可被 CI 直接消费的 Gate 结果（exit code / status / message）。
+- 建立并维护可对比的回归基线（baseline），标记退化维度。
+- 持久化 replay bundle，保证评估过程可重放、可审计。
+
+### 1.2 非目标
 
 - **Not a source code fixer** — 评估产出**评分卡 + 修复建议**，不生成 patch
 - **Not a replacement for human review** — 人类在 loop 中作为"最终仲裁"或"基线设定者"，不在 hot path
 - **Not a real-time monitor** — 是**批/触发**型，不做 metrics dashboard
 - **Not a training/eval benchmark** — 不读训练数据、不调权重、不替代 LM Evaluation Harness
 - **Not opinionated on aesthetics** — 美学/品味/灵感等无客观证据的领域**不**进入 v1 rubric
+
+## 2. 输入/输出
+
+### 2.1 输入
+
+| 输入项 | 形态 | 必填 | 说明 |
+|--------|------|------|------|
+| `target` | `{ kind, ref }` 或 CLI `--target kind:ref` | 是 | 待评估对象，如 `skill-design:./skills/zdoc-i2i/SKILL.md` |
+| `rubric` | `{ id, version }` 或 CLI `--rubric id@version` | 是 | 评分卡，如 `skill-design@1.0.0` |
+| `judges` | `[{ id, role }]` 或 CLI `--judges a,b,c` | 是 | 评审视角列表 |
+| `baseline` | `compare` / `enforce` / `none` | 否，默认 `compare` | 回归检测模式 |
+| `output_dir` | 目录路径 | 否，默认 `.zeval` | 产物输出根目录 |
+| `replay_seed` | 字符串 | 否 | 用于可重放评估的 seed |
+
+输入可通过 `--request request.json` 完整指定，也可通过 CLI 参数由外层 Agent 自动拼装为 `EvalRequest`。
+
+### 2.2 输出
+
+| 输出项 | Schema | 路径约定 |
+|--------|--------|----------|
+| `EvalRequest` | [`schemas/EvalRequest.schema.json`](./schemas/EvalRequest.schema.json) | `{run_dir}/request.json` |
+| `EvalReport`  | [`schemas/EvalReport.schema.json`](./schemas/EvalReport.schema.json) | `{output_dir}/{run_id}/report.json` |
+| `Judgment`    | [`schemas/EvalRequest.schema.json`](./schemas/EvalRequest.schema.json) §judges | `{output_dir}/{run_id}/judgments/<judge_id>.json` |
+| `replay_bundle` | — | `{output_dir}/{run_id}/replay_bundle/` |
+
+### 2.3 Gate 退出码
+
+| Gate.status | 退出码 | 含义 |
+|-------------|--------|------|
+| pass        | 0      | 全部通过 |
+| warn        | 0      | 通过但有警告（仅返回非零 stderr） |
+| fail        | 1      | 评估未通过 |
+| blocked     | 2      | 输入/校验失败 |
+| conflicted  | 3      | 多 judge 冲突无法收敛，升级人类 |
+
+## 3. 执行步骤
+
+```
+1. Loader        解析参数，加载 target / rubric / judges
+2. Validator     Schema / Path / 权限校验（→ blocked if fail）
+3. Dispatcher    并行调度 N 个 Judge Agent
+4. Judges        独立评审，各输出 score + rationale + evidence_refs
+5. Adjudicator   汇总冲突，按 strategy 产出 Verdict
+6. Reporter      输出 EvalReport.json
+7. Baseliner     与 baseline 对比，标记 regressed_dimensions
+8. Replayer      持久化 replay bundle（保证可重放）
+```
 
 ## Execution Model
 
@@ -44,39 +101,6 @@ allowed-tools:
 > **注意**：本技能是**纯 SKILL.md + 外层 AI Agent** 实现，无独立 Python 运行时。
 > `validate.py` 仅用于验证输出产物是否符合 JSON Schema 契约。
 > 这与 `zcode-review-deep` v1.1 简化后的架构一致（参见 ADR-001 §12.1）。
-
-## Top-Level Workflow
-
-```
-1. Loader        解析参数，加载 target / rubric / judges
-2. Validator     Schema / Path / 权限校验（→ blocked if fail）
-3. Dispatcher    并行调度 N 个 Judge Agent
-4. Judges        独立评审，各输出 score + rationale + evidence_refs
-5. Adjudicator   汇总冲突，按 strategy 产出 Verdict
-6. Reporter      输出 EvalReport.json
-7. Baseliner     与 baseline 对比，标记 regressed_dimensions
-8. Replayer      持久化 replay bundle（保证可重放）
-```
-
-## Output Schema
-
-所有输出产物必须符合以下 JSON Schema：
-
-| 产物 | Schema | 路径约定 |
-|------|--------|----------|
-| EvalRequest | [`schemas/EvalRequest.schema.json`](./schemas/EvalRequest.schema.json) | `--request` 输入 |
-| EvalReport  | [`schemas/EvalReport.schema.json`](./schemas/EvalReport.schema.json) | `{output_dir}/{run_id}/report.json` |
-| Judgment    | [`schemas/EvalRequest.schema.json`](./schemas/EvalRequest.schema.json) §judges | `{output_dir}/{run_id}/judgments/<judge_id>.json` |
-
-### Gate 退出码
-
-| Gate.status | 退出码 | 含义 |
-|-------------|--------|------|
-| pass        | 0      | 全部通过 |
-| warn        | 0      | 通过但有警告（仅返回非零 stderr） |
-| fail        | 1      | 评估未通过 |
-| blocked     | 2      | 输入/校验失败 |
-| conflicted  | 3      | 多 judge 冲突无法收敛，升级人类 |
 
 ## Evaluation Target Matrix（v1）
 
