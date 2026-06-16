@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.92,
+  "level": "excellent",
+  "weight": 1.5,
+  "rationale": "目标/非目标二分明确，且非目标具体可验证。显式列出4条非目标：不替代 bmad-code-review、不自动修改源代码、不做合并/发布 Gate 决策、不覆盖全量回归测试。每条非目标都有明确的对标技能或行为边界，可直接验证。",
+  "evidence_refs": [
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "不替代 `bmad-code-review`（互补；bmad 用于快速扫描，deep 用于关键 PR）" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "不自动修改源代码（仅生成修复任务，人工决定是否执行）" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "不做合并/发布 Gate 决策（仅提供证据，决策权保留给人类）" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "不覆盖全量回归测试（聚焦变更范围，不保证无漏测）" }
+  ]
+}

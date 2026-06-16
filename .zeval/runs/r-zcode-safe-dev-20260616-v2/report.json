@@ -1,0 +1,97 @@
+{
+  "run_id": "r-zcode-safe-dev-20260616-v2",
+  "request_hash": "zcode-safe-dev-skill-design-v1-20260616",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.0,
+      "rationale": "SKILL.md 覆盖全部必备章节：1.1/1.2 目标与非目标（含 4 项目标、5 项非目标）、2.1/2.2 输入/输出（含必填字段表格与 6 项输出章节）、3 执行步骤（7 步流程表）。额外包含绝对禁止行为、工作流程、输出格式要求、pitfalls、使用方式与示例。内容充实，无遗漏。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 1. 目标与非目标" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 2. 输入/输出" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 3. 执行步骤" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 绝对禁止的行为" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 工作流程" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 输出格式要求" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## Pitfalls / 常见坑与规避" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 使用方式" }
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "目标与非目标二分极为明确。1.1 列出 4 项目标，1.2 列出 5 项非目标，每条非目标均以'不是…'开头，具体可验证（如'不是通用代码生成器'、'不是 L2/L3 评审的绕过工具'）。另有'绝对禁止的行为'章节以 6 条硬约束进一步划定边界，含触发条件与后果说明。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "### 1.1 目标" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "### 1.2 非目标" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "- **不是通用代码生成器**：本技能仅针对 LEE 项目既有代码的修改与扩展" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "- **不是 L2/L3 评审的绕过工具**：高风险改动...必须交由人类评审" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 绝对禁止的行为（看到这些需求要拒绝并提醒）" }
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.75,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "存在调用示例，包含完整参数（task_description、repo_root、target_module、risk_level、user_constraints）和预期输出结构说明。但缺少可独立执行的 CLI 命令格式（如'claude /zcode-safe-dev ...'），且未展示实际预期输出文本，仅描述输出应包含的章节。因此示例可理解但不可直接复制执行。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "### 示例调用" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "task_description: 为 LEE 项目的 QA 模块增加 worktree 环境下的导入路径支持" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "### 预期输出结构" }
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "共列出 6 条 pitfall，每条均包含：坑的名称、具体影响、可操作的规避方法。覆盖平行目录、孤立模块、重复造轮子、覆盖率阈值造假、跳过自我 review、跳过测试设计等典型风险。表格形式清晰，可直接作为 check-list 使用。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## Pitfalls / 常见坑与规避" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **创建平行目录结构** | 模块路径断裂... | 始终在现有根目录... |" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **只写孤立模块不做集成** | 新代码无法被现有工作流调用... | 每次新增模块必须标明调用路径... |" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **跳过同类实现搜索直接造轮子** | 架构腐化... | 动手前强制搜索关键字... |" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **修改覆盖率阈值或屏蔽失败用例来制造绿灯** | 质量信号失真... | 覆盖率阈值与通过标准属于治理红线... |" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **不经自我 review 就宣称完成** | 低级错误遗漏... | 最终输出必须包含结构化 safety_checklist... |" },
+        { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **在不支持测试的环境中跳过测试设计** | 改动无验证手段... | 即使无法运行也要写出测试策略... |" }
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.9035,
+    "rationale": "四个维度均达标。completeness 与 boundary-clarity 表现优秀，pitfalls 充实。唯一短板为 examples-runnable（0.75），示例缺少可直接执行的 CLI 命令和实际输出文本，但参数与场景描述完整。加权总分 0.9035 > pass_threshold 0.75。",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "pass",
+    "code": "PASS_ALL_DIMS",
+    "message": "所有维度评分高于 fail_threshold，无冲突，gate 通过。"
+  },
+  "artifacts": {
+    "report_path": ".zeval/runs/r-zcode-safe-dev-20260616-v2/report.json",
+    "raw_judgments": [
+      "judgments/j-comp.json",
+      "judgments/j-bnd.json",
+      "judgments/j-ex.json",
+      "judgments/j-pit.json"
+    ],
+    "replay_bundle": ".zeval/runs/r-zcode-safe-dev-20260616-v2/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-16T00:00:00Z",
+    "duration_ms": 120000,
+    "model_versions": { "evaluator": "kimi-for-coding" }
+  }
+}

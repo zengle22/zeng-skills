@@ -1,0 +1,15 @@
+run_id: r-zdoc-quality-loop-20260616-v2
+created_at: "2026-06-16T12:00:00Z"
+duration_ms: 120000
+model_versions:
+  j-comp: kimi-for-coding
+  j-bnd: kimi-for-coding
+  j-ex: kimi-for-coding
+  j-pit: kimi-for-coding
+  adjudicator: kimi-for-coding
+rubric:
+  id: skill-design
+  version: 1.0.0
+target:
+  kind: skill-design
+  ref: skills/zdoc-quality-loop/SKILL.md

@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.75,
+  "level": "good",
+  "weight": 1.0,
+  "rationale": "存在调用示例，包含完整参数（task_description、repo_root、target_module、risk_level、user_constraints）和预期输出结构说明。但缺少可独立执行的 CLI 命令格式（如‘claude /zcode-safe-dev ...’），且未展示实际预期输出文本，仅描述输出应包含的章节。因此示例可理解但不可直接复制执行。",
+  "evidence_refs": [
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "### 示例调用" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "task_description: 为 LEE 项目的 QA 模块增加 worktree 环境下的导入路径支持" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "### 预期输出结构" }
+  ]
+}

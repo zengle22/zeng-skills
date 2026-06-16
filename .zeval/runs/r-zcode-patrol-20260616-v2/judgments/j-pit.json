@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 0.8,
+  "rationale": "Pitfalls 章节列出 5 条具体坑，每条均含'影响'和'规避'两列，形成完整的风险-对策矩阵。覆盖 max-files 截断、基线路径漂移、L3 工具缺失、severity 过滤过宽、shallow clone 中 git blame 失效，均为该技能真实高概率风险点。",
+  "evidence_refs": [
+    {
+      "kind": "line",
+      "ref": "skills/zcode-patrol/SKILL.md:204-212",
+      "quote": "## Pitfalls / 常见坑与规避\n\n| 坑 | 影响 | 规避 |\n|------|------|------|\n| **max-files 超限截断** | 大仓库中 `--max-files 500` 默认截断导致遗漏关键文件... | 首次扫描前用 `find` 估算文件量... |\n| **baseline 路径漂移** | 基线文件被移动/删除后 `--baseline` 指向失效... | 在 CI 中将基线路径写入环境变量... |\n| **L3 工具未安装** | jscpd / vulture / pip-audit 等缺失时该维度空跑... | 在 `Initialize` 阶段检测工具可用性... |\n| **severity 过滤过宽** | `--min-severity P3` 默认放行所有级别... | 在 CI 场景中将 `--min-severity P1` 作为默认... |\n| **git blame 在 shallow clone 中失效** | 浅克隆仓库缺少完整历史... | 检测 `.git/shallow` 存在时跳过 blame enrichment... |"
+    }
+  ]
+}

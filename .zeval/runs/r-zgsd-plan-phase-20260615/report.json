@@ -1,0 +1,89 @@
+{
+  "run_id": "r-zgsd-plan-phase-20260615",
+  "request_hash": "sha256:placeholder",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.55,
+      "level": "acceptable",
+      "weight": 1.0,
+      "rationale": "Has Trigger, What This Skill Does, How to Run, Prerequisites, Generated Output. Missing explicit Goals/Non-Goals, Input/Output, and When-to-use/When-NOT sections.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:8","quote":"## Trigger"},
+        {"kind":"line","ref":"SKILL.md:15","quote":"## What This Skill Does"},
+        {"kind":"line","ref":"SKILL.md:33","quote":"## How to Run"},
+        {"kind":"line","ref":"SKILL.md:108","quote":"## Prerequisites"},
+        {"kind":"line","ref":"SKILL.md:116","quote":"## Generated Output"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.35,
+      "level": "poor",
+      "weight": 1.5,
+      "rationale": "Clear positive scope in 'What This Skill Does', but NO explicit Non-Goals / NOT to use / When NOT section. Rubric fail_if triggered. Only one side of boundary is defined.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:15","quote":"## What This Skill Does"},
+        {"kind":"line","ref":"SKILL.md:16","quote":"Converts impl task packs..."},
+        {"kind":"line","ref":"SKILL.md:82","quote":"it does not modify GSD executor/core"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.75,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Two concrete bash command examples with parameters. Missing expected output. Runnable but placeholders need substitution.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:63","quote":"SKILL_DIR=$(find . -path \"*/zgsd-plan-phase/import-task-pack.mjs\"..."},
+        {"kind":"line","ref":"SKILL.md:66","quote":"node \"$SKILL_DIR/import-task-pack.mjs\" --phase <phase> --impl <impl-dir>"},
+        {"kind":"line","ref":"SKILL.md:103","quote":"SKILL_DIR=$(find . -path \"*/zgsd-plan-phase/validate-bridge.mjs\"..."},
+        {"kind":"line","ref":"SKILL.md:106","quote":"node \"$SKILL_DIR/validate-bridge.mjs\" --phase <n> [--project-root <path>]"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.40,
+      "level": "poor",
+      "weight": 0.8,
+      "rationale": "No dedicated Pitfalls section. One implicit pitfall in Step 1.5 (path normalization problem + solution). No other anti-patterns documented.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:44","quote":"**Problem**: impl task markdown and acceptance criteria may reference bare paths like:"},
+        {"kind":"line","ref":"SKILL.md:51","quote":"If these paths are written to the PLAN as-is..."},
+        {"kind":"line","ref":"SKILL.md:54","quote":"**Solution**: The bridge script automatically normalizes bare paths..."}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass-with-warn",
+    "score": 0.50,
+    "rationale": "Weighted mean score 0.50 falls between fail_threshold (0.45) and pass_threshold (0.75). Boundary-clarity is the weakest dimension (0.35) due to missing non-goals section. Completeness and pitfalls are also below good. Examples-runnable is the strongest at 0.75.",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "warn",
+    "code": "PASS_WITH_WARN",
+    "message": "Score 0.50 >= fail_threshold 0.45 but < pass_threshold 0.75. No dimension failed below 0.0. Verdict: pass-with-warn."
+  },
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-plan-phase-20260615/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-plan-phase-20260615/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-plan-phase-20260615/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-plan-phase-20260615/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-plan-phase-20260615/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-plan-phase-20260615/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-15T00:00:00Z",
+    "duration_ms": 0,
+    "model_versions": {"judge": "kimi-for-coding"}
+  }
+}

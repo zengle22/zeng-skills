@@ -1,0 +1,3 @@
+model: kimi-for-coding
+provider: anthropic
+version: "2026-06-15"

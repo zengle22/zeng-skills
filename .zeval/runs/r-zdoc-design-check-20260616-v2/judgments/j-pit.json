@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.95,
+  "level": "excellent",
+  "rationale": "5 pitfalls listed in a structured table, each with impact and mitigation. Exceeds the >=3 threshold. Pitfalls cover common misuse patterns: treating as editor, using draft docs, expecting XC on single doc, ignoring WARNs, and custom rubric protocol violations.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:296", "quote": "## Pitfalls / 常见坑与规避"},
+    {"kind": "line", "ref": "SKILL.md:300", "quote": "把 Design Check 当文档编辑器，要求它直接修改源文档"},
+    {"kind": "line", "ref": "SKILL.md:301", "quote": "传入 `draft` / `reviewing` 状态文档并期望通过"},
+    {"kind": "line", "ref": "SKILL.md:302", "quote": "只跑单文档却期望触发跨维度一致性（XC）检查"},
+    {"kind": "line", "ref": "SKILL.md:303", "quote": "忽略 WARN 项直接进入 SSOT"},
+    {"kind": "line", "ref": "SKILL.md:304", "quote": "自定义 rubric 未遵循 `rubric.md` 协议"}
+  ]
+}

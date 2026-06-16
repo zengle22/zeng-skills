@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.55,
+  "level": "acceptable",
+  "rationale": "No dedicated 'Pitfalls' or 'Common Mistakes' section exists. However, multiple specific problems with mitigation strategies are embedded throughout: path normalization prevents incorrect directory creation (§0.4), prototype indexing prevents lost reference chains (§0.6), semantic drift detection (§5.2), over-splitting warnings (§3.3), and dependency integrity checks (§3.8). Each includes specific rules and remediation steps.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:149", "quote": "### 0.4 源代码路径规范化"},
+    {"kind": "line", "ref": "SKILL.md:174", "quote": "### 0.6 原型文件检测与索引"},
+    {"kind": "line", "ref": "SKILL.md:548", "quote": "### 3.3 不应拆分的情况"},
+    {"kind": "line", "ref": "SKILL.md:706", "quote": "### 3.8 依赖完整性校验"},
+    {"kind": "line", "ref": "SKILL.md:1046", "quote": "### 5.2 语义偏移检测"}
+  ]
+}

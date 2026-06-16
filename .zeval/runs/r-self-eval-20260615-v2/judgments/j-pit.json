@@ -1,0 +1,16 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.9,
+  "level": "excellent",
+  "weight": 0.8,
+  "rationale": "Pitfalls section contains exactly 5 items, exceeding the >=3 threshold for excellent. Each pitfall is paired with a clear mitigation method embedded in the statement itself (e.g., '它是辅助判断，不是真理', '退化需要参照', 'v1 无客观信号', '多视角 + 仲裁才是设计目标', 'eval 是批/触发型').",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:345", "quote": "## Pitfalls" },
+    { "kind": "line", "ref": "SKILL.md:347", "quote": "- **不要把 eval 当真理** — 它是辅助判断，不是真理" },
+    { "kind": "line", "ref": "SKILL.md:348", "quote": "- **不要在没有 baseline 时判定\"退化\"** — 退化需要参照" },
+    { "kind": "line", "ref": "SKILL.md:349", "quote": "- **不要给\"美/灵/巧\"打分** — v1 无客观信号" },
+    { "kind": "line", "ref": "SKILL.md:350", "quote": "- **不要追求\"单 judge 准确率\"** — 多视角 + 仲裁才是设计目标" },
+    { "kind": "line", "ref": "SKILL.md:351", "quote": "- **不要在 hot path 频繁跑** — eval 是**批/触发**型" }
+  ]
+}

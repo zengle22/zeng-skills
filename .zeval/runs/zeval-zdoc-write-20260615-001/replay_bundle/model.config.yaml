@@ -1,0 +1,9 @@
+outer_agent: kimi-for-coding
+judge_pool:
+  - j-completeness
+  - j-boundary-clarity
+  - j-examples-runnable
+  - j-pitfalls
+adjudicator: default
+seed: null
+snapshot_inputs: true

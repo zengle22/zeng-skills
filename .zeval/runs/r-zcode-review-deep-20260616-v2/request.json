@@ -1,0 +1,17 @@
+{
+  "run_id": "r-zcode-review-deep-20260616-v2",
+  "target": {
+    "kind": "skill-design",
+    "path": "skills/zcode-review-deep/SKILL.md"
+  },
+  "rubric": {
+    "id": "skill-design",
+    "version": "1.0.0"
+  },
+  "judges": [
+    { "id": "j-comp", "dimension": "completeness" },
+    { "id": "j-bnd", "dimension": "boundary-clarity" },
+    { "id": "j-ex", "dimension": "examples-runnable" },
+    { "id": "j-pit", "dimension": "pitfalls" }
+  ]
+}

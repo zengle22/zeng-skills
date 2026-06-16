@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.50,
+  "level": "acceptable",
+  "rationale": "无显式pitfalls章节。Non-Negotiable Rules（5条）可视为反模式/约束，但未明确标注为常见坑或提供规避方法。规则内容涉及不修改源文件、不执行测试、不做gate决策、不捏造数据、工具不可用时优雅跳过，这些属于约束而非pitfall指导。",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:144", "quote": "## Non-Negotiable Rules"},
+    {"kind": "line", "ref": "SKILL.md:146", "quote": "- 不修改源文件（read-only）"},
+    {"kind": "line", "ref": "SKILL.md:147", "quote": "- 不执行测试或运行时分析"},
+    {"kind": "line", "ref": "SKILL.md:148", "quote": "- 不做 gate 决策（仅产出证据）"},
+    {"kind": "line", "ref": "SKILL.md:149", "quote": "- 不捏造统计数据（计数必须匹配原始证据）"},
+    {"kind": "line", "ref": "SKILL.md:150", "quote": "- 工具不可用时优雅跳过，不崩溃"}
+  ]
+}

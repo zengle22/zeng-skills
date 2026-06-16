@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 1.0,
+  "level": "excellent",
+  "weight": 0.8,
+  "rationale": "9 pitfalls listed, each with impact description and concrete mitigation measure. Far exceeds rubric 'excellent' threshold of >=3 pitfalls with avoidance methods. Pitfalls cover self-deception convergence, standard drift, role collusion, majority tyranny, false consensus, report contamination, audit contamination, state loss on interrupt, and token explosion.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:1211", "quote": "## Pitfalls / 常见坑与规避"},
+    {"kind": "line", "ref": "SKILL.md:1215", "quote": "| **自嗨收敛** — Fixer 自我评价\"已修复\"，但问题实际未解决 | 下一轮评审重新发现同一问题... | 强制引入独立 Verifier 核对... |"},
+    {"kind": "line", "ref": "SKILL.md:1216", "quote": "| **标准漂移** — 每轮 Rubric 或严重级别定义被悄悄修改 | 跨轮次问题不可比... | 初始化时锁定 `rubric-locked.md`... |"},
+    {"kind": "line", "ref": "SKILL.md:1217", "quote": "| **角色互相认可** — 评审团在讨论中放弃独立立场... | 冲突被虚假解决... | 讨论时每角色独立 spawn 响应... |"}
+  ]
+}

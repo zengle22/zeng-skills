@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.8,
+  "level": "good",
+  "rationale": "Five pitfalls listed in section 'Pitfalls' (lines 345-351). Each is concrete, but only two explicitly include implicit mitigation guidance within the statement ('不要在...', '不要追求...'). Meets >=2 threshold for 'good'; falls short of >=3 with explicit mitigation for 'excellent'.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:345","quote":"不要把 eval 当真理 — 它是辅助判断，不是真理"},
+    {"kind":"line","ref":"SKILL.md:346","quote":"不要在没有 baseline 时判定退化 — 退化需要参照"},
+    {"kind":"line","ref":"SKILL.md:347","quote":"不要给美/灵/巧打分 — v1 无客观信号"},
+    {"kind":"line","ref":"SKILL.md:348","quote":"不要追求单 judge 准确率 — 多视角 + 仲裁才是设计目标"},
+    {"kind":"line","ref":"SKILL.md:349","quote":"不要在 hot path 频繁跑 — eval 是批/触发型"}
+  ]
+}

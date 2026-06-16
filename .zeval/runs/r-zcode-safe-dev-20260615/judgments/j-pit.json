@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.90,
+  "level": "excellent",
+  "rationale": "6 explicit pitfalls with avoidance methods: parallel directories, isolated modules, missing tests, coverage threshold manipulation, wheel reinvention, skipped self-review. Each has 禁止 + MUST pattern and concrete remediation steps. Exceeds >=3 threshold.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:15","quote":"### 1. 创建'平行目录结构' - 禁止"},
+    {"kind":"line","ref":"SKILL.md:21","quote":"### 2. 不做集成 / 只写'孤立模块' - 禁止"},
+    {"kind":"line","ref":"SKILL.md:26","quote":"### 3. 不写测试 / 不跑测试 - 禁止"},
+    {"kind":"line","ref":"SKILL.md:33","quote":"### 4. 修改测试覆盖率阈值或通过标准来'制造绿灯' - 禁止"},
+    {"kind":"line","ref":"SKILL.md:43","quote":"### 5. 不查找系统内同类实现就'重复造轮子' - 禁止"},
+    {"kind":"line","ref":"SKILL.md:50","quote":"### 6. 不做自我 code review（只给 diff，不做检查） - 禁止"}
+  ]
+}

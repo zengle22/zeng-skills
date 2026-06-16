@@ -1,0 +1,27 @@
+{
+  "target": {
+    "kind": "skill-design",
+    "ref": "./skills/zdoc-write/SKILL.md"
+  },
+  "rubric": {
+    "id": "skill-design",
+    "version": "1.0.0"
+  },
+  "judges": [
+    { "id": "j-completeness", "role": "completeness" },
+    { "id": "j-boundary-clarity", "role": "custom" },
+    { "id": "j-examples-runnable", "role": "custom" },
+    { "id": "j-pitfalls", "role": "custom" }
+  ],
+  "adjudicator": {
+    "strategy": "weighted-mean",
+    "human_in_loop": false
+  },
+  "baseline": {
+    "mode": "compare",
+    "baseline_id": "zeval-zdoc-write-20260615-001"
+  },
+  "replay": {
+    "snapshot_inputs": true
+  }
+}

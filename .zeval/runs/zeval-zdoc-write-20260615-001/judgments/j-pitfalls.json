@@ -1,0 +1,8 @@
+{
+  "judge_id": "j-pitfalls",
+  "dimension": "pitfalls",
+  "score": 0.0,
+  "level": "fail",
+  "rationale": "SKILL.md 全文未出现独立的 pitfalls / 常见坑 / 反模式章节。Non-Negotiable Rules 中虽有规则约束（如不越界、必填章节不跳过），但属于硬性规则而非对常见错误及规避方法的说明。未达到任何 pitfalls 等级要求。",
+  "evidence_refs": []
+}

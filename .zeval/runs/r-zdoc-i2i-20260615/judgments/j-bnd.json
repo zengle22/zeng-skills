@@ -1,0 +1,19 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.95,
+  "level": "excellent",
+  "rationale": "Exceptional boundary clarity. 'Not Equal To' section explicitly lists 4 things the skill is NOT. Runtime Boundary Baseline defines 7 operational boundaries. 21 Non-Negotiable Rules further constrain behavior. All boundaries are specific and verifiable (e.g., 'Read-only', '只整合不补充', '文档状态准入').",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:30", "quote": "- Not a document editor（只读取设计文档，不修改任何输入文件）"},
+    {"kind": "line", "ref": "SKILL.md:31", "quote": "- Not a code generator（产出实施计划文档，不产出代码）"},
+    {"kind": "line", "ref": "SKILL.md:32", "quote": "- Not a gate decision maker（evidence-only，汇总报告供人工确认）"},
+    {"kind": "line", "ref": "SKILL.md:33", "quote": "- Not a replacement for `zdoc-design-check`（Design Check 校验质量，I2I 做实施转化）"},
+    {"kind": "line", "ref": "SKILL.md:46", "quote": "- **Read-only** — does NOT modify source design documents."},
+    {"kind": "line", "ref": "SKILL.md:47", "quote": "- **只整合不补充** — does NOT invent features, tech solutions, or business rules not in input docs."},
+    {"kind": "line", "ref": "SKILL.md:48", "quote": "- **最小可验收颗粒度** — each Task must satisfy 5 conditions"},
+    {"kind": "line", "ref": "SKILL.md:51", "quote": "- **DAG 确定性校验** — cycle detection via `validate-dag.py`, not LLM."},
+    {"kind": "line", "ref": "SKILL.md:52", "quote": "- **文档状态准入** — only accepts `approved` or `frozen` status documents; `draft` / `reviewing` → BLOCK."},
+    {"kind": "line", "ref": "SKILL.md:1110", "quote": "## Non-Negotiable Rules"}
+  ]
+}

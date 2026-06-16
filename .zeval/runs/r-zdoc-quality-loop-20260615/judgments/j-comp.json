@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.65,
+  "level": "good",
+  "rationale": "SKILL.md has strong Use_When/Do_Not_Use_When (lines 24-34) and extensive Steps (lines 373-1137). However, it lacks explicit '目标与非目标' and '输入/输出' sections as required by the rubric. The Purpose section (lines 14-22) partially covers goals but not in the required format. Output directory structure is detailed (lines 38-95) but no formal input/output schema section. Execution steps are extremely thorough across 5 phases. Missing the exact rubric-required sections keeps it from excellent.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:24","quote":"<Use_When>"},
+    {"kind":"line","ref":"SKILL.md:30","quote":"<Do_Not_Use_When>"},
+    {"kind":"line","ref":"SKILL.md:373","quote":"<Steps>"},
+    {"kind":"line","ref":"SKILL.md:14","quote":"<Purpose>"}
+  ]
+}

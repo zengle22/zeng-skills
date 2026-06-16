@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.9,
+  "level": "excellent",
+  "rationale": "6 pitfalls listed, each with impact description and concrete mitigation method. Covers common misuse patterns (editor misuse, missing args, ignoring confirmation markers, skipping change detection, vague out-of-scope, overwriting frozen docs). All exceed the rubric's excellent threshold of >=3 with mitigations.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:738","quote":"## Pitfalls / 常见坑与规避"},
+    {"kind":"line","ref":"SKILL.md:741","quote":"| 1 | 把 `zdoc-write` 当文档编辑器，直接让它修改已有文档 | 可能误删用户内容、破坏版本历史 | 修改已有文档时明确请求更新；日常编辑使用 `zdoc-design-check` 或手动编辑 |"},
+    {"kind":"line","ref":"SKILL.md:745","quote":"| 3 | 忽略 `[需确认]` 标记，把 AI 补充内容当作用户已确认内容 | 引入未经验证的假设，导致语义漂移 | Phase 4 最终化前必须让用户审阅并确认所有 `[需确认]` 项 |"},
+    {"kind":"line","ref":"SKILL.md:746","quote":"| 4 | 撰写 API 文档时不执行 Phase 1.5 变更检测 | 遗漏破坏性变更，下游客户端崩溃 | API 类型强制搜索同模块旧文档；必须输出变更说明或\"首次撰写\"标注 |"}
+  ]
+}

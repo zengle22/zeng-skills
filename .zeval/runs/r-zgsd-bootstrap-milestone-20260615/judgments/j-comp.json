@@ -1,0 +1,12 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.55,
+  "level": "acceptable",
+  "rationale": "Has execution flow (Phase 1-4) and parameter parsing, but lacks explicit numbered sections for '目标与非目标', '输入/输出', and '执行步骤' as required by rubric. No dedicated input/output section. Anti-Patterns partially covers non-goals but not as a formal section. Evidence present for execution steps but missing for two required signals.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:16","quote":"## Execution Flow"},
+    {"kind":"line","ref":"SKILL.md:18","quote":"### Phase 1: Admission Gate (Blocking)"},
+    {"kind":"line","ref":"SKILL.md:329","quote":"## Anti-Patterns"}
+  ]
+}

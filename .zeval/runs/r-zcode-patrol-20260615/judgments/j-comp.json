@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.75,
+  "level": "good",
+  "rationale": "主要章节齐全：目标与非目标(Not Equal To)、输入/输出(Parameters/Output Schema/Issue Schema)、执行步骤(Execution Protocol)、目录结构(Artifact Directory Structure)、验证(Validation)、使用(Usage)。但缺少显式编号章节（如## 1. 目标），且没有何时使用/何时不使用的明确区分段落。Non-Negotiable Rules 可视为反模式但未标记为 pitfalls。",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:17", "quote": "## Not Equal To"},
+    {"kind": "line", "ref": "SKILL.md:38", "quote": "## Parameters"},
+    {"kind": "line", "ref": "SKILL.md:50", "quote": "## Output Schema"},
+    {"kind": "line", "ref": "SKILL.md:89", "quote": "## Execution Protocol"},
+    {"kind": "line", "ref": "SKILL.md:152", "quote": "## Usage"}
+  ]
+}

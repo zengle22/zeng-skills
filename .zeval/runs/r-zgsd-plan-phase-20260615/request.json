@@ -1,0 +1,28 @@
+{
+  "run_id": "r-zgsd-plan-phase-20260615",
+  "skill": "zgsd-plan-phase",
+  "target": "/Users/zengle/git/zeng-skills/skills/zgsd-plan-phase/SKILL.md",
+  "rubric": {
+    "id": "skill-design",
+    "version": "1.0.0",
+    "path": "/Users/zengle/git/zeng-skills/skills/zeval-skill/rubrics/skill-design.v1.yaml"
+  },
+  "judges": [
+    {"id": "j-comp", "dimension": "completeness"},
+    {"id": "j-bnd", "dimension": "boundary-clarity"},
+    {"id": "j-ex", "dimension": "examples-runnable"},
+    {"id": "j-pit", "dimension": "pitfalls"}
+  ],
+  "dimensions": [
+    {"id": "completeness", "weight": 1.0, "evidence_required": true},
+    {"id": "boundary-clarity", "weight": 1.5, "evidence_required": true},
+    {"id": "examples-runnable", "weight": 1.0, "evidence_required": true},
+    {"id": "pitfalls", "weight": 0.8, "evidence_required": false}
+  ],
+  "adjudication": {
+    "strategy": "weighted-mean",
+    "pass_threshold": 0.75,
+    "fail_threshold": 0.45,
+    "any_dimension_fail_blocks": false
+  }
+}

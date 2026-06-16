@@ -1,0 +1,20 @@
+{
+  "run_id": "r-zcode-safe-dev-20260616-v2",
+  "target": {
+    "kind": "skill-design",
+    "path": "/Users/zengle/git/zeng-skills/skills/zcode-safe-dev/SKILL.md"
+  },
+  "rubric": {
+    "id": "skill-design",
+    "version": "1.0.0",
+    "path": "/Users/zengle/git/zeng-skills/skills/zeval-skill/rubrics/skill-design.v1.yaml"
+  },
+  "judges": [
+    { "id": "j-comp", "dimension": "completeness", "model": "kimi-for-coding" },
+    { "id": "j-bnd", "dimension": "boundary-clarity", "model": "kimi-for-coding" },
+    { "id": "j-ex", "dimension": "examples-runnable", "model": "kimi-for-coding" },
+    { "id": "j-pit", "dimension": "pitfalls", "model": "kimi-for-coding" }
+  ],
+  "evaluator": "outer-agent",
+  "timestamp": "2026-06-16T00:00:00Z"
+}

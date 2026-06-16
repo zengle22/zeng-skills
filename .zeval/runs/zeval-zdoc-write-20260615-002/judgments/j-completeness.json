@@ -1,0 +1,39 @@
+{
+  "judge_id": "j-completeness",
+  "dimension": "completeness",
+  "score": 0.92,
+  "level": "excellent",
+  "rationale": "全部必备章节齐全且内容充实。包含1.目标与非目标（含目标/非目标子节）、2.输入/输出（含输入/输出子节）、3.执行步骤（Phase 1-4详细展开），以及何时使用/何时不使用的明确区分（Not Equal To + Workflow Boundary + 非目标列表）。额外覆盖了架构图、支持的文档类型、Phase详细展开、Non-Negotiable Rules、Pitfalls、Usage等章节，内容远超最低要求。",
+  "evidence_refs": [
+    {
+      "kind": "line",
+      "ref": "skills/zdoc-write/SKILL.md:54",
+      "quote": "## 1. 目标与非目标"
+    },
+    {
+      "kind": "line",
+      "ref": "skills/zdoc-write/SKILL.md:72",
+      "quote": "## 2. 输入/输出"
+    },
+    {
+      "kind": "line",
+      "ref": "skills/zdoc-write/SKILL.md:94",
+      "quote": "## 3. 执行步骤"
+    },
+    {
+      "kind": "line",
+      "ref": "skills/zdoc-write/SKILL.md:31",
+      "quote": "- Not a document editor（从零撰写，不修改已有文档）"
+    },
+    {
+      "kind": "line",
+      "ref": "skills/zdoc-write/SKILL.md:63",
+      "quote": "- **不修改已有文档**：除非用户明确请求更新，否则只从零撰写新文档。"
+    },
+    {
+      "kind": "line",
+      "ref": "skills/zdoc-write/SKILL.md:716",
+      "quote": "- 不修改已有文档（除非用户明确要求更新）"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "run_id": "zeval-zdoc-write-20260615-001",
+  "request_hash": "865faa9b51c05ef6",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-completeness",
+      "dimension": "completeness",
+      "score": 0.0,
+      "level": "fail",
+      "weight": 1.0,
+      "rationale": "The SKILL.md is missing all three required signals: no '## 1. 目标与非目标' section, no '## 2. 输入/输出' section, and no '## 3. 执行步骤' section. While there is a 'Workflow Boundary' section with Input/Output/Out of scope, and detailed phase descriptions, the specific required chapter headings are absent. The '何时使用 / 何时不使用' distinction is partially covered by 'Not Equal To' and 'Workflow Boundary', but not as a dedicated clear section.",
+      "evidence_refs": [
+        {
+          "kind": "line",
+          "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:31-36",
+          "quote": "## Not Equal To\n- Not a document editor\n- Not a design check tool\n- Not a task decomposer\n- Not a quality loop"
+        },
+        {
+          "kind": "line",
+          "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:662-670",
+          "quote": "## Workflow Boundary\n- Input: 用户描述 + 可选的现有文档/上下文\n- Output: 完整的标准文档\n- Out of scope:\n  - 不修改已有文档\n  - 不校验文档质量\n  - 不拆分实施任务\n  - 不做多轮评审"
+        },
+        {
+          "kind": "line",
+          "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:77-126",
+          "quote": "## 架构\nPhase 1... Phase 2... Phase 3... Phase 4..."
+        }
+      ]
+    },
+    {
+      "judge_id": "j-boundary-clarity",
+      "dimension": "boundary-clarity",
+      "score": 0.9,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "目标与非目标二分明确。'Not Equal To' 章节以否定句式显式列出 4 项非目标（不修改已有文档、不校验质量、不拆分任务、不做多轮评审），每项均指向可验证的替代技能。'Workflow Boundary' 再次以 Out of scope 列出 4 项排除内容，且强制规则第 4 条要求 Out of Scope 至少 3 项具体排除。非目标具体可验证。",
+      "evidence_refs": [
+        {
+          "kind": "line",
+          "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:31-37",
+          "quote": "## Not Equal To\n\n- Not a document editor（从零撰写，不修改已有文档）\n- Not a design check tool（不校验已有文档质量，用 `zdoc-design-check`）\n- Not a task decomposer（不拆分实施任务，用 `zdoc-i2i`）\n- Not a quality loop（不做多轮评审收敛，用 `zdoc-quality-loop`）"
+        },
+        {
+          "kind": "line",
+          "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:662-671",
+          "quote": "## Workflow Boundary\n\n- **Input**: 用户描述 + 可选的现有文档/上下文\n- **Output**: 完整的标准文档（符合 DOC-WRITING-GUIDE 规范）+ 决策摘要\n- **Out of scope**:\n  - 不修改已有文档（除非用户明确要求更新）\n  - 不校验文档质量（用 `zdoc-design-check`）\n  - 不拆分实施任务（用 `zdoc-i2i`）\n  - 不做多轮评审（用 `zdoc-quality-loop`）"
+        },
+        {
+          "kind": "line",
+          "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:677",
+          "quote": "4. **Out of Scope 必须具体**：至少列出 3 项具体的排除内容，不能写\"无\"或\"暂无\""
+        }
+      ]
+    },
+    {
+      "judge_id": "j-examples-runnable",
+      "dimension": "examples-runnable",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Usage section provides 5 concrete command examples with full command name, arguments, and flags. However, no expected output is shown for any example, and commands are illustrative (the skill is an LLM skill, not a CLI binary), so they cannot be copy-pasted and executed directly in a shell. Meets 'good' threshold (command + parameters) but falls short of 'excellent' (missing expected output and not independently runnable).",
+      "evidence_refs": [
+        {
+          "kind": "file",
+          "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md",
+          "quote": "## Usage\n\n```bash\n# 指定类型撰写\nzdoc-write prd --module M12 --output-dir docs/mvp-lite/prds/\n\n# 从内容推断类型\nzdoc-write \"我需要写一个用户注册模块的架构文档，用 React + Go + PostgreSQL\"\n\n# 从现有文件补充\nzdoc-write prd --input docs/drafts/prd-notes.md --output-dir docs/mvp-lite/prds/\n\n# 指定项目路径（用于交叉引用）\nzdoc-write tech --module M12 --project . --output-dir docs/mvp-lite/tech/\n\n# 完整参数\nzdoc-write api --module M12 --output-dir docs/mvp-lite/api/ --project .\n```"
+        }
+      ]
+    },
+    {
+      "judge_id": "j-pitfalls",
+      "dimension": "pitfalls",
+      "score": 0.0,
+      "level": "fail",
+      "weight": 0.8,
+      "rationale": "SKILL.md 全文未出现独立的 pitfalls / 常见坑 / 反模式章节。Non-Negotiable Rules 中虽有规则约束（如不越界、必填章节不跳过），但属于硬性规则而非对常见错误及规避方法的说明。未达到任何 pitfalls 等级要求。",
+      "evidence_refs": []
+    }
+  ],
+  "verdict": {
+    "verdict": "pass-with-warn",
+    "score": 0.5116,
+    "rationale": "Weighted-mean across 4 dimensions: completeness (0.0 × 1.0), boundary-clarity (0.9 × 1.5), examples-runnable (0.85 × 1.0), pitfalls (0.0 × 0.8). Total = 2.20 / 4.30 = 0.5116. Score is above fail_threshold (0.45) but below pass_threshold (0.75), so verdict is pass-with-warn. completeness and pitfalls both level=fail but any_dimension_fail_blocks is false, so they do not block.",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "warn",
+    "code": "0",
+    "message": "评估通过但有警告：completeness 与 pitfalls 维度未达标，建议补充目标/输入输出/执行步骤章节和 pitfalls 章节。"
+  },
+  "baseline": {
+    "baseline_id": "",
+    "delta": 0,
+    "regressed_dimensions": []
+  },
+  "artifacts": {
+    "report_path": ".zeval/runs/zeval-zdoc-write-20260615-001/report.json",
+    "raw_judgments": [
+      ".zeval/runs/zeval-zdoc-write-20260615-001/judgments/j-completeness.json",
+      ".zeval/runs/zeval-zdoc-write-20260615-001/judgments/j-boundary-clarity.json",
+      ".zeval/runs/zeval-zdoc-write-20260615-001/judgments/j-examples-runnable.json",
+      ".zeval/runs/zeval-zdoc-write-20260615-001/judgments/j-pitfalls.json"
+    ],
+    "replay_bundle": ".zeval/runs/zeval-zdoc-write-20260615-001/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-15T00:00:00Z",
+    "duration_ms": 99666,
+    "model_versions": {
+      "outer_agent": "kimi-for-coding",
+      "judge_pool": "kimi-for-coding"
+    }
+  }
+}

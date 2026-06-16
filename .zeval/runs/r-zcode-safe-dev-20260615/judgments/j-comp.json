@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.45,
+  "level": "acceptable",
+  "rationale": "Has workflow steps (0-6) and output format, but missing rubric-required sections: no explicit '目标与非目标' chapter, no dedicated '输入/输出' chapter (only embedded in workflow), no '何时使用/何时不使用' distinction. Evidence exists for execution steps but not for the three required structural signals.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:59","quote":"## 工作流程（每次任务都按这个顺序来）"},
+    {"kind":"line","ref":"SKILL.md:61","quote":"### 输入参数"},
+    {"kind":"line","ref":"SKILL.md:161","quote":"## 输出格式要求"},
+    {"kind":"line","ref":"SKILL.md:176","quote":"## 使用方式"}
+  ]
+}

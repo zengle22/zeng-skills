@@ -1,0 +1,20 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.95,
+  "level": "excellent",
+  "rationale": "SKILL.md covers all required sections: goals/non-goals (1.1/1.2), input/output with detailed parameter tables and exit states (2.1/2.2/2.3), 6-phase execution pipeline (3), primary/secondary abstractions, authority, runtime boundary baseline, architecture diagram, phase-by-phase breakdown (0-5), rerun semantics, non-negotiable rules (21 items), terminology definitions, pitfalls, and usage examples. Content is substantial throughout, with JSON schemas, template structures, and 19 integrity checks in Phase 4.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:18", "quote": "## 1. 目标与非目标"},
+    {"kind": "line", "ref": "SKILL.md:36", "quote": "## 2. 输入/输出"},
+    {"kind": "line", "ref": "SKILL.md:84", "quote": "## 3. 执行步骤"},
+    {"kind": "line", "ref": "SKILL.md:99", "quote": "## Primary Abstraction"},
+    {"kind": "line", "ref": "SKILL.md:116", "quote": "## Runtime Boundary Baseline"},
+    {"kind": "line", "ref": "SKILL.md:130", "quote": "## 架构"},
+    {"kind": "line", "ref": "SKILL.md:1153", "quote": "## 重跑语义"},
+    {"kind": "line", "ref": "SKILL.md:1164", "quote": "## Non-Negotiable Rules"},
+    {"kind": "line", "ref": "SKILL.md:1190", "quote": "## 术语定义"},
+    {"kind": "line", "ref": "SKILL.md:1208", "quote": "## Pitfalls / 常见坑与规避"},
+    {"kind": "line", "ref": "SKILL.md:1222", "quote": "## Usage"}
+  ]
+}

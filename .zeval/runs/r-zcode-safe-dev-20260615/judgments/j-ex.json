@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.30,
+  "level": "poor",
+  "rationale": "No standalone executable examples. Only illustrative snippets embedded in rules (e.g., 'pytest tests/qa/test_runner_worktree.py' as a suggestion, not a complete runnable example). No full command with all parameters, no expected output shown. Fails '存在具体命令示例' signal.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:17","quote":"示例：代码实际在 src/lee/ 下，却新建一个 lee/ 目录 → 禁止"},
+    {"kind":"line","ref":"SKILL.md:99","quote":"用列表列出你计划修改/新增的文件及职责，例如："},
+    {"kind":"line","ref":"SKILL.md:100","quote":"- src/lee/qa/runner/base.py: 扩展 run() 支持 worktree 环境的 sys.path"},
+    {"kind":"line","ref":"SKILL.md:124","quote":"建议执行的测试命令（例如：pytest tests/qa/test_runner_worktree.py）"}
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.80,
+  "level": "good",
+  "rationale": "The 'Non-Negotiable Rules' section (line 224) contains 9 concrete rules that function as anti-patterns/pitfalls with built-in mitigations: do not modify docs, do not fabricate findings, gate-before-domain, BLOCK stops execution, domain independence, disk persistence, human-confirmed verdict, stable IDs, MAC standards. Each rule implicitly states what to avoid and how to behave instead. Severity Levels table (line 237) also helps users avoid misclassifying issues. This meets the 'good' threshold (≥2 pitfalls) but not 'excellent' because pitfalls are not explicitly labeled as '常见坑' or '反模式' and lack explicit '规避方法' subsections.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:224", "quote": "## Non-Negotiable Rules\n- Do not modify source documents under any circumstance.\n- Do not fabricate findings — every BLOCK/WARN must cite specific evidence from the document.\n- Gate Check (Layer 0) must complete before domain checks begin.\n- Any BLOCK in Gate Check stops execution — do not proceed to domain checks.\n- Domain checks are independent — one domain's BLOCK does not block other domains.\n- All artifacts written to disk immediately; no in-memory-only state.\n- Verdict is always human-confirmed; the skill only recommends.\n- Check IDs must be stable within a run (no renumbering).\n- MAC standards from ITERATION-DOCUMENT-CHECKLIST v2.1 are authoritative."},
+    {"kind": "line", "ref": "SKILL.md:237", "quote": "## Severity Levels\n| Level | Meaning | Action |\n| **BLOCK** | Required element missing or critically insufficient | Must be resolved before SSOT can start |\n| **WARN** | Element exists but quality is below MAC | Recommended to improve; does not block but flagged |\n| **PASS** | Element complete and meets MAC | Cleared |\n| **N/A** | Not applicable for this iteration type | Labeled with reuse source |"}
+  ]
+}

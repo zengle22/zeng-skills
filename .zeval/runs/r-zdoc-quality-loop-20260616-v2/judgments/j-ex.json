@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.8,
+  "level": "good",
+  "weight": 1.0,
+  "rationale": "Three examples provided. Example 1 (single doc) is excellent: full command + complete expected output with all phases. Examples 2 (multi-doc parallel) and 3 (resume) provide commands with parameters but no expected output. Meets rubric 'good' criterion of '示例含命令与参数' but not all examples reach 'excellent' level of '含完整命令、参数、预期输出'.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:1233", "quote": "```\n/zdoc-quality-loop prd.md\n```"},
+    {"kind": "line", "ref": "SKILL.md:1237", "quote": "**预期输出**："},
+    {"kind": "line", "ref": "SKILL.md:1299", "quote": "```\n/zdoc-quality-loop spec.md api.md design.md --parallel --rubric ./custom-rubric.md --p1-threshold 5 --output-dir ./quality-reports\n```"},
+    {"kind": "line", "ref": "SKILL.md:1305", "quote": "```\n/zdoc-quality-loop --resume 20260615-143022-a3f2\n```"}
+  ]
+}

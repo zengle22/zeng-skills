@@ -1,0 +1,25 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.88,
+  "level": "good",
+  "weight": 1.0,
+  "rationale": "SKILL.md 覆盖所有必备章节：1. 目标与非目标（1.1/1.2）明确存在；2. 输入/输出（2.1/2.2/2.3）完整，含参数表、输出产物表、退出码；3. 执行步骤（3.0）存在，且详细展开为 5 阶段；4. 何时使用/何时不使用在目标与非目标中明确区分。扣分点：缺少独立的 '何时使用/何时不使用' 显式章节（rubrics 要求 'When NOT' 区分），且执行步骤仅列出 5 阶段标题，缺少每个阶段内的详细子步骤（如 Discovery 阶段的排除规则具体是什么）。",
+  "evidence_refs": [
+    {
+      "kind": "line",
+      "ref": "skills/zcode-patrol/SKILL.md:17-32",
+      "quote": "## 1. 目标与非目标 ... 1.1 目标 ... 1.2 非目标"
+    },
+    {
+      "kind": "line",
+      "ref": "skills/zcode-patrol/SKILL.md:33-63",
+      "quote": "## 2. 输入/输出 ... 2.1 输入 ... 2.2 输出 ... 2.3 退出码"
+    },
+    {
+      "kind": "line",
+      "ref": "skills/zcode-patrol/SKILL.md:64-73",
+      "quote": "## 3. 执行步骤 ... 1. Initialize ... 2. Discovery ... 3. Scan ... 4. Aggregation ... 5. Reporting"
+    }
+  ]
+}

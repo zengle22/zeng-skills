@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.55,
+  "level": "acceptable",
+  "rationale": "Has Trigger (line 8), What This Skill Does (line 15), How to Run with numbered steps (line 33), Prerequisites (line 108), and Generated Output (line 116). Missing explicit 'Goals vs Non-Goals' section, dedicated 'Input/Output' section, and 'When to use / When NOT to use' distinction. The 'How to Run' steps cover execution flow but not the canonical chapter structure required by the rubric. Evidence exists for execution steps and trigger, but not for the three required signal types (goals/non-goals, input/output, when-use).",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:8","quote":"## Trigger"},
+    {"kind":"line","ref":"SKILL.md:15","quote":"## What This Skill Does"},
+    {"kind":"line","ref":"SKILL.md:33","quote":"## How to Run"},
+    {"kind":"line","ref":"SKILL.md:108","quote":"## Prerequisites"},
+    {"kind":"line","ref":"SKILL.md:116","quote":"## Generated Output"}
+  ]
+}

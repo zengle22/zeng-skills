@@ -1,0 +1,12 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.65,
+  "level": "good",
+  "rationale": "Contains concrete bash commands (path validation, find, conditional pattern detection), agent spawn examples with full prompts, and markdown templates. However, no expected output is shown for any command. The bash examples are runnable but embedded in narrative flow rather than as standalone copy-paste examples.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:29","quote":"test -d \"$PACKAGE_PATH\" || { echo \"ERROR: Package path not found: $PACKAGE_PATH\"; exit 1; }"},
+    {"kind":"line","ref":"SKILL.md:37","quote":"find \"$PACKAGE_PATH\" -type f -name '*.md' | sort > /tmp/doc_list.txt"},
+    {"kind":"line","ref":"SKILL.md:118","quote":"if [ -f \"$PACKAGE_PATH/00_blueprint.md\" ]; then"}
+  ]
+}

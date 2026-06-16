@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.75,
+  "level": "good",
+  "rationale": "Usage section provides 6 concrete command examples with parameters (--dir, --feature, --prd, --arch, --src, --output-dir, --validate-only). However, no expected output is shown for any example. Commands are realistic and runnable but lack output verification.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:1157", "quote": "zdoc-i2i --dir docs/mvp-lite/"},
+    {"kind": "line", "ref": "SKILL.md:1160", "quote": "zdoc-i2i --dir docs/mvp-lite/ --feature M01"},
+    {"kind": "line", "ref": "SKILL.md:1163", "quote": "zdoc-i2i --prd docs/prds/PRD-M01.md --arch docs/arch/ARCH-M01.md"},
+    {"kind": "line", "ref": "SKILL.md:1166", "quote": "zdoc-i2i --dir docs/mvp-lite/ --src apps/ai-coach-skill/src"},
+    {"kind": "line", "ref": "SKILL.md:1169", "quote": "zdoc-i2i --dir docs/mvp-lite/ --output-dir docs/mvp-lite/impl"},
+    {"kind": "line", "ref": "SKILL.md:1172", "quote": "zdoc-i2i --dir docs/mvp-lite/ --validate-only"}
+  ]
+}

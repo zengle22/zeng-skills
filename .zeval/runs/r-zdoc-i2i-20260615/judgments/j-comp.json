@@ -1,0 +1,22 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.88,
+  "level": "good",
+  "rationale": "SKILL.md covers all essential content: Primary/Secondary Abstraction (goals), Not Equal To (non-goals), 6 detailed phases with execution steps, input/output specs, 21 Non-Negotiable Rules, terminology, and Usage. However, it lacks the exact heading structure expected by the rubric (no explicit '目标与非目标', '输入/输出', '执行步骤' sections). Content is thorough but reorganized under phase-based architecture.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:18", "quote": "## Primary Abstraction"},
+    {"kind": "line", "ref": "SKILL.md:30", "quote": "## Not Equal To"},
+    {"kind": "line", "ref": "SKILL.md:42", "quote": "## Runtime Boundary Baseline"},
+    {"kind": "line", "ref": "SKILL.md:56", "quote": "## 架构"},
+    {"kind": "line", "ref": "SKILL.md:101", "quote": "## Phase 0: 源文档交叉一致性校验"},
+    {"kind": "line", "ref": "SKILL.md:299", "quote": "## Phase 1: 输入校验"},
+    {"kind": "line", "ref": "SKILL.md:465", "quote": "## Phase 2: 内容整合"},
+    {"kind": "line", "ref": "SKILL.md:511", "quote": "## Phase 3: 任务拆分"},
+    {"kind": "line", "ref": "SKILL.md:801", "quote": "## Phase 4: 文档生成"},
+    {"kind": "line", "ref": "SKILL.md:1028", "quote": "## Phase 5: 交付前审核 + 交付报告"},
+    {"kind": "line", "ref": "SKILL.md:1110", "quote": "## Non-Negotiable Rules"},
+    {"kind": "line", "ref": "SKILL.md:1136", "quote": "## 术语定义"},
+    {"kind": "line", "ref": "SKILL.md:1154", "quote": "## Usage"}
+  ]
+}

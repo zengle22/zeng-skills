@@ -1,0 +1,19 @@
+{
+  "judge_id": "j-examples-runnable",
+  "dimension": "examples-runnable",
+  "score": 0.7,
+  "level": "good",
+  "rationale": "Usage section contains 5 concrete command examples with full command names, arguments (--module, --output-dir, --input, --project), and expected output description. However, no expected stdout/result output is shown for any example, and the commands reference a fictional 'zdoc-write' CLI rather than a real executable path. Meets 'good' (命令与参数) but not 'excellent' (缺少预期输出).",
+  "evidence_refs": [
+    {
+      "kind": "file",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:751-768",
+      "quote": "```bash\n# 指定类型撰写\nzdoc-write prd --module M12 --output-dir docs/mvp-lite/prds/\n\n# 从内容推断类型\nzdoc-write \"我需要写一个用户注册模块的架构文档，用 React + Go + PostgreSQL\"\n\n# 从现有文件补充\nzdoc-write prd --input docs/drafts/prd-notes.md --output-dir docs/mvp-lite/prds/\n\n# 指定项目路径（用于交叉引用）\nzdoc-write tech --module M12 --project . --output-dir docs/mvp-lite/tech/\n\n# 完整参数\nzdoc-write api --module M12 --output-dir docs/mvp-lite/api/ --project .\n```"
+    },
+    {
+      "kind": "file",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:770",
+      "quote": "> **预期输出**：上述命令不会立即落盘最终文档。执行后，`zdoc-write` 会先输出 `## 文档摘要` 供用户确认核心决策点；用户确认后进入 Phase 4 最终化，生成文档本体与决策摘要。"
+    }
+  ]
+}

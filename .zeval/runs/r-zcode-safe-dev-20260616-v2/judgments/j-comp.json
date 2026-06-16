@@ -1,0 +1,18 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 1.0,
+  "rationale": "SKILL.md 覆盖全部必备章节：1.1/1.2 目标与非目标（含 4 项目标、5 项非目标）、2.1/2.2 输入/输出（含必填字段表格与 6 项输出章节）、3 执行步骤（7 步流程表）。额外包含绝对禁止行为、工作流程、输出格式要求、pitfalls、使用方式与示例。内容充实，无遗漏。",
+  "evidence_refs": [
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 1. 目标与非目标" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 2. 输入/输出" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 3. 执行步骤" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 绝对禁止的行为" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 工作流程" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 输出格式要求" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## Pitfalls / 常见坑与规避" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 使用方式" }
+  ]
+}

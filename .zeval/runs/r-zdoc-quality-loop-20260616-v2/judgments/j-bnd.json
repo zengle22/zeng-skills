@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 1.5,
+  "rationale": "Non-goals section (1.2) explicitly lists 5 concrete 'not-to-use' cases with redirects to alternative tools. Each non-goal is verifiable: e.g., '不用于代码文件评审 —— 代码审查请使用 gsd-code-review + gsd-code-fixer'. Use_When section also clearly defines trigger conditions. Meets rubric 'excellent' criterion of '目标/非目标二分明确，且非目标具体可验证'. Slight deduction because one non-goal ('不保证零问题收敛') is more of a limitation than a boundary, but still clearly stated.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:40", "quote": "### 1.2 非目标"},
+    {"kind": "line", "ref": "SKILL.md:42", "quote": "不用于代码文件评审 —— 代码审查请使用 `gsd-code-review` + `gsd-code-fixer`"},
+    {"kind": "line", "ref": "SKILL.md:43", "quote": "不用于单轮评审且无需修复的场景 —— 此类需求请使用 `code-reviewer`"},
+    {"kind": "line", "ref": "SKILL.md:24", "quote": "<Use_When>"}
+  ]
+}

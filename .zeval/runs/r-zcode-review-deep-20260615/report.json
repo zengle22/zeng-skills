@@ -1,0 +1,185 @@
+{
+  "run_id": "r-zcode-review-deep-20260615",
+  "request_hash": "sha256:request-placeholder",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.65,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Has Not Equal To, Execution Model, Output Schema, Issue Schema, Severity levels, Execution Protocol, Artifact Directory, Validation, Non-Negotiable Rules, Usage. Missing: explicit numbered sections for goals/non-goals (rubric expects ## 1. 目标与非目标), input/output sections, and when to use / when not to use. Content is substantial but structure deviates from rubric-required signals.",
+      "evidence_refs": [
+        {
+          "kind": "line",
+          "ref": "SKILL.md:18",
+          "quote": "## Not Equal To"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:24",
+          "quote": "## Execution Model"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:36",
+          "quote": "## Output Schema"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:50",
+          "quote": "## Issue Schema"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:65",
+          "quote": "## Severity 级别"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:74",
+          "quote": "## Execution Protocol"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:105",
+          "quote": "## Artifact Directory Structure"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:121",
+          "quote": "## Validation"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:133",
+          "quote": "## Non-Negotiable Rules"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:140",
+          "quote": "## Usage"
+        }
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.5,
+      "rationale": "Clear 'Not Equal To' section with 3 concrete non-goals: not replacement for bmad-code-review, not auto-fixer, not gate decision maker. Each is specific and verifiable. However, lacks explicit 'When to use / When NOT to use' section beyond the 'Not Equal To' list. The boundary is well-drawn but could be more comprehensive with explicit usage triggers.",
+      "evidence_refs": [
+        {
+          "kind": "line",
+          "ref": "SKILL.md:18",
+          "quote": "## Not Equal To"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:20",
+          "quote": "- Not a replacement for `bmad-code-review`（互补；bmad 用于快速扫描，deep 用于关键 PR）"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:21",
+          "quote": "- Not a source code auto-fixer（生成修复任务，人工决定是否执行）"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:22",
+          "quote": "- Not a gate decision maker（仅提供证据）"
+        }
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Three concrete CLI examples with full commands and parameters for commit, pr, and module modes. No expected output shown. Commands are realistic and match the argument-hint. Missing expected output or sample results prevents 'excellent' rating.",
+      "evidence_refs": [
+        {
+          "kind": "line",
+          "ref": "SKILL.md:145",
+          "quote": "/zcode-review-deep --mode commit --ref HEAD~1"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:146",
+          "quote": "/zcode-review-deep --mode pr --base main --head feature/x"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:147",
+          "quote": "/zcode-review-deep --mode module --path src/services/order/"
+        }
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.4,
+      "level": "poor",
+      "weight": 0.8,
+      "rationale": "No dedicated pitfalls section. The 'Non-Negotiable Rules' section contains 4 anti-patterns (don't modify source, don't fabricate, don't mark style as P0/P1, write to disk immediately) but these are framed as rules rather than pitfalls with explanations. No explicit '常见坑' or '反模式' section exists.",
+      "evidence_refs": [
+        {
+          "kind": "line",
+          "ref": "SKILL.md:133",
+          "quote": "## Non-Negotiable Rules"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:135",
+          "quote": "- 审查阶段不修改源文件"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:136",
+          "quote": "- 不捏造问题 — 每个发现必须有精确代码证据"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:137",
+          "quote": "- 纯风格问题不得标记为 P0/P1"
+        },
+        {
+          "kind": "line",
+          "ref": "SKILL.md:138",
+          "quote": "- 所有产物立即写入磁盘，不保留内存状态"
+        }
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass-with-warn",
+    "score": 0.7198,
+    "rationale": "Weighted mean score 0.7198. Weakest dimension: pitfalls."
+  },
+  "gate": {
+    "status": "warn",
+    "code": "WARN",
+    "message": "Gate WARN: score=0.7198, threshold=0.75"
+  },
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-review-deep-20260615/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-review-deep-20260615/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-review-deep-20260615/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-review-deep-20260615/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-review-deep-20260615/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-review-deep-20260615/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-15T00:00:00Z",
+    "duration_ms": 0,
+    "model_versions": {
+      "judge": "kimi-for-coding"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.85,
+  "level": "good",
+  "weight": 1.0,
+  "rationale": "Usage 章节提供 4 条具体命令示例，每条均含完整命令、参数、预期产物说明。示例覆盖全量扫描、增量扫描+基线对比、限制范围+JSON格式、高严重级别过滤 4 种典型场景。扣分点：缺少对预期输出内容的 snippet 展示（如 report.json 的结构示例），且未提供 `--baseline` 参数的完整路径格式示例（仅给出占位符 xxx）。",
+  "evidence_refs": [
+    {
+      "kind": "line",
+      "ref": "skills/zcode-patrol/SKILL.md:214-234",
+      "quote": "## Usage\n\n在 Claude Code 中调用：\n\n```\n# 全量扫描，输出到默认目录\n/zcode-patrol --paths src/ --scope full\n# 预期产物：.zcode-patrol/{patrol_id}/report.json, report.md, hotspots.json, patrol-state.json\n\n# 增量扫描，对比基线\n/zcode-patrol --paths src/ --scope delta --baseline .zcode-patrol/20260527-120000-xxx/report.json\n# 预期产物：上述文件 + baseline-diff.json\n\n# 限制扫描范围与输出格式\n/zcode-patrol --paths src/ tests/ --scope targeted --max-files 200 --format json\n# 预期产物：.zcode-patrol/{patrol_id}/report.json（无 report.md）\n\n# 仅关注高严重级别问题\n/zcode-patrol --paths src/ --min-severity P1 --output-dir ./reports/patrol\n# 预期产物：./reports/patrol/{patrol_id}/report.json, hotspots.json, patrol-state.json\n```"
+    }
+  ]
+}

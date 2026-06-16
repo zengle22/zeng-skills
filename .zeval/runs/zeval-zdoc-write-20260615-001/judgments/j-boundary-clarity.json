@@ -1,0 +1,24 @@
+{
+  "judge_id": "j-boundary-clarity",
+  "dimension": "boundary-clarity",
+  "score": 0.9,
+  "level": "excellent",
+  "rationale": "目标与非目标二分明确。'Not Equal To' 章节以否定句式显式列出 4 项非目标（不修改已有文档、不校验质量、不拆分任务、不做多轮评审），每项均指向可验证的替代技能。'Workflow Boundary' 再次以 Out of scope 列出 4 项排除内容，且强制规则第 4 条要求 Out of Scope 至少 3 项具体排除。非目标具体可验证。",
+  "evidence_refs": [
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:31-37",
+      "quote": "## Not Equal To\n\n- Not a document editor（从零撰写，不修改已有文档）\n- Not a design check tool（不校验已有文档质量，用 `zdoc-design-check`）\n- Not a task decomposer（不拆分实施任务，用 `zdoc-i2i`）\n- Not a quality loop（不做多轮评审收敛，用 `zdoc-quality-loop`）"
+    },
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:662-671",
+      "quote": "## Workflow Boundary\n\n- **Input**: 用户描述 + 可选的现有文档/上下文\n- **Output**: 完整的标准文档（符合 DOC-WRITING-GUIDE 规范）+ 决策摘要\n- **Out of scope**:\n  - 不修改已有文档（除非用户明确要求更新）\n  - 不校验文档质量（用 `zdoc-design-check`）\n  - 不拆分实施任务（用 `zdoc-i2i`）\n  - 不做多轮评审（用 `zdoc-quality-loop`）"
+    },
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:677",
+      "quote": "4. **Out of Scope 必须具体**：至少列出 3 项具体的排除内容，不能写\"无\"或\"暂无\""
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.85,
+  "level": "good",
+  "rationale": "Strong '绝对禁止的行为' section with 6 concrete prohibitions (parallel dirs, isolated modules, no tests, coverage threshold manipulation, wheel reinvention, skipped self-review). Each has clear MUST/禁止 contrast. However, lacks explicit '非目标' / 'NOT to use' / 'When NOT' chapter as rubric requires; boundary is implicit in prohibitions rather than explicit non-goals.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:13","quote":"## 绝对禁止的行为（看到这些需求要拒绝并提醒）"},
+    {"kind":"line","ref":"SKILL.md:15","quote":"### 1. 创建'平行目录结构' - 禁止"},
+    {"kind":"line","ref":"SKILL.md:21","quote":"### 2. 不做集成 / 只写'孤立模块' - 禁止"},
+    {"kind":"line","ref":"SKILL.md:26","quote":"### 3. 不写测试 / 不跑测试 - 禁止"},
+    {"kind":"line","ref":"SKILL.md:33","quote":"### 4. 修改测试覆盖率阈值或通过标准来'制造绿灯' - 禁止"},
+    {"kind":"line","ref":"SKILL.md:43","quote":"### 5. 不查找系统内同类实现就'重复造轮子' - 禁止"},
+    {"kind":"line","ref":"SKILL.md:50","quote":"### 6. 不做自我 code review（只给 diff，不做检查） - 禁止"}
+  ]
+}

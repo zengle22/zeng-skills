@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.40,
+  "level": "poor",
+  "rationale": "No dedicated pitfalls section. The 'Non-Negotiable Rules' section contains 4 anti-patterns (don't modify source, don't fabricate, don't mark style as P0/P1, write to disk immediately) but these are framed as rules rather than pitfalls with explanations. No explicit '常见坑' or '反模式' section exists.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:133","quote":"## Non-Negotiable Rules"},
+    {"kind":"line","ref":"SKILL.md:135","quote":"- 审查阶段不修改源文件"},
+    {"kind":"line","ref":"SKILL.md:136","quote":"- 不捏造问题 — 每个发现必须有精确代码证据"},
+    {"kind":"line","ref":"SKILL.md:137","quote":"- 纯风格问题不得标记为 P0/P1"},
+    {"kind":"line","ref":"SKILL.md:138","quote":"- 所有产物立即写入磁盘，不保留内存状态"}
+  ]
+}

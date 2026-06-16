@@ -1,0 +1,19 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.65,
+  "level": "good",
+  "rationale": "Has Not Equal To, Execution Model, Output Schema, Issue Schema, Severity levels, Execution Protocol, Artifact Directory, Validation, Non-Negotiable Rules, Usage. Missing: explicit numbered sections for goals/non-goals (rubric expects ## 1. 目标与非目标), input/output sections, and when to use / when not to use. Content is substantial but structure deviates from rubric-required signals.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:18","quote":"## Not Equal To"},
+    {"kind":"line","ref":"SKILL.md:24","quote":"## Execution Model"},
+    {"kind":"line","ref":"SKILL.md:36","quote":"## Output Schema"},
+    {"kind":"line","ref":"SKILL.md:50","quote":"## Issue Schema"},
+    {"kind":"line","ref":"SKILL.md:65","quote":"## Severity 级别"},
+    {"kind":"line","ref":"SKILL.md:74","quote":"## Execution Protocol"},
+    {"kind":"line","ref":"SKILL.md:105","quote":"## Artifact Directory Structure"},
+    {"kind":"line","ref":"SKILL.md:121","quote":"## Validation"},
+    {"kind":"line","ref":"SKILL.md:133","quote":"## Non-Negotiable Rules"},
+    {"kind":"line","ref":"SKILL.md:140","quote":"## Usage"}
+  ]
+}

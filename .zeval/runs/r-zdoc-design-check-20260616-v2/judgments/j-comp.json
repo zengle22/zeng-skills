@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.95,
+  "level": "excellent",
+  "rationale": "All required sections present and richly detailed. Section 1 covers goals and non-goals with 5 explicit non-goals. Section 2 has comprehensive input/output tables with exit states. Section 3 provides a 7-step execution flow with sub-phases. 'When to use / when NOT to use' is covered across 1.2 non-goals, Runtime Boundary Baseline, and Workflow Boundary out-of-scope lists.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:17", "quote": "## 1. 目标与非目标"},
+    {"kind": "line", "ref": "SKILL.md:26", "quote": "### 1.2 非目标"},
+    {"kind": "line", "ref": "SKILL.md:34", "quote": "## 2. 输入/输出"},
+    {"kind": "line", "ref": "SKILL.md:62", "quote": "## 3. 执行步骤"},
+    {"kind": "line", "ref": "SKILL.md:103", "quote": "Read-only validation — does NOT modify source documents."}
+  ]
+}

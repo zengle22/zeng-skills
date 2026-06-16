@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.75,
+  "level": "good",
+  "rationale": "Contains two concrete bash command examples: (1) bridge script execution at line 63-66 with find + node command, flags, and placeholders; (2) validation command at line 103-106. Both include actual CLI commands with parameters. Missing expected output samples and no explicit placeholder values filled in. The examples are runnable but require the user to substitute <phase> and <impl-dir>. Good level because commands and parameters are present, but no expected output shown.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:63","quote":"SKILL_DIR=$(find . -path \"*/zgsd-plan-phase/import-task-pack.mjs\" -not -path \"*/node_modules/*\" | head -1 | xargs dirname)"},
+    {"kind":"line","ref":"SKILL.md:66","quote":"node \"$SKILL_DIR/import-task-pack.mjs\" --phase <phase> --impl <impl-dir>"},
+    {"kind":"line","ref":"SKILL.md:103","quote":"SKILL_DIR=$(find . -path \"*/zgsd-plan-phase/validate-bridge.mjs\" -not -path \"*/node_modules/*\" | head -1 | xargs dirname)"},
+    {"kind":"line","ref":"SKILL.md:106","quote":"node \"$SKILL_DIR/validate-bridge.mjs\" --phase <n> [--project-root <path>]"}
+  ]
+}

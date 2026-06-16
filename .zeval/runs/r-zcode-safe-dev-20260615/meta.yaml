@@ -1,0 +1,10 @@
+run_id: r-zcode-safe-dev-20260615
+target_skill: zcode-safe-dev
+eval_date: "2026-06-15"
+rubric: skill-design.v1.yaml
+model: kimi-for-coding
+judges:
+  - j-comp
+  - j-bnd
+  - j-ex
+  - j-pit

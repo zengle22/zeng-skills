@@ -1,0 +1,5 @@
+run_id: r-zdoc-i2i-20260615
+skill: zdoc-i2i
+rubric: skill-design.v1.yaml
+model: kimi-for-coding
+requested_at: "2026-06-15T00:00:00Z"

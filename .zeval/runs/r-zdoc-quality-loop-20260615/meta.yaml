@@ -1,0 +1,14 @@
+run_id: r-zdoc-quality-loop-20260615
+target: zdoc-quality-loop
+rubric: skill-design.v1.yaml
+dimensions:
+  - completeness (weight 1.0, evidence_required: true)
+  - boundary-clarity (weight 1.5, evidence_required: true)
+  - examples-runnable (weight 1.0, evidence_required: true)
+  - pitfalls (weight 0.8, evidence_required: false)
+strategy: weighted-mean
+pass_threshold: 0.75
+fail_threshold: 0.45
+any_dimension_fail_blocks: false
+model: kimi-for-coding
+created_at: 2026-06-15

@@ -1,0 +1,10 @@
+model:
+  host: claude-code
+  name: kimi-for-coding
+judges:
+  j-comp: kimi-for-coding
+  j-bnd: kimi-for-coding
+  j-ex: kimi-for-coding
+  j-pit: kimi-for-coding
+adjudicator: kimi-for-coding
+seed: r-self-eval-20260615-v2

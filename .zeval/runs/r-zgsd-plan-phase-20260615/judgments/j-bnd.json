@@ -1,0 +1,12 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.35,
+  "level": "poor",
+  "rationale": "The SKILL.md states 'What This Skill Does' (line 15) clearly describing the bridge conversion. However, there is NO explicit 'Non-Goals', 'NOT to use', or 'When NOT' section anywhere in the document. The rubric has a fail_if condition: '未出现 非目标 / NOT to use / When NOT 章节'. While the score is poor (0.35) because the 'What This Skill Does' gives some boundary clarity on the positive side, the absence of any negative boundary definition is a critical gap. Evidence only shows positive scope, not negative scope.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:15","quote":"## What This Skill Does"},
+    {"kind":"line","ref":"SKILL.md:16","quote":"Converts impl task packs (containing `task-list.json`, `task-*.md`, `dag-validation.json`) into GSD-executable `*-PLAN.md` files."},
+    {"kind":"line","ref":"SKILL.md:82","quote":"This is a semi-integrated DEV-002 path: it does not modify GSD executor/core, but it gives every PLAN an explicit context gate before execution."}
+  ]
+}

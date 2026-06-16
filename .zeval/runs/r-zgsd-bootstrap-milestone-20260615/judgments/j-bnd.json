@@ -1,0 +1,12 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.45,
+  "level": "poor",
+  "rationale": "Has 'Key difference from gsd-ingest-docs' and 6 'Do NOT' anti-patterns, but lacks a dedicated '非目标' / 'NOT to use' / 'When NOT' section. The rubric explicitly fails if such a section is missing. Boundary is partially clear via comparison and anti-patterns, but no formal non-goals section exists.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:10","quote":"**Key difference from `gsd-ingest-docs`**: `ingest-docs` merges doc content into existing planning incrementally. This skill treats the document package as a **self-contained milestone blueprint** and generates a complete, standalone milestone ready for `/gsd-plan-phase`."},
+    {"kind":"line","ref":"SKILL.md:329","quote":"## Anti-Patterns"},
+    {"kind":"line","ref":"SKILL.md:331","quote":"- **Do NOT** skip the admission gate unless `--force` is explicitly passed AND user has acknowledged the risk"}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.85,
+  "level": "good",
+  "rationale": "Clear Do_Not_Use_When (lines 30-34) with 3 concrete non-goals: code files -> gsd-code-review, single-round only -> code-reviewer, document not written yet -> write first. Use_When (lines 24-28) also clear. Non-goals are specific and actionable. However, '非目标' section is labeled <Do_Not_Use_When> rather than an explicit '非目标/NOT to use' heading, and the rubric prefers a dedicated section. Also, the description in the header (line 3) conflates purpose and mechanics. Strong but not excellent because the non-goals could be more verifiable (e.g., 'if file extension is .js/.py' rather than '目标是代码文件').",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:30","quote":"<Do_Not_Use_When>"},
+    {"kind":"line","ref":"SKILL.md:31","quote":"- 目标是代码文件 → 用 `gsd-code-review` + `gsd-code-fixer`"},
+    {"kind":"line","ref":"SKILL.md:32","quote":"- 只需要单轮评审无需修复 → 用 `code-reviewer`"},
+    {"kind":"line","ref":"SKILL.md:33","quote":"- 文档尚未写好 → 先写文档再运行"},
+    {"kind":"line","ref":"SKILL.md:24","quote":"<Use_When>"}
+  ]
+}

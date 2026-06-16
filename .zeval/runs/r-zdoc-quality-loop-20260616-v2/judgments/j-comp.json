@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 1.0,
+  "level": "excellent",
+  "weight": 1.0,
+  "rationale": "All required sections present and richly detailed: Purpose, Use_When, Goals/Non-goals (1.1/1.2), Input/Output with full schemas and file tree, 5-phase execution steps, Standard Rubric, Role Pool, 10+ JSON data structure schemas, Stop conditions, Pitfalls, Usage examples, File path reference, Final checklist. Exceeds rubric 'excellent' criterion of '全部章节齐全且内容充实'.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:30", "quote": "## 1. 目标与非目标"},
+    {"kind": "line", "ref": "SKILL.md:50", "quote": "## 2. 输入/输出"},
+    {"kind": "line", "ref": "SKILL.md:152", "quote": "## 3. 执行步骤"},
+    {"kind": "line", "ref": "SKILL.md:24", "quote": "<Use_When>"},
+    {"kind": "line", "ref": "SKILL.md:40", "quote": "### 1.2 非目标"}
+  ]
+}
