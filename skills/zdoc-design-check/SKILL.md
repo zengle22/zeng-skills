@@ -20,6 +20,7 @@ Skill for Pre-SSOT document validation across 6 dimensions (Business Design, Pro
 
 - 对 Pre-SSOT 设计文档执行 6 大维度（商业/产品/UX/架构/测试/工程）+ 跨维度一致性检查。
 - 基于 ITERATION-DOCUMENT-CHECKLIST 和 ADR-002 的 55 项规则，产出 BLOCK / WARN / PASS 诊断报告。
+- 对涉及用户交互的 PRD，强制校验用户旅程是否覆盖主路径、分支路径、异常路径，并能映射到 FR / AC。
 - 帮助团队在正式进入 SSOT 撰写前发现文档缺陷，降低下游返工成本。
 - 作为纯 LLM + 结构化输出技能运行，无需外部 linter 或人工逐项检查。
 
@@ -150,7 +151,7 @@ This capability is a governed `Skill` for `Business Design Document → Structur
 
 | 文档特征 | 识别规则 | 映射到域 |
 |---------|---------|---------|
-| PRD（含用户故事、AC、业务规则） | 路径含 `prd/` 或内容含 `US-`/`AC`/`用户故事` | D1 商业设计 + D2 产品设计 |
+| PRD（含用户故事、AC、业务规则、用户旅程） | 路径含 `prd/` 或内容含 `US-`/`AC`/`用户故事`/`用户旅程` | D1 商业设计 + D2 产品设计 |
 | UX 规格说明书 | 路径含 `ux/` 或内容含 `设计原则`/`交互流程`/`设计令牌` | D3 UX 设计 |
 | Tech Design（含 API、数据流、时序图） | 路径含 `tech/` 或内容含 `API`/`时序图`/`同步.*异步` | D4 架构设计 |
 | TESTSET 文档 | 路径含 `testset/` 或内容含 `测试范围`/`Happy Path`/`边界条件` | D5 测试设计 |
@@ -165,7 +166,7 @@ XC 检查缺少任一相关域产物时标记 `SKIPPED`，不计入 BLOCK/WARN�
 |-------|--------|---------------|---------|-------------|
 | **G** | 通用质量门 | `G-*` | 5 | `gate/rubric.md` |
 | **D1** | 商业设计 | `BD-*` | 6 | `domains/business-design/rubric.md` |
-| **D2** | 产品设计 | `PD-*` | 7 | `domains/product-design/rubric.md` |
+| **D2** | 产品设计 | `PD-*` | 7 | `domains/product-design/rubric.md`（PD-7 包含交互型 PRD 用户旅程强制检查） |
 | **D3** | UX 设计 | `UX-*` | 7 | `domains/ux-design/rubric.md` |
 | **D4** | 架构设计 | `AD-*` | 9 | `domains/architecture/rubric.md` |
 | **D5** | 测试设计 | `TD-*` | 8 | `domains/test-design/rubric.md` |
@@ -206,7 +207,7 @@ XC 检查缺少任一相关域产物时标记 `SKIPPED`，不计入 BLOCK/WARN�
 
 已实现的域：
 - **D1 商业设计**: `domains/business-design/rubric.md` (BD-1–BD-6)
-- **D2 产品设计**: `domains/product-design/rubric.md` (PD-1–PD-7)
+- **D2 产品设计**: `domains/product-design/rubric.md` (PD-1–PD-7；PD-7 校验交互型 PRD 用户旅程)
 - **D3 UX 设计**: `domains/ux-design/rubric.md` (UX-1–UX-7)
 - **D4 架构设计**: `domains/architecture/rubric.md` (AD-1–AD-9)
 - **D5 测试设计**: `domains/test-design/rubric.md` (TD-1–TD-8)
@@ -282,6 +283,7 @@ XC 检查项缺少任一相关域产物时标记 `SKIPPED`（原因：`missing_d
 - Verdict is always human-confirmed; the skill only recommends.
 - Check IDs must be stable within a run (no renumbering).
 - MAC standards from ITERATION-DOCUMENT-CHECKLIST v2.1 are authoritative.
+- 涉及用户交互的 PRD 若缺少用户旅程，或用户旅程未覆盖主路径/分支路径/异常路径，必须判为 BLOCK；纯后端/无人工交互 PRD 仅在文档明确说明不适用原因时可标记 N/A。
 - New domain rubrics must follow the rubric protocol (rubric.md with PASS/FAIL conditions).
 
 ## Severity Levels
@@ -302,6 +304,7 @@ XC 检查项缺少任一相关域产物时标记 `SKIPPED`（原因：`missing_d
 | 3 | 只跑单文档却期望触发跨维度一致性（XC）检查 | XC 被 SKIP，遗漏跨文档冲突 | 传入 2+ 个不同域文件或使用 `--dir` 目录扫描 |
 | 4 | 忽略 WARN 项直接进入 SSOT | 低质量文档进入下游，导致 I2I 任务缺陷 | 将 WARN 项视为必须修复或显式接受的风险 |
 | 5 | 自定义 rubric 未遵循 `rubric.md` 协议 | Check ID 不稳定、报告无法被工具消费 | 新增域 rubric 必须含 PASS/FAIL 条件和稳定 ID 格式 |
+| 6 | 交互型 PRD 缺少用户旅程但仍被判通过 | 下游 UX、测试和实施无法对齐真实用户流程 | PD-7 必须先判断交互信号；触发时缺少用户旅程或缺少主/分支/异常路径均判 BLOCK |
 
 ## Usage Examples
 
