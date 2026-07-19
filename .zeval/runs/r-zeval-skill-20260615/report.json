@@ -1,0 +1,98 @@
+{
+  "run_id": "r-zeval-skill-20260615",
+  "request_hash": "sha256:zeval-skill-eval-request",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.9,
+      "level": "excellent",
+      "weight": 1.0,
+      "rationale": "SKILL.md contains all required sections: goals/non-goals (sec 1), input/output (sec 2), execution steps (sec 3), and clear when-to-use / when-not-to-use distinctions. Additional sections (scoring model, replay/baseline, validation, relationship matrix) exceed the minimum required_signals.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:24","quote":"## 1. 目标与非目标"},
+        {"kind":"line","ref":"SKILL.md:40","quote":"## 2. 输入/输出"},
+        {"kind":"line","ref":"SKILL.md:74","quote":"## 3. 执行步骤"},
+        {"kind":"line","ref":"SKILL.md:34","quote":"Not a source code fixer / Not a replacement for human review / Not a real-time monitor"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.9,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "Explicit goals/non-goals dichotomy in section 1.1/1.2. Non-goals are concrete and verifiable (e.g., 'Not a source code fixer', 'Not a real-time monitor'). No fail_if conditions triggered.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:24","quote":"## 1. 目标与非目标"},
+        {"kind":"line","ref":"SKILL.md:34","quote":"Not a source code fixer — 评估产出评分卡 + 修复建议，不生成 patch"},
+        {"kind":"line","ref":"SKILL.md:35","quote":"Not a replacement for human review — 人类在 loop 中作为最终仲裁"},
+        {"kind":"line","ref":"SKILL.md:36","quote":"Not a real-time monitor — 是批/触发型，不做 metrics dashboard"},
+        {"kind":"line","ref":"SKILL.md:37","quote":"Not a training/eval benchmark — 不读训练数据、不调权重"},
+        {"kind":"line","ref":"SKILL.md:38","quote":"Not opinionated on aesthetics — 美学/品味/灵感等无客观证据的领域不进入 v1 rubric"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.8,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Five concrete usage scenarios provided with CLI commands and parameters. Scenarios 1-4 include exact flags and arguments. Scenario 5 is an orchestration diagram (not a runnable command). Missing explicit 'expected output' snippets for each scenario, preventing 'excellent'.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:292","quote":"/zeval-skill --target skill-design:./skills/zdoc-i2i/SKILL.md --rubric skill-design@1.0.0 --judges correctness,completeness,clarity"},
+        {"kind":"line","ref":"SKILL.md:301","quote":"/zeval-skill --target agent-run:./trajectories/run-001.jsonl --rubric agent-run@1.0.0 --judges correctness,efficiency,safety,contract"},
+        {"kind":"line","ref":"SKILL.md:309","quote":"/zeval-skill --target document:./docs/my-design.md --rubric document@1.0.0 --baseline none"},
+        {"kind":"line","ref":"SKILL.md:320","quote":"/zeval-skill --target code-diff:./pr-123.diff --rubric code-diff@1.0.0 --baseline enforce --judges correctness,safety,style"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.8,
+      "level": "good",
+      "weight": 0.8,
+      "rationale": "Five pitfalls listed in section 'Pitfalls' (lines 345-351). Each is concrete, but only two explicitly include implicit mitigation guidance within the statement ('不要在...', '不要追求...'). Meets >=2 threshold for 'good'; falls short of >=3 with explicit mitigation for 'excellent'.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:345","quote":"不要把 eval 当真理 — 它是辅助判断，不是真理"},
+        {"kind":"line","ref":"SKILL.md:346","quote":"不要在没有 baseline 时判定退化 — 退化需要参照"},
+        {"kind":"line","ref":"SKILL.md:347","quote":"不要给美/灵/巧打分 — v1 无客观信号"},
+        {"kind":"line","ref":"SKILL.md:348","quote":"不要追求单 judge 准确率 — 多视角 + 仲裁才是设计目标"},
+        {"kind":"line","ref":"SKILL.md:349","quote":"不要在 hot path 频繁跑 — eval 是批/触发型"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.87,
+    "rationale": "Weighted mean score 0.87 exceeds pass_threshold 0.75. No dimension failed. All evidence-required dimensions provided evidence. Weakest dimension is examples-runnable (0.8, good) due to missing expected output snippets.",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "pass",
+    "code": "0",
+    "message": "Evaluation passed. Score 0.87 >= 0.75 threshold."
+  },
+  "baseline": {
+    "baseline_id": "none",
+    "delta": 0.0,
+    "regressed_dimensions": []
+  },
+  "artifacts": {
+    "report_path": ".zeval/runs/r-zeval-skill-20260615/report.json",
+    "raw_judgments": [
+      "j-comp.json",
+      "j-bnd.json",
+      "j-ex.json",
+      "j-pit.json"
+    ],
+    "replay_bundle": ".zeval/runs/r-zeval-skill-20260615/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-15T00:00:00Z",
+    "duration_ms": 0,
+    "model_versions": {}
+  }
+}

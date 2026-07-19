@@ -1,0 +1,19 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.88,
+  "level": "good",
+  "weight": 1.0,
+  "rationale": "主要章节齐全且内容充实，但缺少一个标准的'何时使用/何时不使用'独立章节。目标与非目标(1.1/1.2)已明确区分使用边界，输入/输出(2.1/2.2/2.3)和执行步骤(第3节)均完整存在。内容覆盖评估目标矩阵、评分模型、重放与基线、执行协议、产物目录、验证、使用场景、关联技能、陷阱和参考，整体充实。扣分点：没有独立的'Usage / When to Use'章节，使用边界信息分散在目标与非目标及Usage中。",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:22", "quote": "## 1. 目标与非目标" },
+    { "kind": "line", "ref": "SKILL.md:24", "quote": "### 1.1 目标" },
+    { "kind": "line", "ref": "SKILL.md:32", "quote": "### 1.2 非目标" },
+    { "kind": "line", "ref": "SKILL.md:40", "quote": "## 2. 输入/输出" },
+    { "kind": "line", "ref": "SKILL.md:42", "quote": "### 2.1 输入" },
+    { "kind": "line", "ref": "SKILL.md:55", "quote": "### 2.2 输出" },
+    { "kind": "line", "ref": "SKILL.md:64", "quote": "### 2.3 Gate 退出码" },
+    { "kind": "line", "ref": "SKILL.md:74", "quote": "## 3. 执行步骤" },
+    { "kind": "line", "ref": "SKILL.md:288", "quote": "## Usage" }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.95,
+  "level": "excellent",
+  "rationale": "Boundary clarity is excellent. Non-goals section lists 5 specific 'Not X' items with references to complementary skills. Runtime Boundary Baseline and Workflow Boundary reinforce read-only, evidence-only, pre-SSOT scope. Each non-goal is concrete and verifiable (e.g., 'Not a replacement for zdoc-quality-loop', 'Not a document editor').",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:28", "quote": "Not a replacement for `zdoc-quality-loop`"},
+    {"kind": "line", "ref": "SKILL.md:29", "quote": "Not a document editor"},
+    {"kind": "line", "ref": "SKILL.md:30", "quote": "Not a gate decision maker"},
+    {"kind": "line", "ref": "SKILL.md:31", "quote": "Not a SSOT formalization tool"},
+    {"kind": "line", "ref": "SKILL.md:32", "quote": "Not a code review tool"},
+    {"kind": "line", "ref": "SKILL.md:270", "quote": "Out of scope: Document editing or correction; SSOT formalization"}
+  ]
+}

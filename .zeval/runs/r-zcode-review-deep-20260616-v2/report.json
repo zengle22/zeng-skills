@@ -1,0 +1,89 @@
+{
+  "run_id": "r-zcode-review-deep-20260616-v2",
+  "request_hash": "sha256:zcode-review-deep:skill-design:1.0.0:20260616",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.88,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "主要章节齐全且内容充实。具备目标/非目标、输入/输出、执行步骤、执行模型、输出 schema、severity 级别、目录结构、验证、non-negotiable rules、pitfalls、usage 等章节。扣分点：1) 缺少独立的 '何时使用 / 何时不使用' 章节（虽然非目标部分有类似内容，但 rubric 要求显式章节）；2) 缺少 '前置条件' 或 '依赖' 章节（如 pip install jsonschema 仅在验证节出现）；3) 缺少 '错误处理' 独立章节（仅在退出码表格中体现）。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "## 1. 目标与非目标" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "## 2. 输入/输出" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "## 3. 执行步骤" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "## Execution Protocol" }
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.92,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "目标/非目标二分明确，且非目标具体可验证。显式列出4条非目标：不替代 bmad-code-review、不自动修改源代码、不做合并/发布 Gate 决策、不覆盖全量回归测试。每条非目标都有明确的对标技能或行为边界，可直接验证。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "不替代 `bmad-code-review`（互补；bmad 用于快速扫描，deep 用于关键 PR）" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "不自动修改源代码（仅生成修复任务，人工决定是否执行）" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "不做合并/发布 Gate 决策（仅提供证据，决策权保留给人类）" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "不覆盖全量回归测试（聚焦变更范围，不保证无漏测）" }
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "示例含完整命令与参数，且给出了预期输出路径表格。但缺少预期输出内容示例（如 final-report.md 的片段或 JSON 产物示例），以及缺少 --frz 模式的示例。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "/zcode-review-deep --mode commit --ref HEAD~1" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "/zcode-review-deep --mode pr --base main --head feature/x" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "| `--mode commit --ref HEAD~1` | `.cr-deep/CR-{YYYYMMDD}-{NNN}/` |" }
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "列出5条 pitfall，每条均带影响说明与具体规避措施。覆盖 Agent 选择、合并去重、P0 证据链、磁盘持久化、 severity 误标等关键风险点。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "Agent 选择过少（<2）" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "Moderator 合并时过度去重" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "P0 问题缺乏代码证据" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "输出产物未写入磁盘即中断" },
+        { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "纯风格问题标记为 P0/P1" }
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.896,
+    "rationale": "weighted mean = (0.88*1.0 + 0.92*1.5 + 0.85*1.0 + 0.95*0.8) / (1.0+1.5+1.0+0.8) = 4.48 / 4.3 = 0.896。高于 pass_threshold 0.75，无维度 fail，判定 pass。"
+  },
+  "gate": {
+    "status": "pass",
+    "code": "GATE-OK",
+    "message": "所有维度评分均高于 fail_threshold，加权平均分高于 pass_threshold。"
+  },
+  "artifacts": {
+    "report_path": ".zeval/runs/r-zcode-review-deep-20260616-v2/report.json",
+    "raw_judgments": [
+      "judgments/j-comp.json",
+      "judgments/j-bnd.json",
+      "judgments/j-ex.json",
+      "judgments/j-pit.json"
+    ],
+    "replay_bundle": "replay_bundle/"
+  },
+  "meta": {
+    "created_at": "2026-06-16T00:00:00Z",
+    "duration_ms": 0,
+    "model_versions": {}
+  }
+}

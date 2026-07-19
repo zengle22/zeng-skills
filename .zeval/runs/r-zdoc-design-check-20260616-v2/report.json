@@ -1,0 +1,94 @@
+{
+  "run_id": "r-zdoc-design-check-20260616-v2",
+  "request_hash": "sha256:request-json-placeholder",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.0,
+      "rationale": "All required sections present and richly detailed. Section 1 covers goals and non-goals with 5 explicit non-goals. Section 2 has comprehensive input/output tables with exit states. Section 3 provides a 7-step execution flow with sub-phases. 'When to use / when NOT to use' is covered across 1.2 non-goals, Runtime Boundary Baseline, and Workflow Boundary out-of-scope lists.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:17", "quote": "## 1. 目标与非目标"},
+        {"kind": "line", "ref": "SKILL.md:26", "quote": "### 1.2 非目标"},
+        {"kind": "line", "ref": "SKILL.md:34", "quote": "## 2. 输入/输出"},
+        {"kind": "line", "ref": "SKILL.md:62", "quote": "## 3. 执行步骤"},
+        {"kind": "line", "ref": "SKILL.md:103", "quote": "Read-only validation — does NOT modify source documents."}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "Boundary clarity is excellent. Non-goals section lists 5 specific 'Not X' items with references to complementary skills. Runtime Boundary Baseline and Workflow Boundary reinforce read-only, evidence-only, pre-SSOT scope. Each non-goal is concrete and verifiable (e.g., 'Not a replacement for zdoc-quality-loop', 'Not a document editor').",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:28", "quote": "Not a replacement for `zdoc-quality-loop`"},
+        {"kind": "line", "ref": "SKILL.md:29", "quote": "Not a document editor"},
+        {"kind": "line", "ref": "SKILL.md:30", "quote": "Not a gate decision maker"},
+        {"kind": "line", "ref": "SKILL.md:31", "quote": "Not a SSOT formalization tool"},
+        {"kind": "line", "ref": "SKILL.md:32", "quote": "Not a code review tool"},
+        {"kind": "line", "ref": "SKILL.md:270", "quote": "Out of scope: Document editing or correction; SSOT formalization"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Four concrete command examples with full flags and parameters. Each includes expected output paths. One minor gap: no example shows actual sample output content (e.g., a snippet of design-check.json), but commands are complete and runnable.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:310", "quote": "zdoc-design-check --dir docs/ --project my-project --domain all"},
+        {"kind": "line", "ref": "SKILL.md:317", "quote": "zdoc-design-check --input docs/prd/xxx-prd.md --domain business"},
+        {"kind": "line", "ref": "SKILL.md:323", "quote": "zdoc-design-check --dir docs/ --layer gate-only"},
+        {"kind": "line", "ref": "SKILL.md:313", "quote": "{output_dir}/DC-20260616-001/design-check.json"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "5 pitfalls listed in a structured table, each with impact and mitigation. Exceeds the >=3 threshold. Pitfalls cover common misuse patterns: treating as editor, using draft docs, expecting XC on single doc, ignoring WARNs, and custom rubric protocol violations.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:296", "quote": "## Pitfalls / 常见坑与规避"},
+        {"kind": "line", "ref": "SKILL.md:300", "quote": "把 Design Check 当文档编辑器，要求它直接修改源文档"},
+        {"kind": "line", "ref": "SKILL.md:301", "quote": "传入 `draft` / `reviewing` 状态文档并期望通过"},
+        {"kind": "line", "ref": "SKILL.md:302", "quote": "只跑单文档却期望触发跨维度一致性（XC）检查"},
+        {"kind": "line", "ref": "SKILL.md:303", "quote": "忽略 WARN 项直接进入 SSOT"},
+        {"kind": "line", "ref": "SKILL.md:304", "quote": "自定义 rubric 未遵循 `rubric.md` 协议"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.92,
+    "rationale": "Weighted mean score 0.92 exceeds pass threshold 0.75. All dimensions score >=0.85. No dimension below fail threshold. Boundary clarity and completeness are excellent; examples and pitfalls are good-to-excellent."
+  },
+  "gate": {
+    "status": "pass",
+    "code": "PASS",
+    "message": "All dimensions meet thresholds. Weighted score 0.92 >= 0.75."
+  },
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260616-v2/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260616-v2/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260616-v2/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260616-v2/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260616-v2/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260616-v2/replay_bundle/"
+  },
+  "meta": {
+    "created_at": "2026-06-16T00:00:00Z",
+    "duration_ms": 0,
+    "model_versions": {}
+  }
+}

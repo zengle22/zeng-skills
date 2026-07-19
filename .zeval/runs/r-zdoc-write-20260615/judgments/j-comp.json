@@ -1,0 +1,16 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.95,
+  "level": "excellent",
+  "rationale": "All required chapters present and highly detailed. Sections 1 (goals/non-goals), 2 (input/output), 3 (execution steps) all exist with rich subsections. Additional sections: supported doc types (16 types), architecture diagram, detailed Phase 1-4 breakdowns, workflow boundary, non-negotiable rules, pitfalls, usage, compatibility note. The document covers far beyond the rubric's minimum requirements.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:54","quote":"## 1. 目标与非目标"},
+    {"kind":"line","ref":"SKILL.md:72","quote":"## 2. 输入/输出"},
+    {"kind":"line","ref":"SKILL.md:94","quote":"## 3. 执行步骤"},
+    {"kind":"line","ref":"SKILL.md:712","quote":"## Workflow Boundary"},
+    {"kind":"line","ref":"SKILL.md:722","quote":"## Non-Negotiable Rules"},
+    {"kind":"line","ref":"SKILL.md:738","quote":"## Pitfalls / 常见坑与规避"},
+    {"kind":"line","ref":"SKILL.md:751","quote":"## Usage"}
+  ]
+}

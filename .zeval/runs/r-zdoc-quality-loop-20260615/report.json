@@ -1,0 +1,97 @@
+{
+  "run_id": "r-zdoc-quality-loop-20260615",
+  "request_hash": "sha256:request.json",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.65,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "SKILL.md has strong Use_When/Do_Not_Use_When and extensive Steps. However, it lacks explicit '目标与非目标' and '输入/输出' sections as required by the rubric. The Purpose section partially covers goals but not in the required format. Output directory structure is detailed but no formal input/output schema section. Execution steps are extremely thorough across 5 phases. Missing the exact rubric-required sections keeps it from excellent.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:24","quote":"<Use_When>"},
+        {"kind":"line","ref":"SKILL.md:30","quote":"<Do_Not_Use_When>"},
+        {"kind":"line","ref":"SKILL.md:373","quote":"<Steps>"},
+        {"kind":"line","ref":"SKILL.md:14","quote":"<Purpose>"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.5,
+      "rationale": "Clear Do_Not_Use_When with 3 concrete non-goals. Use_When also clear. Non-goals are specific and actionable. However, '非目标' section is labeled <Do_Not_Use_When> rather than an explicit '非目标/NOT to use' heading, and the rubric prefers a dedicated section. Also, the description in the header conflates purpose and mechanics. Strong but not excellent because the non-goals could be more verifiable.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:30","quote":"<Do_Not_Use_When>"},
+        {"kind":"line","ref":"SKILL.md:31","quote":"- 目标是代码文件 → 用 `gsd-code-review` + `gsd-code-fixer`"},
+        {"kind":"line","ref":"SKILL.md:32","quote":"- 只需要单轮评审无需修复 → 用 `code-reviewer`"},
+        {"kind":"line","ref":"SKILL.md:33","quote":"- 文档尚未写好 → 先写文档再运行"},
+        {"kind":"line","ref":"SKILL.md:24","quote":"<Use_When>"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.75,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Has concrete command examples: argument-hint shows full CLI syntax, and line 1158 shows `/zdoc-quality-loop spec.md prd.md`. Phase 0.1 documents all parameters with defaults. However, no expected output is shown for any command. The File_Path_Quick_Reference shows directory structure after running but not as a runnable example with expected output. Good for command+params, but lacks expected output which keeps it from excellent.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:4","quote":"argument-hint: \"<doc1> [doc2 doc3 ...] [--ssot <path>] [--rubric <path>] [--max-rounds 5] [--p1-threshold 3] [--parallel] [--p2 always|never|low-risk] [--no-verify] [--output-dir .quality-loop]\""},
+        {"kind":"line","ref":"SKILL.md:1158","quote":"运行 `/zdoc-quality-loop spec.md prd.md` 后，以 spec 为例："},
+        {"kind":"line","ref":"SKILL.md:379","quote":"位置参数（可多个）：<doc1> [doc2 ...]"},
+        {"kind":"line","ref":"SKILL.md:384","quote":"--ssot <path>           SSOT 文件（可多个，重复使用 --ssot）"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "Anti_Patterns section contains 8 pitfalls with explicit prevention mechanisms: 自嗨收敛→Verifier独立核对, 标准漂移→rubric-locked.md, 角色互相认可→独立响应+人类裁判, 多数暴政→证据质量而非数量, 假共识→ID追踪+审计check5, 报告与实际不符→独立Agent只读磁盘, 审计被污染→仅收文件路径, 中断丢失→落盘+resume, Token爆炸→只传open_issues. Each has concrete mitigation. Far exceeds the ≥3 threshold for excellent.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:1141","quote":"<Anti_Patterns>"},
+        {"kind":"line","ref":"SKILL.md:1142","quote":"| 自嗨收敛（Fixer 自我评价\"已修复\"） | Verifier 独立核对 + evidence 强制引用原文 |"},
+        {"kind":"line","ref":"SKILL.md:1143","quote":"| 标准漂移（每轮 Rubric 变化） | 初始化时锁定 rubric-locked.md，每轮从文件读取传入 |"},
+        {"kind":"line","ref":"SKILL.md:1144","quote":"| 角色互相认可（评审团互吹） | 讨论时每角色独立响应，Moderator 综合判断，人类作为最终裁判 |"},
+        {"kind":"line","ref":"SKILL.md:1145","quote":"| 多数暴政（2 对 1 压倒少数角色） | 冲突判断基于证据质量，不基于角色数量；差异 ≥ 2 级必须讨论 |"},
+        {"kind":"line","ref":"SKILL.md:1146","quote":"| 假共识（P0 被讨论降为 P1） | ID 追踪，审计 check 5 重建 closed_issue_ids |"},
+        {"kind":"line","ref":"SKILL.md:1147","quote":"| 报告与实际不符 | 独立报告 Agent 无共享上下文，只读磁盘；报告中注明生成方式 |"},
+        {"kind":"line","ref":"SKILL.md:1148","quote":"| 审计被流水线污染 | 独立审计 Agent 仅收到文件路径清单，无任何流水线上下文 |"},
+        {"kind":"line","ref":"SKILL.md:1149","quote":"| 中断丢失状态 | 每阶段立即落盘，所有状态可从磁盘文件重建；支持 --resume |"},
+        {"kind":"line","ref":"SKILL.md:1150","quote":"| Token 爆炸 | 第 2 轮起 Reviewer 只传 open_issues JSON；各角色并行 |"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass-with-warn",
+    "score": 0.784,
+    "rationale": "Weighted mean: (0.65*1.0 + 0.85*1.5 + 0.75*1.0 + 0.95*0.8) / (1.0+1.5+1.0+0.8) = 3.53/4.3 = 0.784. Passes pass_threshold (0.75) but not excellent. No dimension failed (all >= 0.65). Weakest dimension is completeness (0.65).",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "warn",
+    "code": "PASS_WITH_WARN",
+    "message": "Score 0.784 >= 0.75 threshold. No dimension failed. Weakest: completeness (0.65)."
+  },
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260615/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260615/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260615/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260615/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260615/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260615/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-15T00:00:00Z",
+    "duration_ms": 0,
+    "model_versions": {"judge": "kimi-for-coding"}
+  }
+}

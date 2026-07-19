@@ -1,0 +1,108 @@
+{
+  "run_id": "r-self-eval-20260615",
+  "request_hash": "sha256:c0262a2fed6d03ce02ae2a62c7ab6489581c0b88179cde9468e7eb9cfa3ea0b3",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.35,
+      "level": "poor",
+      "weight": 1.0,
+      "rationale": "Missing 3/4 required structural sections. No dedicated '## 1. 目标与非目标' (goals absent, only 'Not Equal To' lists non-goals), no '## 2. 输入/输出' (output schema exists but no unified I/O section with input definitions), no '## 3. 执行步骤' (workflow described as 'Top-Level Workflow' but not as numbered execution steps). '何时使用/何时不使用' partially covered by 'Not Equal To' + 'Pitfalls'. Content is substantial but structurally deviates from required SKILL.md format.",
+      "evidence_refs": [
+        { "kind": "line", "ref": "SKILL.md:14", "quote": "# zeval-skill" },
+        { "kind": "line", "ref": "SKILL.md:22", "quote": "## Not Equal To" },
+        { "kind": "line", "ref": "SKILL.md:48", "quote": "## Top-Level Workflow" },
+        { "kind": "line", "ref": "SKILL.md:61", "quote": "## Output Schema" },
+        { "kind": "line", "ref": "SKILL.md:321", "quote": "## Pitfalls" }
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "存在显式 'Not Equal To' 章节（SKILL.md:22），列出5条具体非目标，每条均可验证：不生成patch、不替代人工review、不做实时监控、不读训练数据、不评价美学。另有 TL;DR 强化边界（SKILL.md:18），以及 Non-Negotiable Rules（SKILL.md:255）以'不'字句再次锁定。非目标具体、可验证，无抽象模糊表述。",
+      "evidence_refs": [
+        { "kind": "line", "ref": "SKILL.md:22", "quote": "## Not Equal To" },
+        { "kind": "line", "ref": "SKILL.md:24", "quote": "- **Not a source code fixer** — 评估产出**评分卡 + 修复建议**，不生成 patch" },
+        { "kind": "line", "ref": "SKILL.md:25", "quote": "- **Not a replacement for human review** — 人类在 loop 中作为\"最终仲裁\"或\"基线设定者\"，不在 hot path" },
+        { "kind": "line", "ref": "SKILL.md:26", "quote": "- **Not a real-time monitor** — 是**批/触发**型，不做 metrics dashboard" },
+        { "kind": "line", "ref": "SKILL.md:27", "quote": "- **Not a training/eval benchmark** — 不读训练数据、不调权重、不替代 LM Evaluation Harness" },
+        { "kind": "line", "ref": "SKILL.md:28", "quote": "- **Not opinionated on aesthetics** — 美学/品味/灵感等无客观证据的领域**不**进入 v1 rubric" },
+        { "kind": "line", "ref": "SKILL.md:18", "quote": "> `zeval-skill` 是\"裁判\"与\"基线守护者\"——它**不**直接修复问题、不**直接**产出代码。" },
+        { "kind": "line", "ref": "SKILL.md:257", "quote": "1. **不修代码** — 评估是裁判，修复是别人" },
+        { "kind": "line", "ref": "SKILL.md:261", "quote": "5. **不评价美学** — 无客观信号的维度不进 v1 rubric" }
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.82,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "5 usage scenarios with complete runnable commands and all parameters. '最小调用' is a full 3-step workflow with JSON payload. CI mode includes expected exit code behavior. Missing actual expected output samples (e.g. sample report.json) and some <run_id> placeholders prevent excellent.",
+      "evidence_refs": [
+        { "kind": "line", "ref": "SKILL.md:172", "quote": "### 最小调用" },
+        { "kind": "line", "ref": "SKILL.md:187", "quote": "/zeval-skill --request /tmp/eval.req.json" },
+        { "kind": "line", "ref": "SKILL.md:190", "quote": "cat .zeval/runs/<run_id>/report.json" },
+        { "kind": "line", "ref": "SKILL.md:268", "quote": "/zeval-skill --target skill-design:./skills/zdoc-i2i/SKILL.md --rubric skill-design@1.0.0 --judges correctness,completeness,clarity" },
+        { "kind": "line", "ref": "SKILL.md:277", "quote": "/zeval-skill --target agent-run:./trajectories/run-001.jsonl --rubric agent-run@1.0.0 --judges correctness,efficiency,safety,contract" },
+        { "kind": "line", "ref": "SKILL.md:285", "quote": "/zeval-skill --target document:./docs/my-design.md --rubric document@1.0.0 --baseline none" },
+        { "kind": "line", "ref": "SKILL.md:296", "quote": "/zeval-skill --target code-diff:./pr-123.diff --rubric code-diff@1.0.0 --baseline enforce --judges correctness,safety,style" },
+        { "kind": "line", "ref": "SKILL.md:301", "quote": "# gate 退出码 1 = 退化阻断 CI" }
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "Pitfalls section exists (SKILL.md:321) with 5 distinct pitfalls, each accompanied by a clear mitigation or avoidance method. Exceeds the >=3 threshold for 'excellent'. The pitfalls cover: (1) eval as absolute truth, (2) baseline-less regression claims, (3) subjective scoring, (4) over-reliance on single judge, (5) hot-path misuse. All are concrete and actionable.",
+      "evidence_refs": [
+        { "kind": "line", "ref": "SKILL.md:321", "quote": "## Pitfalls" },
+        { "kind": "line", "ref": "SKILL.md:323", "quote": "- **不要把 eval 当真理** — 它是辅助判断，不是真理" },
+        { "kind": "line", "ref": "SKILL.md:324", "quote": "- **不要在没有 baseline 时判定\"退化\"** — 退化需要参照" },
+        { "kind": "line", "ref": "SKILL.md:325", "quote": "- **不要给\"美/灵/巧\"打分** — v1 无客观信号" },
+        { "kind": "line", "ref": "SKILL.md:326", "quote": "- **不要追求\"单 judge 准确率\"** — 多视角 + 仲裁才是设计目标" },
+        { "kind": "line", "ref": "SKILL.md:327", "quote": "- **不要在 hot path 频繁跑** — eval 是**批/触发**型" }
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.78,
+    "rationale": "Weighted mean score 0.78 exceeds pass_threshold 0.75. boundary-clarity、examples-runnable、pitfalls 表现优秀；completeness 维度得分 0.35（poor），主要因为缺少 rubric 要求的编号式 '1. 目标与非目标 / 2. 输入/输出 / 3. 执行步骤' 章节，相关内容以其他章节形式存在但结构不符。因 any_dimension_fail_blocks=false，不阻断整体通过。",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "pass",
+    "code": "G000",
+    "message": "All clear"
+  },
+  "artifacts": {
+    "report_path": ".zeval/runs/r-self-eval-20260615/report.json",
+    "raw_judgments": [
+      ".zeval/runs/r-self-eval-20260615/judgments/j-comp.json",
+      ".zeval/runs/r-self-eval-20260615/judgments/j-bnd.json",
+      ".zeval/runs/r-self-eval-20260615/judgments/j-ex.json",
+      ".zeval/runs/r-self-eval-20260615/judgments/j-pit.json"
+    ],
+    "replay_bundle": ".zeval/runs/r-self-eval-20260615/replay_bundle/"
+  },
+  "meta": {
+    "created_at": "2026-06-15T12:00:00Z",
+    "duration_ms": 180000,
+    "model_versions": {
+      "j-comp": "kimi-for-coding",
+      "j-bnd": "kimi-for-coding",
+      "j-ex": "kimi-for-coding",
+      "j-pit": "kimi-for-coding",
+      "adjudicator": "kimi-for-coding"
+    }
+  }
+}

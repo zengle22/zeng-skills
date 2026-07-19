@@ -1,0 +1,10 @@
+run_id: r-zeval-skill-20260615
+rubric_id: skill-design
+rubric_version: 1.0.0
+target_kind: skill-design
+target_ref: ./skills/zeval-skill/SKILL.md
+created_at: 2026-06-15T00:00:00Z
+model: kimi-for-coding
+strategy: weighted-mean
+pass_threshold: 0.75
+fail_threshold: 0.45

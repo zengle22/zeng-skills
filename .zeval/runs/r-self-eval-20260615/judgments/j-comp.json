@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.35,
+  "level": "poor",
+  "weight": 1.0,
+  "rationale": "Missing 3/4 required structural sections. No dedicated '## 1. 目标与非目标' (goals absent, only 'Not Equal To' lists non-goals), no '## 2. 输入/输出' (output schema exists but no unified I/O section with input definitions), no '## 3. 执行步骤' (workflow described as 'Top-Level Workflow' but not as numbered execution steps). '何时使用/何时不使用' partially covered by 'Not Equal To' + 'Pitfalls'. Content is substantial but structurally deviates from required SKILL.md format.",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:14", "quote": "# zeval-skill" },
+    { "kind": "line", "ref": "SKILL.md:22", "quote": "## Not Equal To" },
+    { "kind": "line", "ref": "SKILL.md:48", "quote": "## Top-Level Workflow" },
+    { "kind": "line", "ref": "SKILL.md:61", "quote": "## Output Schema" },
+    { "kind": "line", "ref": "SKILL.md:321", "quote": "## Pitfalls" }
+  ]
+}

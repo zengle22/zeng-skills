@@ -1,0 +1,14 @@
+{
+  "run_id": "r-zeval-skill-20260615",
+  "target": { "kind": "skill-design", "ref": "./skills/zeval-skill/SKILL.md" },
+  "rubric": { "id": "skill-design", "version": "1.0.0" },
+  "judges": [
+    { "id": "j-comp", "role": "completeness" },
+    { "id": "j-bnd", "role": "boundary-clarity" },
+    { "id": "j-ex", "role": "examples-runnable" },
+    { "id": "j-pit", "role": "pitfalls" }
+  ],
+  "baseline": "compare",
+  "output_dir": ".zeval",
+  "replay_seed": "r-zeval-skill-20260615"
+}

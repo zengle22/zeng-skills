@@ -1,0 +1,16 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 0.8,
+  "rationale": "Pitfalls section exists (SKILL.md:321) with 5 distinct pitfalls, each accompanied by a clear mitigation or avoidance method. Exceeds the >=3 threshold for 'excellent'. The pitfalls cover: (1) eval as absolute truth, (2) baseline-less regression claims, (3) subjective scoring, (4) over-reliance on single judge, (5) hot-path misuse. All are concrete and actionable.",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:321", "quote": "## Pitfalls" },
+    { "kind": "line", "ref": "SKILL.md:323", "quote": "- **不要把 eval 当真理** — 它是辅助判断，不是真理" },
+    { "kind": "line", "ref": "SKILL.md:324", "quote": "- **不要在没有 baseline 时判定\"退化\"** — 退化需要参照" },
+    { "kind": "line", "ref": "SKILL.md:325", "quote": "- **不要给\"美/灵/巧\"打分** — v1 无客观信号" },
+    { "kind": "line", "ref": "SKILL.md:326", "quote": "- **不要追求\"单 judge 准确率\"** — 多视角 + 仲裁才是设计目标" },
+    { "kind": "line", "ref": "SKILL.md:327", "quote": "- **不要在 hot path 频繁跑** — eval 是**批/触发**型" }
+  ]
+}

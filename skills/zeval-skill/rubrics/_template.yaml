@@ -1,0 +1,47 @@
+# Rubric Template — v1
+# 复制此文件，按需重命名（例：skill-design.v1.yaml）
+# 规则：每个维度必须有可被 judge 看到的信号 + 存在反例条件（否则作废）
+id: <rubric_id>
+version: 1.0.0
+description: <一句话说明>
+target_kinds:
+  - skill-design
+
+dimensions:
+  - id: <dimension_id>
+    description: <说明>
+    weight: 1.0
+    evidence_required: true
+    timeout_ms: 60000
+    levels:
+      excellent:
+        min: 0.9
+        desc: "..."
+      good:
+        min: 0.7
+        desc: "..."
+      acceptable:
+        min: 0.5
+        desc: "..."
+      poor:
+        min: 0.3
+        desc: "..."
+      fail:
+        min: 0.0
+        desc: "..."
+    fail_if:
+      - "<某条件描述，judge 据此判定 fail>"
+    required_signals:
+      - "<必检信号 1>"
+      - "<必检信号 2>"
+
+adjudication:
+  strategy: weighted-mean
+  pass_threshold: 0.75
+  fail_threshold: 0.45
+  any_dimension_fail_blocks: false
+  conflict_threshold: 0.4
+
+baseline:
+  regression_threshold: 0.10
+  default_mode: compare

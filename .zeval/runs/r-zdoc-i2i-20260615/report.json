@@ -1,0 +1,113 @@
+{
+  "run_id": "r-zdoc-i2i-20260615",
+  "request_hash": "sha256:zdoc-i2i-skill-design-eval-20260615",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.88,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "SKILL.md covers all essential content: Primary/Secondary Abstraction (goals), Not Equal To (non-goals), 6 detailed phases with execution steps, input/output specs, 21 Non-Negotiable Rules, terminology, and Usage. However, it lacks the exact heading structure expected by the rubric (no explicit '目标与非目标', '输入/输出', '执行步骤' sections). Content is thorough but reorganized under phase-based architecture.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:18", "quote": "## Primary Abstraction"},
+        {"kind": "line", "ref": "SKILL.md:30", "quote": "## Not Equal To"},
+        {"kind": "line", "ref": "SKILL.md:42", "quote": "## Runtime Boundary Baseline"},
+        {"kind": "line", "ref": "SKILL.md:56", "quote": "## 架构"},
+        {"kind": "line", "ref": "SKILL.md:101", "quote": "## Phase 0: 源文档交叉一致性校验"},
+        {"kind": "line", "ref": "SKILL.md:299", "quote": "## Phase 1: 输入校验"},
+        {"kind": "line", "ref": "SKILL.md:465", "quote": "## Phase 2: 内容整合"},
+        {"kind": "line", "ref": "SKILL.md:511", "quote": "## Phase 3: 任务拆分"},
+        {"kind": "line", "ref": "SKILL.md:801", "quote": "## Phase 4: 文档生成"},
+        {"kind": "line", "ref": "SKILL.md:1028", "quote": "## Phase 5: 交付前审核 + 交付报告"},
+        {"kind": "line", "ref": "SKILL.md:1110", "quote": "## Non-Negotiable Rules"},
+        {"kind": "line", "ref": "SKILL.md:1136", "quote": "## 术语定义"},
+        {"kind": "line", "ref": "SKILL.md:1154", "quote": "## Usage"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "Exceptional boundary clarity. 'Not Equal To' section explicitly lists 4 things the skill is NOT. Runtime Boundary Baseline defines 7 operational boundaries. 21 Non-Negotiable Rules further constrain behavior. All boundaries are specific and verifiable (e.g., 'Read-only', '只整合不补充', '文档状态准入').",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:30", "quote": "- Not a document editor（只读取设计文档，不修改任何输入文件）"},
+        {"kind": "line", "ref": "SKILL.md:31", "quote": "- Not a code generator（产出实施计划文档，不产出代码）"},
+        {"kind": "line", "ref": "SKILL.md:32", "quote": "- Not a gate decision maker（evidence-only，汇总报告供人工确认）"},
+        {"kind": "line", "ref": "SKILL.md:33", "quote": "- Not a replacement for `zdoc-design-check`（Design Check 校验质量，I2I 做实施转化）"},
+        {"kind": "line", "ref": "SKILL.md:46", "quote": "- **Read-only** — does NOT modify source design documents."},
+        {"kind": "line", "ref": "SKILL.md:47", "quote": "- **只整合不补充** — does NOT invent features, tech solutions, or business rules not in input docs."},
+        {"kind": "line", "ref": "SKILL.md:48", "quote": "- **最小可验收颗粒度** — each Task must satisfy 5 conditions"},
+        {"kind": "line", "ref": "SKILL.md:51", "quote": "- **DAG 确定性校验** — cycle detection via `validate-dag.py`, not LLM."},
+        {"kind": "line", "ref": "SKILL.md:52", "quote": "- **文档状态准入** — only accepts `approved` or `frozen` status documents; `draft` / `reviewing` → BLOCK."},
+        {"kind": "line", "ref": "SKILL.md:1110", "quote": "## Non-Negotiable Rules"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.75,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Usage section provides 6 concrete command examples with parameters (--dir, --feature, --prd, --arch, --src, --output-dir, --validate-only). However, no expected output is shown for any example. Commands are realistic and runnable but lack output verification.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:1157", "quote": "zdoc-i2i --dir docs/mvp-lite/"},
+        {"kind": "line", "ref": "SKILL.md:1160", "quote": "zdoc-i2i --dir docs/mvp-lite/ --feature M01"},
+        {"kind": "line", "ref": "SKILL.md:1163", "quote": "zdoc-i2i --prd docs/prds/PRD-M01.md --arch docs/arch/ARCH-M01.md"},
+        {"kind": "line", "ref": "SKILL.md:1166", "quote": "zdoc-i2i --dir docs/mvp-lite/ --src apps/ai-coach-skill/src"},
+        {"kind": "line", "ref": "SKILL.md:1169", "quote": "zdoc-i2i --dir docs/mvp-lite/ --output-dir docs/mvp-lite/impl"},
+        {"kind": "line", "ref": "SKILL.md:1172", "quote": "zdoc-i2i --dir docs/mvp-lite/ --validate-only"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.55,
+      "level": "acceptable",
+      "weight": 0.8,
+      "rationale": "No dedicated 'Pitfalls' or 'Common Mistakes' section exists. However, multiple specific problems with mitigation strategies are embedded throughout: path normalization prevents incorrect directory creation (§0.4), prototype indexing prevents lost reference chains (§0.6), semantic drift detection (§5.2), over-splitting warnings (§3.3), and dependency integrity checks (§3.8). Each includes specific rules and remediation steps.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:149", "quote": "### 0.4 源代码路径规范化"},
+        {"kind": "line", "ref": "SKILL.md:174", "quote": "### 0.6 原型文件检测与索引"},
+        {"kind": "line", "ref": "SKILL.md:548", "quote": "### 3.3 不应拆分的情况"},
+        {"kind": "line", "ref": "SKILL.md:706", "quote": "### 3.8 依赖完整性校验"},
+        {"kind": "line", "ref": "SKILL.md:1046", "quote": "### 5.2 语义偏移检测"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.813,
+    "rationale": "Weighted mean score 0.813 exceeds pass threshold 0.75. All dimensions score above fail threshold 0.45. Boundary-clarity is excellent (0.95). Completeness is good (0.88). Examples-runnable is good (0.75). Pitfalls is weakest at acceptable (0.55) due to lack of dedicated pitfalls section.",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "pass",
+    "code": "PASS",
+    "message": "Skill design meets quality threshold. Weighted score 0.813 >= 0.75."
+  },
+  "baseline": {
+    "baseline_id": "",
+    "delta": 0,
+    "regressed_dimensions": []
+  },
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260615/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260615/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260615/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260615/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260615/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260615/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-15T00:00:00Z",
+    "duration_ms": 0,
+    "model_versions": {"kimi-for-coding": "2026-06-15"}
+  }
+}

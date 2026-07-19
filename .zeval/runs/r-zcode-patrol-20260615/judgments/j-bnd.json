@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.85,
+  "level": "good",
+  "rationale": "Not Equal To 章节明确列出4条非目标，每条具体可验证：不是ESLint替代、不是runtime profiler、不是source modifier、不是gate decision maker。目标在描述和Execution Model中清晰。但非目标仅4条，未覆盖所有边界（如与zcode-review-deep的区分），且缺少When NOT to use场景化说明。",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:17", "quote": "## Not Equal To"},
+    {"kind": "line", "ref": "SKILL.md:19", "quote": "- Not a replacement for ESLint, Pylint, SonarQube（补充/聚合）"},
+    {"kind": "line", "ref": "SKILL.md:20", "quote": "- Not a runtime profiler or test executor"},
+    {"kind": "line", "ref": "SKILL.md:21", "quote": "- Not a source code modifier（read-only）"},
+    {"kind": "line", "ref": "SKILL.md:22", "quote": "- Not a gate decision maker（evidence-only）"},
+    {"kind": "line", "ref": "SKILL.md:144", "quote": "## Non-Negotiable Rules"}
+  ]
+}

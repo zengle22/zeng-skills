@@ -1,0 +1,17 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.9,
+  "level": "excellent",
+  "rationale": "Pitfalls section (line 1208) lists 7 specific pitfalls, each with impact description and concrete mitigation method. Covers path shorthand, validate-only skip, draft status submission, 8h exception missing, UI prototype omission, multi-feature IMPL-INDEX missing, and frozen doc modification. All are actionable and directly tied to skill behavior. Exceeds the >=3 threshold for excellent.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:1208", "quote": "## Pitfalls / 常见坑与规避"},
+    {"kind": "line", "ref": "SKILL.md:1212", "quote": "| **使用简写路径（如 `src/handlers/`）** | Task 文档中的文件路径被 Agent 错误解析，导致在错误位置创建目录 | 始终使用 `--src` 参数指定源代码根路径；Phase 0 会自动规范化所有路径 |"},
+    {"kind": "line", "ref": "SKILL.md:1213", "quote": "| **忽略 `--validate-only` 提前发现问题** | 直接运行完整 Pipeline，因 Gate FAIL 或文档状态 BLOCK 浪费大量时间 | 首次执行新 Feature 时先跑 `--validate-only`，确认 PASS 后再生成 Task |"},
+    {"kind": "line", "ref": "SKILL.md:1214", "quote": "| **draft 状态文档直接提交 I2I** | 文档尚未评审，I2I 执行到 Phase 1 即 BLOCK，需重新走评审流程 | 确保所有输入文档状态为 `approved` 或 `frozen`；使用 `zdoc-design-check` 前置校验 |"},
+    {"kind": "line", "ref": "SKILL.md:1215", "quote": "| **Task 超 8h 未记录例外理由** | 产物完整性检查 FAIL，Phase 4 无法完成，文档状态不冻结 | 拆分策略阶段严格按 5 条件检查；超 8h 时在 `task-list.json` 的 `exception` 字段记录理由 |"},
+    {"kind": "line", "ref": "SKILL.md:1216", "quote": "| **UI Task 未关联原型文件** | 实施者无法对照原型实现，导致布局/文案/状态偏差 | Phase 0 确保 `ux-prototypes/` 目录被扫描；Phase 3 自动注入原型引用到 Task 文档和验收标准 |"},
+    {"kind": "line", "ref": "SKILL.md:1217", "quote": "| **多 Feature 时遗漏 IMPL-INDEX.md** | 全局索引缺失，跨 Feature 依赖不可见 | 非单 Feature 场景必须检查产物完整性第 8 项；多 Feature 时自动触发 IMPL-INDEX.md 生成 |"},
+    {"kind": "line", "ref": "SKILL.md:1218", "quote": "| ** frozen 文档直接修改后重跑** | 违反文档生命周期，冻结状态被静默覆盖，历史追溯断裂 | 修改设计文档必须走 deprecated + 新建流程；I2I 对 frozen 文档是幂等的，不会自动解冻 |"}
+  ]
+}

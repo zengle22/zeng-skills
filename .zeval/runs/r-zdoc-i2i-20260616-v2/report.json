@@ -1,0 +1,113 @@
+{
+  "run_id": "r-zdoc-i2i-20260616-v2",
+  "request_hash": "sha256:9f3e2a1b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.0,
+      "rationale": "SKILL.md covers all required sections: goals/non-goals (1.1/1.2), input/output with detailed parameter tables and exit states (2.1/2.2/2.3), 6-phase execution pipeline (3), primary/secondary abstractions, authority, runtime boundary baseline, architecture diagram, phase-by-phase breakdown (0-5), rerun semantics, non-negotiable rules (21 items), terminology definitions, pitfalls, and usage examples. Content is substantial throughout, with JSON schemas, template structures, and 19 integrity checks in Phase 4.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:18", "quote": "## 1. 目标与非目标"},
+        {"kind": "line", "ref": "SKILL.md:36", "quote": "## 2. 输入/输出"},
+        {"kind": "line", "ref": "SKILL.md:84", "quote": "## 3. 执行步骤"},
+        {"kind": "line", "ref": "SKILL.md:99", "quote": "## Primary Abstraction"},
+        {"kind": "line", "ref": "SKILL.md:116", "quote": "## Runtime Boundary Baseline"},
+        {"kind": "line", "ref": "SKILL.md:130", "quote": "## 架构"},
+        {"kind": "line", "ref": "SKILL.md:1153", "quote": "## 重跑语义"},
+        {"kind": "line", "ref": "SKILL.md:1164", "quote": "## Non-Negotiable Rules"},
+        {"kind": "line", "ref": "SKILL.md:1190", "quote": "## 术语定义"},
+        {"kind": "line", "ref": "SKILL.md:1208", "quote": "## Pitfalls / 常见坑与规避"},
+        {"kind": "line", "ref": "SKILL.md:1222", "quote": "## Usage"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.92,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "Boundary clarity is excellent. Non-goals (1.2) are explicitly listed with 5 concrete, verifiable items: no source doc modification, no code generation, no gate decision, does not replace Design Check, no inventing missing info. Runtime Boundary Baseline (line 116) reinforces 7 constraints. The 21 Non-Negotiable Rules (line 1164) further harden boundaries. Each phase has clear BLOCK/CONDITIONAL/PASS states. Evidence is line-referenced and directly quotable.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:28", "quote": "### 1.2 非目标"},
+        {"kind": "line", "ref": "SKILL.md:30", "quote": "- **不修改源文档**：只读取设计文档，不修改任何输入文件（状态冻结除外）"},
+        {"kind": "line", "ref": "SKILL.md:31", "quote": "- **不生成代码**：产出实施计划文档（task-*.md + INDEX.md + SUMMARY.md），不产出业务代码"},
+        {"kind": "line", "ref": "SKILL.md:32", "quote": "- **不做 gate 决策**：evidence-only，汇总报告供人工确认，不自动判定通过/不通过"},
+        {"kind": "line", "ref": "SKILL.md:33", "quote": "- **不替代 Design Check**：`zdoc-design-check` 校验设计质量，`zdoc-i2i` 做实施转化，两者互补"},
+        {"kind": "line", "ref": "SKILL.md:34", "quote": "- **不补充缺失信息**：不发明设计文档中没有的功能、技术方案或业务规则"},
+        {"kind": "line", "ref": "SKILL.md:116", "quote": "## Runtime Boundary Baseline"},
+        {"kind": "line", "ref": "SKILL.md:120", "quote": "- **Read-only** — does NOT modify source design documents."},
+        {"kind": "line", "ref": "SKILL.md:121", "quote": "- **只整合不补充** — does NOT invent features, tech solutions, or business rules not in input docs."},
+        {"kind": "line", "ref": "SKILL.md:1164", "quote": "## Non-Negotiable Rules"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Usage section (line 1222) provides 6 concrete command examples with full flags and expected output descriptions. Examples cover directory scan, feature filter, minimal input, src path normalization, custom output dir, and validate-only mode. Each example includes the exact command and a comment explaining the output. However, no actual stdout sample is shown (only output path descriptions), which prevents 'excellent' rating. Commands are executable as-is.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:1224", "quote": "```bash\n# 全量目录扫描（推荐）\n# 输出: docs/mvp-lite/impl/ 目录 + delivery-report.json\nzdoc-i2i --dir docs/mvp-lite/"},
+        {"kind": "line", "ref": "SKILL.md:1229", "quote": "zdoc-i2i --dir docs/mvp-lite/ --feature M01"},
+        {"kind": "line", "ref": "SKILL.md:1235", "quote": "zdoc-i2i --prd docs/prds/PRD-M01.md --arch docs/arch/ARCH-M01.md"},
+        {"kind": "line", "ref": "SKILL.md:1239", "quote": "zdoc-i2i --dir docs/mvp-lite/ --src apps/ai-coach-skill/src"},
+        {"kind": "line", "ref": "SKILL.md:1247", "quote": "zdoc-i2i --dir docs/mvp-lite/ --validate-only"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.9,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "Pitfalls section (line 1208) lists 7 specific pitfalls, each with impact description and concrete mitigation method. Covers path shorthand, validate-only skip, draft status submission, 8h exception missing, UI prototype omission, multi-feature IMPL-INDEX missing, and frozen doc modification. All are actionable and directly tied to skill behavior. Exceeds the >=3 threshold for excellent.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:1208", "quote": "## Pitfalls / 常见坑与规避"},
+        {"kind": "line", "ref": "SKILL.md:1212", "quote": "| **使用简写路径（如 `src/handlers/`）** | Task 文档中的文件路径被 Agent 错误解析，导致在错误位置创建目录 | 始终使用 `--src` 参数指定源代码根路径；Phase 0 会自动规范化所有路径 |"},
+        {"kind": "line", "ref": "SKILL.md:1213", "quote": "| **忽略 `--validate-only` 提前发现问题** | 直接运行完整 Pipeline，因 Gate FAIL 或文档状态 BLOCK 浪费大量时间 | 首次执行新 Feature 时先跑 `--validate-only`，确认 PASS 后再生成 Task |"},
+        {"kind": "line", "ref": "SKILL.md:1214", "quote": "| **draft 状态文档直接提交 I2I** | 文档尚未评审，I2I 执行到 Phase 1 即 BLOCK，需重新走评审流程 | 确保所有输入文档状态为 `approved` 或 `frozen`；使用 `zdoc-design-check` 前置校验 |"},
+        {"kind": "line", "ref": "SKILL.md:1215", "quote": "| **Task 超 8h 未记录例外理由** | 产物完整性检查 FAIL，Phase 4 无法完成，文档状态不冻结 | 拆分策略阶段严格按 5 条件检查；超 8h 时在 `task-list.json` 的 `exception` 字段记录理由 |"},
+        {"kind": "line", "ref": "SKILL.md:1216", "quote": "| **UI Task 未关联原型文件** | 实施者无法对照原型实现，导致布局/文案/状态偏差 | Phase 0 确保 `ux-prototypes/` 目录被扫描；Phase 3 自动注入原型引用到 Task 文档和验收标准 |"},
+        {"kind": "line", "ref": "SKILL.md:1217", "quote": "| **多 Feature 时遗漏 IMPL-INDEX.md** | 全局索引缺失，跨 Feature 依赖不可见 | 非单 Feature 场景必须检查产物完整性第 8 项；多 Feature 时自动触发 IMPL-INDEX.md 生成 |"},
+        {"kind": "line", "ref": "SKILL.md:1218", "quote": "| ** frozen 文档直接修改后重跑** | 违反文档生命周期，冻结状态被静默覆盖，历史追溯断裂 | 修改设计文档必须走 deprecated + 新建流程；I2I 对 frozen 文档是幂等的，不会自动解冻 |"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.91,
+    "rationale": "weighted-mean = (0.95*1.0 + 0.92*1.5 + 0.85*1.0 + 0.9*0.8) / (1.0+1.5+1.0+0.8) = 0.91. All dimensions >= 0.75. Pass threshold 0.75 met. No dimension below fail threshold 0.45.",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "pass",
+    "code": "PASS_ALL_DIMENSIONS",
+    "message": "All dimensions pass. Weighted score 0.91 exceeds pass threshold 0.75."
+  },
+  "baseline": {
+    "baseline_id": "r-zdoc-i2i-20260616-v1",
+    "delta": 0.0,
+    "regressed_dimensions": []
+  },
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260616-v2/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260616-v2/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260616-v2/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260616-v2/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260616-v2/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-i2i-20260616-v2/replay_bundle/"
+  },
+  "meta": {
+    "created_at": "2026-06-16T00:00:00Z",
+    "duration_ms": 120000,
+    "model_versions": {"judge": "kimi-for-coding"}
+  }
+}

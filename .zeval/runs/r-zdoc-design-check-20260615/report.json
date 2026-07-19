@@ -1,0 +1,86 @@
+{
+  "run_id": "r-zdoc-design-check-20260615",
+  "request_hash": "sha256:zdoc-design-check-skill-design-1.0.0",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.65,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "SKILL.md covers most critical sections: input/output model (line 91), execution protocol (line 126), workflow boundary (line 213), non-goals in 'Not Equal To' (line 29), and severity levels. However, it lacks an explicit numbered '目标与非目标' section as required by the rubric's required_signals. The 'Not Equal To' section serves as non-goals but is not labeled as such. Execution steps are present but not in a numbered '执行步骤' heading. Missing a dedicated '何时使用/何时不使用' section beyond the boundary baseline.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:29", "quote": "## Not Equal To\n- Not a replacement for zdoc-quality-loop\n- Not a document editor\n- Not a gate decision maker\n- Not a SSOT formalization tool"},
+        {"kind": "line", "ref": "SKILL.md:91", "quote": "## 输入模型\n| 模式 | 输入 | 可执行的检查 | XC 跨维度 |"},
+        {"kind": "line", "ref": "SKILL.md:126", "quote": "## Execution Protocol\n### 执行流程\n#### 阶段 1: 文档读取与上下文构建"},
+        {"kind": "line", "ref": "SKILL.md:213", "quote": "## Workflow Boundary\n- **Input**: Document path(s)\n- **Output**: Validation artifact bundle\n- **Out of scope**: Document editing or correction; SSOT formalization"},
+        {"kind": "line", "ref": "SKILL.md:224", "quote": "## Non-Negotiable Rules\n- Do not modify source documents under any circumstance."}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.5,
+      "rationale": "Boundary clarity is strong. 'Not Equal To' (line 29) lists 4 concrete non-goals with specific counterparts. 'Runtime Boundary Baseline' (line 49) defines 5 clear constraints (read-only, evidence-only, MAC-driven, pure LLM, check IDs). 'Workflow Boundary' (line 213) explicitly states Out of scope items. Non-goals are specific and verifiable (e.g., 'does NOT modify source documents' is testable). Not excellent because 'Not Equal To' is not a dedicated '非目标' heading and lacks explicit 'When NOT to use' trigger conditions.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:29", "quote": "## Not Equal To\n- Not a replacement for zdoc-quality-loop (complements it; Doc Quality Loop for document structure/readability, Design Check for business design input sufficiency)\n- Not a document editor (produces diagnostic reports only, never modifies source documents)\n- Not a gate decision maker (evidence-only, human confirms verdict)\n- Not a SSOT formalization tool (runs BEFORE SSOT, not during)"},
+        {"kind": "line", "ref": "SKILL.md:49", "quote": "- **Read-only validation** — does NOT modify source documents.\n- **Evidence-only output** — does NOT make gate decisions; human confirms.\n- **MAC-driven** — uses Minimum Acceptable Criteria from ITERATION-DOCUMENT-CHECKLIST as thresholds.\n- **Pure LLM execution** — all checks handled by LLM, domain rubrics embedded in prompt.\n- **Check IDs** follow `{layer}-{seq}` format"},
+        {"kind": "line", "ref": "SKILL.md:213", "quote": "- **Out of scope**:\n  - Document editing or correction\n  - SSOT formalization"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.75,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Five bash examples are provided with full commands and parameters (line 246). Each includes the skill name, flags, and values. However, examples lack expected output samples, which prevents 'excellent' rating. The --project flag in example 1 is not documented in the argument-hint (line 4), creating a minor inconsistency. Otherwise examples are concrete and runnable.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:246", "quote": "```bash\n# Validate all dimensions (full check)\nzdoc-design-check --dir docs/ --project my-project --domain all\n\n# Validate only Business Design (D1)\nzdoc-design-check --input docs/prd/xxx-prd.md --domain business\n\n# Validate only Architecture Design (D4)\nzdoc-design-check --dir docs/ --domain architecture\n\n# Gate check only (quick screen, all domains)\nzdoc-design-check --dir docs/ --layer gate-only\n\n# Custom output directory\nzdoc-design-check --dir docs/ --output-dir .design-check\n```"},
+        {"kind": "line", "ref": "SKILL.md:4", "quote": "argument-hint: \"[--input PATH] [--dir DIR] [--domain business|product|ux|arch|test|eng|all] [--layer gate-only|full] [--output-dir .design-check]\""}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.80,
+      "level": "good",
+      "weight": 0.8,
+      "rationale": "The 'Non-Negotiable Rules' section (line 224) contains 9 concrete rules that function as anti-patterns/pitfalls with built-in mitigations: do not modify docs, do not fabricate findings, gate-before-domain, BLOCK stops execution, domain independence, disk persistence, human-confirmed verdict, stable IDs, MAC standards. Each rule implicitly states what to avoid and how to behave instead. Severity Levels table (line 237) also helps users avoid misclassifying issues. This meets the 'good' threshold (>=2 pitfalls) but not 'excellent' because pitfalls are not explicitly labeled as '常见坑' or '反模式' and lack explicit '规避方法' subsections.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:224", "quote": "## Non-Negotiable Rules\n- Do not modify source documents under any circumstance.\n- Do not fabricate findings — every BLOCK/WARN must cite specific evidence from the document.\n- Gate Check (Layer 0) must complete before domain checks begin.\n- Any BLOCK in Gate Check stops execution — do not proceed to domain checks.\n- Domain checks are independent — one domain's BLOCK does not block other domains.\n- All artifacts written to disk immediately; no in-memory-only state.\n- Verdict is always human-confirmed; the skill only recommends.\n- Check IDs must be stable within a run (no renumbering).\n- MAC standards from ITERATION-DOCUMENT-CHECKLIST v2.1 are authoritative."},
+        {"kind": "line", "ref": "SKILL.md:237", "quote": "## Severity Levels\n| Level | Meaning | Action |\n| **BLOCK** | Required element missing or critically insufficient | Must be resolved before SSOT can start |\n| **WARN** | Element exists but quality is below MAC | Recommended to improve; does not block but flagged |\n| **PASS** | Element complete and meets MAC | Cleared |\n| **N/A** | Not applicable for this iteration type | Labeled with reuse source |"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.771,
+    "rationale": "Weighted mean score 0.771 >= pass threshold 0.75. All dimensions scored good (0.65-0.85). No dimension failed. Boundary-clarity is strongest (0.85); completeness is weakest (0.65) due to missing explicit '目标与非目标' and '何时使用/何时不使用' sections.",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "pass",
+    "code": "PASS",
+    "message": "All dimensions >= acceptable; weighted score 0.771 >= 0.75 threshold"
+  },
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260615/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260615/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260615/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260615/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260615/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-design-check-20260615/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-15T00:00:00Z",
+    "duration_ms": 0,
+    "model_versions": {"kimi-for-coding": "2026-06-15"}
+  }
+}

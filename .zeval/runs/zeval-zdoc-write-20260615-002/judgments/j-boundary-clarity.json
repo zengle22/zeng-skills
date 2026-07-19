@@ -1,0 +1,29 @@
+{
+  "judge_id": "j-boundary-clarity",
+  "dimension": "boundary-clarity",
+  "score": 0.9,
+  "level": "excellent",
+  "rationale": "目标与非目标二分明确。第1.1节列出4项具体目标，第1.2节以'非目标'为标题列出4项'不做什么'，每项均给出替代工具（zdoc-design-check/zdoc-i2i/zdoc-quality-loop）。Not Equal To、Workflow Boundary、Out of scope、Pitfalls多处重复强化边界，非目标具体可验证。",
+  "evidence_refs": [
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:54",
+      "quote": "## 1. 目标与非目标"
+    },
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:63",
+      "quote": "### 1.2 非目标\n\n- **不修改已有文档**：除非用户明确请求更新，否则只从零撰写新文档。\n- **不做文档质量校验**：写完后应调用 `zdoc-design-check` 做质量检查。\n- **不拆分实施任务**：任务分解由 `zdoc-i2i` 负责。\n- **不做多轮评审收敛**：质量循环由 `zdoc-quality-loop` 负责。"
+    },
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:31",
+      "quote": "## Not Equal To\n\n- Not a document editor（从零撰写，不修改已有文档）\n- Not a design check tool（不校验已有文档质量，用 `zdoc-design-check`）\n- Not a task decomposer（不拆分实施任务，用 `zdoc-i2i`）\n- Not a quality loop（不做多轮评审收敛，用 `zdoc-quality-loop`）"
+    },
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:712",
+      "quote": "## Workflow Boundary\n\n- **Out of scope**:\n  - 不修改已有文档（除非用户明确要求更新）\n  - 不校验文档质量（用 `zdoc-design-check`）\n  - 不拆分实施任务（用 `zdoc-i2i`）\n  - 不做多轮评审（用 `zdoc-quality-loop`）"
+    }
+  ]
+}

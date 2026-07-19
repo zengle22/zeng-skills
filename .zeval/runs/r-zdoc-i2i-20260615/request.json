@@ -1,0 +1,18 @@
+{
+  "run_id": "r-zdoc-i2i-20260615",
+  "target": "zdoc-i2i",
+  "target_path": "/Users/zengle/git/zeng-skills/skills/zdoc-i2i/SKILL.md",
+  "rubric": {
+    "id": "skill-design",
+    "version": "1.0.0",
+    "path": "/Users/zengle/git/zeng-skills/skills/zeval-skill/rubrics/skill-design.v1.yaml"
+  },
+  "dimensions": ["completeness", "boundary-clarity", "examples-runnable", "pitfalls"],
+  "judges": [
+    {"id": "j-comp", "dimension": "completeness"},
+    {"id": "j-bnd", "dimension": "boundary-clarity"},
+    {"id": "j-ex", "dimension": "examples-runnable"},
+    {"id": "j-pit", "dimension": "pitfalls"}
+  ],
+  "requested_at": "2026-06-15T00:00:00Z"
+}

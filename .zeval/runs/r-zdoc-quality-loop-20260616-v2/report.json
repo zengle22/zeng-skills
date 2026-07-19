@@ -1,0 +1,96 @@
+{
+  "run_id": "r-zdoc-quality-loop-20260616-v2",
+  "request_hash": "sha256:b186b850891d8f3a08797c9e3a356c9e4b27cfb34f62537b171db204dcd8254f",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 1.0,
+      "level": "excellent",
+      "weight": 1.0,
+      "rationale": "All required sections present and richly detailed: Purpose, Use_When, Goals/Non-goals (1.1/1.2), Input/Output with full schemas and file tree, 5-phase execution steps, Standard Rubric, Role Pool, 10+ JSON data structure schemas, Stop conditions, Pitfalls, Usage examples, File path reference, Final checklist. Exceeds rubric 'excellent' criterion of '全部章节齐全且内容充实'.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:30", "quote": "## 1. 目标与非目标"},
+        {"kind": "line", "ref": "SKILL.md:50", "quote": "## 2. 输入/输出"},
+        {"kind": "line", "ref": "SKILL.md:152", "quote": "## 3. 执行步骤"},
+        {"kind": "line", "ref": "SKILL.md:24", "quote": "<Use_When>"},
+        {"kind": "line", "ref": "SKILL.md:40", "quote": "### 1.2 非目标"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "Non-goals section (1.2) explicitly lists 5 concrete 'not-to-use' cases with redirects to alternative tools. Each non-goal is verifiable: e.g., '不用于代码文件评审 —— 代码审查请使用 gsd-code-review + gsd-code-fixer'. Use_When section also clearly defines trigger conditions. Meets rubric 'excellent' criterion of '目标/非目标二分明确，且非目标具体可验证'. Slight deduction because one non-goal ('不保证零问题收敛') is more of a limitation than a boundary, but still clearly stated.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:40", "quote": "### 1.2 非目标"},
+        {"kind": "line", "ref": "SKILL.md:42", "quote": "不用于代码文件评审 —— 代码审查请使用 `gsd-code-review` + `gsd-code-fixer`"},
+        {"kind": "line", "ref": "SKILL.md:43", "quote": "不用于单轮评审且无需修复的场景 —— 此类需求请使用 `code-reviewer`"},
+        {"kind": "line", "ref": "SKILL.md:24", "quote": "<Use_When>"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.8,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Three examples provided. Example 1 (single doc) is excellent: full command + complete expected output with all phases. Examples 2 (multi-doc parallel) and 3 (resume) provide commands with parameters but no expected output. Meets rubric 'good' criterion of '示例含命令与参数' but not all examples reach 'excellent' level of '含完整命令、参数、预期输出'.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:1233", "quote": "```\n/zdoc-quality-loop prd.md\n```"},
+        {"kind": "line", "ref": "SKILL.md:1237", "quote": "**预期输出**："},
+        {"kind": "line", "ref": "SKILL.md:1299", "quote": "```\n/zdoc-quality-loop spec.md api.md design.md --parallel --rubric ./custom-rubric.md --p1-threshold 5 --output-dir ./quality-reports\n```"},
+        {"kind": "line", "ref": "SKILL.md:1305", "quote": "```\n/zdoc-quality-loop --resume 20260615-143022-a3f2\n```"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 1.0,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "9 pitfalls listed, each with impact description and concrete mitigation measure. Far exceeds rubric 'excellent' threshold of >=3 pitfalls with avoidance methods. Pitfalls cover self-deception convergence, standard drift, role collusion, majority tyranny, false consensus, report contamination, audit contamination, state loss on interrupt, and token explosion.",
+      "evidence_refs": [
+        {"kind": "line", "ref": "SKILL.md:1211", "quote": "## Pitfalls / 常见坑与规避"},
+        {"kind": "line", "ref": "SKILL.md:1215", "quote": "| **自嗨收敛** — Fixer 自我评价\"已修复\"，但问题实际未解决 | 下一轮评审重新发现同一问题... | 强制引入独立 Verifier 核对... |"},
+        {"kind": "line", "ref": "SKILL.md:1216", "quote": "| **标准漂移** — 每轮 Rubric 或严重级别定义被悄悄修改 | 跨轮次问题不可比... | 初始化时锁定 `rubric-locked.md`... |"},
+        {"kind": "line", "ref": "SKILL.md:1217", "quote": "| **角色互相认可** — 评审团在讨论中放弃独立立场... | 冲突被虚假解决... | 讨论时每角色独立 spawn 响应... |"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.935,
+    "rationale": "Weighted mean score 0.935 exceeds pass threshold 0.75. All dimensions scored good or excellent. Weakest dimension is examples-runnable (0.80) due to 2 of 3 examples lacking expected output."
+  },
+  "gate": {
+    "status": "pass",
+    "code": "G000",
+    "message": "All clear"
+  },
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260616-v2/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260616-v2/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260616-v2/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260616-v2/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260616-v2/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zdoc-quality-loop-20260616-v2/replay_bundle/"
+  },
+  "meta": {
+    "created_at": "2026-06-16T12:00:00Z",
+    "duration_ms": 120000,
+    "model_versions": {
+      "j-comp": "kimi-for-coding",
+      "j-bnd": "kimi-for-coding",
+      "j-ex": "kimi-for-coding",
+      "j-pit": "kimi-for-coding",
+      "adjudicator": "kimi-for-coding"
+    }
+  }
+}

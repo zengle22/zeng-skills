@@ -1,0 +1,102 @@
+{
+  "run_id": "r-zdoc-write-20260615",
+  "request_hash": "sha256:8b3f42796bf26dfe57398561932a5f1cab6cc4bf152b449d48c546af258c1188",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.0,
+      "rationale": "All required chapters present and highly detailed. Sections 1 (goals/non-goals), 2 (input/output), 3 (execution steps) all exist with rich subsections. Additional sections: supported doc types (16 types), architecture diagram, detailed Phase 1-4 breakdowns, workflow boundary, non-negotiable rules, pitfalls, usage, compatibility note. The document covers far beyond the rubric's minimum requirements.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:54","quote":"## 1. 目标与非目标"},
+        {"kind":"line","ref":"SKILL.md:72","quote":"## 2. 输入/输出"},
+        {"kind":"line","ref":"SKILL.md:94","quote":"## 3. 执行步骤"},
+        {"kind":"line","ref":"SKILL.md:712","quote":"## Workflow Boundary"},
+        {"kind":"line","ref":"SKILL.md:722","quote":"## Non-Negotiable Rules"},
+        {"kind":"line","ref":"SKILL.md:738","quote":"## Pitfalls / 常见坑与规避"},
+        {"kind":"line","ref":"SKILL.md:751","quote":"## Usage"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.92,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "Boundary clarity is excellent. 'Not Equal To' section explicitly lists 4 things it is NOT. Section 1.2 non-goals lists 4 concrete non-goals with specific alternative skills. Workflow Boundary repeats the out-of-scope list. Non-negotiable Rule #5 explicitly prevents scope creep. All non-goals are actionable and verifiable.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:31","quote":"## Not Equal To"},
+        {"kind":"line","ref":"SKILL.md:33","quote":"- Not a document editor（从零撰写，不修改已有文档）"},
+        {"kind":"line","ref":"SKILL.md:63","quote":"### 1.2 非目标"},
+        {"kind":"line","ref":"SKILL.md:65","quote":"- **不修改已有文档**：除非用户明确请求更新，否则只从零撰写新文档。"},
+        {"kind":"line","ref":"SKILL.md:712","quote":"## Workflow Boundary"},
+        {"kind":"line","ref":"SKILL.md:716","quote":"- 不修改已有文档（除非用户明确要求更新）"},
+        {"kind":"line","ref":"SKILL.md:728","quote":"5. **不越界**：不同类型文档的内容不混写（如 PRD 不写 API 端点细节）"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Usage section provides 5 concrete bash commands with all required flags (--module, --output-dir, --input, --project). Each command is independently runnable. Expected output description clarifies the two-phase behavior. However, no explicit expected output samples are shown for the commands, and the frontmatter/change-report examples are structural templates rather than runnable commands.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:753","quote":"zdoc-write prd --module M12 --output-dir docs/mvp-lite/prds/"},
+        {"kind":"line","ref":"SKILL.md:758","quote":"zdoc-write \"我需要写一个用户注册模块的架构文档，用 React + Go + PostgreSQL\""},
+        {"kind":"line","ref":"SKILL.md:761","quote":"zdoc-write prd --input docs/drafts/prd-notes.md --output-dir docs/mvp-lite/prds/"},
+        {"kind":"line","ref":"SKILL.md:767","quote":"zdoc-write api --module M12 --output-dir docs/mvp-lite/api/ --project ."},
+        {"kind":"line","ref":"SKILL.md:770","quote":"> **预期输出**：上述命令不会立即落盘最终文档。执行后，`zdoc-write` 会先输出 `## 文档摘要` 供用户确认核心决策点"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.9,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "6 pitfalls listed, each with impact description and concrete mitigation method. Covers common misuse patterns (editor misuse, missing args, ignoring confirmation markers, skipping change detection, vague out-of-scope, overwriting frozen docs). All exceed the rubric's excellent threshold of >=3 with mitigations.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:738","quote":"## Pitfalls / 常见坑与规避"},
+        {"kind":"line","ref":"SKILL.md:741","quote":"| 1 | 把 `zdoc-write` 当文档编辑器，直接让它修改已有文档 | 可能误删用户内容、破坏版本历史 | 修改已有文档时明确请求更新；日常编辑使用 `zdoc-design-check` 或手动编辑 |"},
+        {"kind":"line","ref":"SKILL.md:745","quote":"| 3 | 忽略 `[需确认]` 标记，把 AI 补充内容当作用户已确认内容 | 引入未经验证的假设，导致语义漂移 | Phase 4 最终化前必须让用户审阅并确认所有 `[需确认]` 项 |"},
+        {"kind":"line","ref":"SKILL.md:746","quote":"| 4 | 撰写 API 文档时不执行 Phase 1.5 变更检测 | 遗漏破坏性变更，下游客户端崩溃 | API 类型强制搜索同模块旧文档；必须输出变更说明或\"首次撰写\"标注 |"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.907,
+    "rationale": "Weighted mean score 0.907 exceeds pass threshold 0.75. All dimensions scored good or excellent. No dimension failed."
+  },
+  "gate": {
+    "status": "pass",
+    "code": "G000",
+    "message": "All clear"
+  },
+  "artifacts": {
+    "report_path": ".zeval/runs/r-zdoc-write-20260615/report.json",
+    "raw_judgments": [
+      ".zeval/runs/r-zdoc-write-20260615/judgments/j-comp.json",
+      ".zeval/runs/r-zdoc-write-20260615/judgments/j-bnd.json",
+      ".zeval/runs/r-zdoc-write-20260615/judgments/j-ex.json",
+      ".zeval/runs/r-zdoc-write-20260615/judgments/j-pit.json"
+    ],
+    "replay_bundle": ".zeval/runs/r-zdoc-write-20260615/replay_bundle/"
+  },
+  "meta": {
+    "created_at": "2026-06-15T12:30:00Z",
+    "duration_ms": 180000,
+    "model_versions": {
+      "j-comp": "kimi-for-coding",
+      "j-bnd": "kimi-for-coding",
+      "j-ex": "kimi-for-coding",
+      "j-pit": "kimi-for-coding",
+      "adjudicator": "kimi-for-coding"
+    }
+  }
+}

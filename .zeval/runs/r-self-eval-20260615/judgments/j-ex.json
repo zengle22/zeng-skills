@@ -1,0 +1,18 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.82,
+  "level": "good",
+  "weight": 1.0,
+  "rationale": "5 usage scenarios with complete runnable commands and all parameters. '最小调用' is a full 3-step workflow with JSON payload. CI mode includes expected exit code behavior. Missing actual expected output samples (e.g. sample report.json) and some <run_id> placeholders prevent excellent.",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:172", "quote": "### 最小调用" },
+    { "kind": "line", "ref": "SKILL.md:187", "quote": "/zeval-skill --request /tmp/eval.req.json" },
+    { "kind": "line", "ref": "SKILL.md:190", "quote": "cat .zeval/runs/<run_id>/report.json" },
+    { "kind": "line", "ref": "SKILL.md:268", "quote": "/zeval-skill --target skill-design:./skills/zdoc-i2i/SKILL.md --rubric skill-design@1.0.0 --judges correctness,completeness,clarity" },
+    { "kind": "line", "ref": "SKILL.md:277", "quote": "/zeval-skill --target agent-run:./trajectories/run-001.jsonl --rubric agent-run@1.0.0 --judges correctness,efficiency,safety,contract" },
+    { "kind": "line", "ref": "SKILL.md:285", "quote": "/zeval-skill --target document:./docs/my-design.md --rubric document@1.0.0 --baseline none" },
+    { "kind": "line", "ref": "SKILL.md:296", "quote": "/zeval-skill --target code-diff:./pr-123.diff --rubric code-diff@1.0.0 --baseline enforce --judges correctness,safety,style" },
+    { "kind": "line", "ref": "SKILL.md:301", "quote": "# gate 退出码 1 = 退化阻断 CI" }
+  ]
+}

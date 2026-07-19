@@ -1,0 +1,18 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 1.5,
+  "rationale": "目标/非目标二分明确，非目标具体可验证。1.2非目标列出4项具体排除：不修改已有文档、不做文档质量校验、不拆分实施任务、不做多轮评审收敛。Workflow Boundary再次明确Input/Output/Out of scope。每个非目标都指向替代技能（zdoc-design-check/zdoc-i2i/zdoc-quality-loop），可验证。",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:54", "quote": "### 1.2 非目标" },
+    { "kind": "line", "ref": "SKILL.md:56", "quote": "**不修改已有文档**：除非用户明确请求更新，否则只从零撰写新文档。" },
+    { "kind": "line", "ref": "SKILL.md:57", "quote": "**不做文档质量校验**：写完后应调用 `zdoc-design-check` 做质量检查。" },
+    { "kind": "line", "ref": "SKILL.md:58", "quote": "**不拆分实施任务**：任务分解由 `zdoc-i2i` 负责。" },
+    { "kind": "line", "ref": "SKILL.md:59", "quote": "**不做多轮评审收敛**：质量循环由 `zdoc-quality-loop` 负责。" },
+    { "kind": "line", "ref": "SKILL.md:703", "quote": "## Workflow Boundary" },
+    { "kind": "line", "ref": "SKILL.md:707", "quote": "- **Out of scope**:" },
+    { "kind": "line", "ref": "SKILL.md:708", "quote": "  - 不修改已有文档（除非用户明确要求更新）" }
+  ]
+}

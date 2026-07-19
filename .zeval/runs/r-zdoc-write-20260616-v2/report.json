@@ -1,0 +1,88 @@
+{
+  "run_id": "r-zdoc-write-20260616-v2",
+  "request_hash": "sha256:zdoc-write-20260616-v2",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.0,
+      "rationale": "全部必备章节齐全且内容充实。包含：1.1目标/1.2非目标、2.1输入/2.2输出、3.执行步骤（Phase 1-4）、Phase 1.5旧接口变更检测、Phase 2文档生成、Phase 3决策摘要、Phase 4最终化、架构图、关联文档表、Workflow Boundary、Non-Negotiable Rules、Pitfalls、Usage、Compatibility Note。",
+      "evidence_refs": [
+        { "kind": "file", "ref": "skills/zdoc-write/SKILL.md", "quote": "## 1. 目标与非目标" }
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "目标/非目标二分明确，非目标具体可验证。1.2非目标列出4项具体排除，每项指向替代技能。Workflow Boundary再次明确Out of scope。",
+      "evidence_refs": [
+        { "kind": "line", "ref": "SKILL.md:54", "quote": "### 1.2 非目标" }
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 1.0,
+      "rationale": "5个完整使用示例，均含具体命令、参数和预期输出目录结构。覆盖指定类型、内容推断、文件补充、项目路径、完整参数（含API强制变更检测）。",
+      "evidence_refs": [
+        { "kind": "line", "ref": "SKILL.md:742", "quote": "## Usage" }
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "6条常见坑，每条均含影响和具体规避方法。覆盖误当编辑器、缺失参数、忽略确认标记、遗漏API变更检测、Out of Scope模糊、覆盖已冻结文档。",
+      "evidence_refs": [
+        { "kind": "line", "ref": "SKILL.md:729", "quote": "## Pitfalls / 常见坑与规避" }
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.95,
+    "rationale": "四个维度全部 excellent（0.95）。completeness 章节齐全充实；boundary-clarity 非目标具体可验证；examples-runnable 5个完整示例含命令+参数+预期输出；pitfalls 6条均带影响和规避方法。加权总分 0.95，远超 0.75 通过阈值。",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "pass",
+    "code": "G000",
+    "message": "All clear"
+  },
+  "baseline": {
+    "baseline_id": "sha256:zdoc-write-prev",
+    "delta": 0.0,
+    "regressed_dimensions": []
+  },
+  "artifacts": {
+    "report_path": ".zeval/runs/r-zdoc-write-20260616-v2/report.json",
+    "raw_judgments": [
+      ".zeval/runs/r-zdoc-write-20260616-v2/judgments/j-comp.json",
+      ".zeval/runs/r-zdoc-write-20260616-v2/judgments/j-bnd.json",
+      ".zeval/runs/r-zdoc-write-20260616-v2/judgments/j-ex.json",
+      ".zeval/runs/r-zdoc-write-20260616-v2/judgments/j-pit.json"
+    ],
+    "replay_bundle": ".zeval/runs/r-zdoc-write-20260616-v2/replay_bundle/"
+  },
+  "meta": {
+    "created_at": "2026-06-16T00:00:00Z",
+    "duration_ms": 45000,
+    "model_versions": {
+      "j-comp": "kimi-for-coding",
+      "j-bnd": "kimi-for-coding",
+      "j-ex": "kimi-for-coding",
+      "j-pit": "kimi-for-coding"
+    }
+  }
+}

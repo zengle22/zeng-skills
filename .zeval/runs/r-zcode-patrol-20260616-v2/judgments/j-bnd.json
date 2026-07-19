@@ -1,0 +1,20 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.92,
+  "level": "excellent",
+  "weight": 1.5,
+  "rationale": "目标/非目标二分极其明确。非目标（1.2）列出 4 条具体可验证的边界：'不替代 ESLint/SonarQube'、'不做运行时分析'、'不修改源文件（只读）'、'不做 gate 决策'。每条均可直接验证——例如检查是否调用了测试框架或执行了写操作。此外，'Non-Negotiable Rules' 章节进一步强化了边界，以否定句式列出 5 条红线。",
+  "evidence_refs": [
+    {
+      "kind": "line",
+      "ref": "skills/zcode-patrol/SKILL.md:26-31",
+      "quote": "### 1.2 非目标\n- 不替代 ESLint、Pylint、SonarQube（定位为补充/聚合层）\n- 不做运行时分析或测试执行（纯静态分析）\n- 不修改源文件（只读巡检）\n- 不做 gate 决策（仅产出证据，不替人判断）"
+    },
+    {
+      "kind": "line",
+      "ref": "skills/zcode-patrol/SKILL.md:196-203",
+      "quote": "## Non-Negotiable Rules\n- 不修改源文件（read-only）\n- 不执行测试或运行时分析\n- 不做 gate 决策（仅产出证据）\n- 不捏造统计数据（计数必须匹配原始证据）\n- 工具不可用时优雅跳过，不崩溃"
+    }
+  ]
+}

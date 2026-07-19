@@ -1,0 +1,11 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.75,
+  "level": "good",
+  "rationale": "Five bash examples are provided with full commands and parameters (line 246). Each includes the skill name, flags, and values. However, examples lack expected output samples, which prevents 'excellent' rating. The --project flag in example 1 is not documented in the argument-hint (line 4), creating a minor inconsistency. Otherwise examples are concrete and runnable.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:246", "quote": "```bash\n# Validate all dimensions (full check)\nzdoc-design-check --dir docs/ --project my-project --domain all\n\n# Validate only Business Design (D1)\nzdoc-design-check --input docs/prd/xxx-prd.md --domain business\n\n# Validate only Architecture Design (D4)\nzdoc-design-check --dir docs/ --domain architecture\n\n# Gate check only (quick screen, all domains)\nzdoc-design-check --dir docs/ --layer gate-only\n\n# Custom output directory\nzdoc-design-check --dir docs/ --output-dir .design-check\n```"},
+    {"kind": "line", "ref": "SKILL.md:4", "quote": "argument-hint: \"[--input PATH] [--dir DIR] [--domain business|product|ux|arch|test|eng|all] [--layer gate-only|full] [--output-dir .design-check]\""}
+  ]
+}

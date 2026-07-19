@@ -1,0 +1,16 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.85,
+  "level": "good",
+  "rationale": "Dedicated 'Anti-Patterns' section with 6 explicit pitfalls, each stating what NOT to do. Most include implicit mitigation via the surrounding rules (e.g., admission gate blocks incomplete packages). Strong coverage but not all pitfalls include explicit 'how to avoid' guidance beyond the negative rule.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:329","quote":"## Anti-Patterns"},
+    {"kind":"line","ref":"SKILL.md:331","quote":"- **Do NOT** skip the admission gate unless `--force` is explicitly passed AND user has acknowledged the risk"},
+    {"kind":"line","ref":"SKILL.md:332","quote":"- **Do NOT** invent requirements not present in the source documents"},
+    {"kind":"line","ref":"SKILL.md:333","quote":"- **Do NOT** change business rules, thresholds, or formulas during translation"},
+    {"kind":"line","ref":"SKILL.md:334","quote":"- **Do NOT** create phases for P1/P2 items — only P0 goes into this milestone"},
+    {"kind":"line","ref":"SKILL.md:335","quote":"- **Do NOT** delete or modify original source documents in `$PACKAGE_PATH`"},
+    {"kind":"line","ref":"SKILL.md:336","quote":"- **Do NOT** overwrite existing `.planning/` files without user approval in merge mode"}
+  ]
+}

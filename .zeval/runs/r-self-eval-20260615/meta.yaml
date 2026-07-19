@@ -1,0 +1,15 @@
+run_id: r-self-eval-20260615
+created_at: "2026-06-15T12:00:00Z"
+duration_ms: 180000
+model_versions:
+  j-comp: kimi-for-coding
+  j-bnd: kimi-for-coding
+  j-ex: kimi-for-coding
+  j-pit: kimi-for-coding
+  adjudicator: kimi-for-coding
+rubric:
+  id: skill-design
+  version: 1.0.0
+target:
+  kind: skill-design
+  ref: skills/zeval-skill/SKILL.md

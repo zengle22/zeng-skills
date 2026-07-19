@@ -25,6 +25,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSy
 import { join, dirname, basename, resolve, relative } from 'path';
 import { createHash } from 'crypto';
 import { fileURLToPath } from 'url';
+import { spawnSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -119,6 +120,40 @@ function readFile(path) {
   return readFileSync(path, 'utf-8');
 }
 
+function guardrailsReference() {
+  return fileExists(join(PROJECT_ROOT, 'rules/agent-coding-guardrails.md'))
+    ? 'rules/agent-coding-guardrails.md'
+    : 'AGENTS.md';
+}
+
+function taskFileNameForId(implDir, taskId) {
+  const num = taskId.slice(5);
+  return readdirSync(resolve(implDir)).find(f =>
+    f.startsWith(`task-${num}-`) || f.startsWith(`IMPL-TASK-${num}-`)
+  ) || `${taskId}.md`;
+}
+
+function loadDagValidation(implDir) {
+  const dagPath = join(implDir, 'dag-validation.json');
+  if (fileExists(dagPath)) return JSON.parse(readFile(dagPath));
+
+  const deliveryPath = join(implDir, 'delivery-report.json');
+  if (fileExists(deliveryPath)) {
+    const delivery = JSON.parse(readFile(deliveryPath));
+    if (delivery.dependency_validation) {
+      return {
+        status: delivery.dependency_validation.status,
+        topological_order: delivery.dependency_validation.order || [],
+        cycles: [],
+        isolated_nodes: [],
+        source: 'delivery-report.json:dependency_validation',
+      };
+    }
+  }
+
+  fail('Required file missing in impl directory: dag-validation.json (or delivery-report.json with dependency_validation)');
+}
+
 function sha256(content) {
   return 'sha256:' + createHash('sha256').update(content).digest('hex');
 }
@@ -146,12 +181,13 @@ function validatePreflight(args) {
     fail('AI_CONSTITUTION.md not found at project root.');
   }
 
-  if (!fileExists(join(PROJECT_ROOT, 'rules/agent-coding-guardrails.md'))) {
-    fail('rules/agent-coding-guardrails.md not found.');
+  const guardrails = guardrailsReference();
+  if (guardrails !== 'rules/agent-coding-guardrails.md') {
+    warn('rules/agent-coding-guardrails.md not found; using AGENTS.md mandatory safe coding rules as guardrails.');
   }
 
   const roadmap = readFile(roadmapPath);
-  const phasePattern = new RegExp(`###\\s*Phase ${args.phase}:`, 'i');
+  const phasePattern = new RegExp(`#{2,3}\\s*Phase ${args.phase}:`, 'i');
   if (!phasePattern.test(roadmap)) {
     fail(`Phase ${args.phase} not found in .planning/ROADMAP.md.`);
   }
@@ -160,14 +196,11 @@ function validatePreflight(args) {
     fail(`Impl directory not found: ${args.impl}`);
   }
 
-  const requiredFiles = ['task-list.json', 'dag-validation.json'];
-  for (const f of requiredFiles) {
-    if (!fileExists(join(args.impl, f))) {
-      fail(`Required file missing in impl directory: ${f}`);
-    }
+  if (!fileExists(join(args.impl, 'task-list.json'))) {
+    fail('Required file missing in impl directory: task-list.json');
   }
 
-  const dagValidation = JSON.parse(readFile(join(args.impl, 'dag-validation.json')));
+  const dagValidation = loadDagValidation(args.impl);
   if (dagValidation.status !== 'PASS') {
     fail(`DAG validation failed: ${dagValidation.reason || 'unknown reason'}`);
   }
@@ -181,7 +214,7 @@ function loadTaskPack(implDir) {
   info('Loading impl task pack...');
 
   const taskList = JSON.parse(readFile(join(implDir, 'task-list.json')));
-  const dagValidation = JSON.parse(readFile(join(implDir, 'dag-validation.json')));
+  const dagValidation = loadDagValidation(implDir);
 
   const featureContext = fileExists(join(implDir, 'feature-context.md'))
     ? readFile(join(implDir, 'feature-context.md'))
@@ -196,9 +229,10 @@ function loadTaskPack(implDir) {
     : null;
 
   const taskFiles = {};
-  const taskMdFiles = readdirSync(implDir).filter(f => f.startsWith('task-') && f.endsWith('.md'));
+  const taskMdFiles = readdirSync(implDir).filter(f => (f.startsWith('task-') || f.startsWith('IMPL-TASK-')) && f.endsWith('.md'));
   for (const f of taskMdFiles) {
-    const taskId = f.replace(/^task-(\d+)-.*$/, 'task-$1');
+    const taskNum = f.match(/(?:task-|IMPL-TASK-)(\d+)/)?.[1];
+    const taskId = taskNum ? `task-${taskNum}` : f.replace(/\.md$/, '');
     taskFiles[taskId] = readFile(join(implDir, f));
   }
 
@@ -229,7 +263,7 @@ function loadTaskPack(implDir) {
 function derivePhaseDir(phase, taskPack) {
   const roadmap = readFile(join(PROJECT_ROOT, '.planning/ROADMAP.md'));
 
-  const phaseRegex = new RegExp(`###\\s*Phase ${phase}:\\s*(.+)`, 'i');
+  const phaseRegex = new RegExp(`#{2,3}\\s*Phase ${phase}:\\s*(.+)`, 'i');
   const match = roadmap.match(phaseRegex);
 
   let slug;
@@ -257,7 +291,7 @@ function buildRequirementMapping(taskPack, phase) {
   const roadmap = readFile(join(PROJECT_ROOT, '.planning/ROADMAP.md'));
 
   const phaseReqRegex = new RegExp(
-    `###\\s*Phase ${phase}:.*?[\\s\\S]*?\\*\\*Requirements\\*\\*:\\s*(.+)`,
+    `#{2,3}\\s*Phase ${phase}:[\\s\\S]*?\\*\\*Requirements:?\\*\\*:?\\s*(.+)`,
     'i'
   );
   const reqMatch = roadmap.match(phaseReqRegex);
@@ -313,7 +347,9 @@ function buildRequirementMapping(taskPack, phase) {
       for (const doc of task.source_docs) {
         for (const req of phaseRequirements) {
           if (doc.toUpperCase().includes(req.toUpperCase()) ||
-              doc.toLowerCase().includes(req.toLowerCase())) {
+              doc.toLowerCase().includes(req.toLowerCase()) ||
+              req.toUpperCase().includes(doc.toUpperCase()) ||
+              req.toLowerCase().includes(doc.toLowerCase())) {
             if (!mappedReqs.includes(req)) mappedReqs.push(req);
           }
         }
@@ -322,7 +358,9 @@ function buildRequirementMapping(taskPack, phase) {
       for (const ac of task.acceptance_criteria) {
         for (const req of phaseRequirements) {
           if (ac.toUpperCase().includes(req.toUpperCase()) ||
-              ac.toLowerCase().includes(req.toLowerCase())) {
+              ac.toLowerCase().includes(req.toLowerCase()) ||
+              req.toUpperCase().includes(ac.toUpperCase()) ||
+              req.toLowerCase().includes(ac.toLowerCase())) {
             if (!mappedReqs.includes(req)) mappedReqs.push(req);
           }
         }
@@ -339,7 +377,10 @@ function buildRequirementMapping(taskPack, phase) {
         }
       }
 
-      if (mappedReqs.length === 0) {
+      if (mappedReqs.length === 0 && phaseRequirements.length > 0) {
+        mappedReqs.push(...phaseRequirements);
+        warn(`Task ${task.id} mapped to all phase requirements by fallback.`);
+      } else if (mappedReqs.length === 0) {
         warn(`Task ${task.id} has no requirement mapping.`);
       }
 
@@ -578,6 +619,132 @@ function normalizeFilePath(filePath) {
 
 // ─── files_modified Inference ──────────────────────────────────────────────────
 
+function repoRelative(filePath) {
+  return relative(PROJECT_ROOT, filePath).replace(/\\/g, '/');
+}
+
+function contextAssemblyAvailable() {
+  return fileExists(join(PROJECT_ROOT, 'doc/dev/DEV-002-Context-Assembly.md')) &&
+    fileExists(join(PROJECT_ROOT, 'scripts/docs/assemble-context.mjs'));
+}
+
+function contextTaskTypeForFiles(files) {
+  if (files.some(f => f.startsWith('doc/api/') || f.startsWith('src/go/internal/api/'))) return 'api_change';
+  if (files.some(f => f.startsWith('doc/data/') || f.startsWith('src/go/migrations/'))) return 'data_change';
+  if (files.some(f => f.startsWith('doc/core/'))) return 'business_rule_change';
+  if (files.some(f => f.startsWith('src/go/'))) return 'backend_implementation';
+  if (files.some(f => f.startsWith('skills/') || f.startsWith('doc/skills/'))) return 'skill_change';
+  return 'phase_execution';
+}
+
+function runContextAssembler(args) {
+  return spawnSync(process.execPath, [join(PROJECT_ROOT, 'scripts/docs/assemble-context.mjs'), ...args], {
+    cwd: PROJECT_ROOT,
+    encoding: 'utf8',
+    timeout: 10000,
+    maxBuffer: 1024 * 1024,
+  });
+}
+
+function readContextPackJson(jsonPath) {
+  try {
+    return JSON.parse(readFile(jsonPath));
+  } catch {
+    return null;
+  }
+}
+
+function parseAssemblerPack(stdout) {
+  try {
+    const parsed = JSON.parse(stdout || '{}');
+    return parsed.context_pack || parsed;
+  } catch {
+    return null;
+  }
+}
+
+function ensureContextPackFiles(metadata, pack) {
+  if (!pack) return;
+  const markdownPath = join(PROJECT_ROOT, metadata.phase_pack);
+  const jsonPath = join(PROJECT_ROOT, metadata.phase_pack_json);
+  if (!fileExists(jsonPath)) {
+    mkdirSync(dirname(jsonPath), { recursive: true });
+    writeFileSync(jsonPath, JSON.stringify(pack, null, 2) + '\n');
+  }
+  if (!fileExists(markdownPath)) {
+    mkdirSync(dirname(markdownPath), { recursive: true });
+    writeFileSync(markdownPath, `# Context Pack - ${pack.task?.type || 'phase_execution'}\n\n## Raw Context Pack\n\n\`\`\`json\n${JSON.stringify(pack, null, 2)}\n\`\`\`\n`);
+  }
+}
+
+function contextPackBlocking(pack) {
+  if (!pack) return true;
+  const missing = Array.isArray(pack.missing) ? pack.missing : [];
+  const conflicts = Array.isArray(pack.conflicts) ? pack.conflicts : [];
+  return missing.some(m => m.blocking) || conflicts.some(c => c.blocking);
+}
+
+function initialContextAssemblyMetadata(phaseDir) {
+  const enabled = contextAssemblyAvailable();
+  const phasePack = join(phaseDir, 'AI-CONTEXT-PACK.md');
+  const phasePackJson = join(phaseDir, 'AI-CONTEXT-PACK.json');
+  return {
+    enabled,
+    mode: 'zgsd-plan-phase-plan-gate',
+    phase_pack: repoRelative(phasePack),
+    phase_pack_json: repoRelative(phasePackJson),
+    plans_require_gate: enabled,
+    blocking: false,
+    generated: false,
+    reason: enabled ? null : 'DEV-002 assembler not available in this project',
+  };
+}
+
+function generatePhaseContextPack(phaseDir, phaseSlug) {
+  const metadata = initialContextAssemblyMetadata(phaseDir);
+  if (!metadata.enabled) return metadata;
+
+  const result = runContextAssembler(['--task', 'phase_execution', '--phase', phaseSlug, '--write', metadata.phase_pack]);
+  const emittedPack = parseAssemblerPack(result.stdout);
+  ensureContextPackFiles(metadata, emittedPack);
+  if (result.status !== 0 && !emittedPack) {
+    metadata.blocking = true;
+    metadata.reason = 'phase context assembly failed before emitting a pack';
+    metadata.stderr = String(result.stderr || '').slice(0, 500);
+    return metadata;
+  }
+
+  metadata.generated = Boolean(emittedPack) || fileExists(join(PROJECT_ROOT, metadata.phase_pack_json));
+  if (result.status === 2) {
+    metadata.reason = 'phase context assembly emitted a blocking pack';
+  } else if (result.status && result.status !== 0) {
+    metadata.reason = 'phase context assembly exited non-zero after emitting a pack';
+  }
+  const pack = readContextPackJson(join(PROJECT_ROOT, metadata.phase_pack_json)) || emittedPack;
+  metadata.blocking = contextPackBlocking(pack);
+  metadata.missing_blocking_count = pack?.missing?.filter(m => m.blocking).length || 0;
+  metadata.conflict_blocking_count = pack?.conflicts?.filter(c => c.blocking).length || 0;
+  return metadata;
+}
+
+function buildContextAssemblyGate(phaseSlug, planId, filesModified, contextAssembly) {
+  if (!contextAssembly.enabled) {
+    return `## 0. Context Assembly Gate\n\nContext Assembly is not enabled for this project. Reason: ${contextAssembly.reason || 'assembler unavailable'}.\n`;
+  }
+
+  const targetFiles = filesModified.length > 0 ? filesModified.join(',') : '';
+  const taskType = contextTaskTypeForFiles(filesModified);
+  const commandParts = [
+    'node scripts/docs/assemble-context.mjs',
+    `  --task ${taskType}`,
+    `  --phase ${phaseSlug}`,
+  ];
+  if (targetFiles) commandParts.push(`  --target-files ${targetFiles}`);
+  commandParts.push(`  --write ${contextAssembly.phase_pack}`);
+
+  return `## 0. Context Assembly Gate\n\nBefore implementation, load or regenerate the Context Pack. This gate is generated by \`zgsd-plan-phase\` and is required by \`doc/dev/DEV-002-Context-Assembly.md\`.\n\n\`\`\`bash\n${commandParts.join(' \\\n')}\n\`\`\`\n\nRequired pack:\n- \`${contextAssembly.phase_pack}\`\n- \`${contextAssembly.phase_pack_json}\`\n\nPlan context:\n- plan_id: \`${planId}\`\n- inferred_task_type: \`${taskType}\`\n- target_files: ${filesModified.length > 0 ? filesModified.map(f => `\`${f}\``).join(', ') : '_none inferred_'}\n\nIf the pack reports blocking \`missing\` or \`conflicts\`, stop before editing code.\n`;
+}
+
 function inferFilesModified(plan, taskPack) {
   const files = new Set();
 
@@ -632,8 +799,14 @@ function inferFilesModified(plan, taskPack) {
           files.add(`${APP_DIR}/src/`);
         } else if (slug.includes('eslint') || slug.includes('arch')) {
           files.add(`${APP_DIR}/.eslintrc.`);
+        } else if (slug.includes('http') || slug.includes('api')) {
+          files.add('src/go/internal/api/');
+        } else if (slug.includes('cli')) {
+          files.add('src/go/cmd/');
+        } else if (slug.includes('repo') || slug.includes('service') || slug.includes('trace')) {
+          files.add('src/go/internal/');
         } else if (slug.includes('test')) {
-          files.add(`${APP_DIR}/tests/`);
+          files.add(APP_DIR === '.' ? 'src/go/' : `${APP_DIR}/tests/`);
         }
       }
     }
@@ -684,7 +857,7 @@ ${taskPack.index ? taskPack.index.split('## 关键路径')[1] || 'See INDEX.md' 
 | Reference | Path |
 |-----------|------|
 | Task Pack | \`${implDir}/\` |
-| Guardrails | \`rules/agent-coding-guardrails.md\` |
+| Guardrails | \`${guardrailsReference()}\` |
 | Constitution | \`AI_CONSTITUTION.md\` |
 | Agents | \`AGENTS.md\` |
 `;
@@ -693,7 +866,7 @@ ${taskPack.index ? taskPack.index.split('## 关键路径')[1] || 'See INDEX.md' 
   success(`Generated ${padded}-CONTEXT.md`);
 }
 
-function generateTaskBridge(phase, phaseDir, taskPack, planMap, requirementMapping, padded, slug, implDir) {
+function generateTaskBridge(phase, phaseDir, taskPack, planMap, requirementMapping, padded, slug, implDir, contextAssembly) {
   info('Generating TASK-BRIDGE.json...');
 
   const plans = Object.values(planMap).map(p => ({
@@ -710,7 +883,7 @@ function generateTaskBridge(phase, phaseDir, taskPack, planMap, requirementMappi
     for (const taskId of plan.sourceTasks) {
       taskMapping[taskId] = {
         plan_id: plan.planId,
-        task_file: readdirSync(resolve(implDir)).find(f => f.startsWith(`task-${taskId.slice(5)}-`)) || `${taskId}.md`,
+        task_file: taskFileNameForId(implDir, taskId),
         status: 'mapped',
       };
     }
@@ -774,6 +947,7 @@ function generateTaskBridge(phase, phaseDir, taskPack, planMap, requirementMappi
       app_dir: APP_DIR,
       normalized_paths: normalizedPaths,
     },
+    context_assembly: contextAssembly,
   };
 
   writeFileSync(join(phaseDir, `${padded}-TASK-BRIDGE.json`), JSON.stringify(bridge, null, 2));
@@ -781,7 +955,7 @@ function generateTaskBridge(phase, phaseDir, taskPack, planMap, requirementMappi
   return bridge;
 }
 
-function generatePlans(phase, phaseDir, planMap, taskPack, requirementMapping, padded, slug, implDir) {
+function generatePlans(phase, phaseDir, planMap, taskPack, requirementMapping, padded, slug, implDir, contextAssembly) {
   info('Generating PLAN.md files...');
 
   for (const [planId, plan] of Object.entries(planMap)) {
@@ -797,21 +971,12 @@ function generatePlans(phase, phaseDir, planMap, taskPack, requirementMapping, p
       const readFirst = [
         'AGENTS.md',
         'AI_CONSTITUTION.md',
-        'rules/agent-coding-guardrails.md',
-        `${implDir}/${taskId}-*.md`,
+        guardrailsReference(),
+        `${implDir}/${taskFileNameForId(implDir, taskId)}`,
         `${implDir}/feature-context.md`,
       ];
 
-      const verifyCommands = ['npm run lint', 'npm run typecheck'];
-      if (plan.requirements.some(r => r.includes('FOUND-6'))) {
-        verifyCommands.push('npm run test:arch');
-      }
-      if (plan.sourceTasks.some(t => t.includes('test'))) {
-        verifyCommands.push('npm run test');
-      }
-      if (plan.sourceTasks.includes(taskId) && taskId === plan.sourceTasks[plan.sourceTasks.length - 1]) {
-        verifyCommands.push('npm run build');
-      }
+      const verifyCommands = ['make -C src/go test'];
 
       return `  <task>
     <name>${task?.name || taskId}</name>
@@ -836,13 +1001,16 @@ ${inferFilesModified(plan, taskPack).map(f => `      <file>${f}</file>`).join('\
   </task>`;
     }).join('\n');
 
+    const filesModified = inferFilesModified(plan, taskPack);
+    const contextGate = buildContextAssemblyGate(`${padded}-${slug}`, planId, filesModified, contextAssembly);
+
     const content = `---
 phase: ${padded}-${slug}
 plan: "${planNum}"
 type: execute
 wave: ${plan.wave}
 depends_on: ${JSON.stringify(plan.dependsOn)}
-files_modified: ${JSON.stringify(inferFilesModified(plan, taskPack))}
+files_modified: ${JSON.stringify(filesModified)}
 autonomous: true
 requirements: ${JSON.stringify(plan.requirements)}
 user_setup: []
@@ -854,12 +1022,14 @@ ${(taskPack.taskList.tasks.filter(t => plan.sourceTasks.includes(t.id))
     .map(ac => `    - "${ac.replace(/"/g, '\\"')}"`)
     .join('\n')) || '    - "See acceptance criteria below"'}
   artifacts:
-${inferFilesModified(plan, taskPack).map(f => `    - "${f}"`).join('\n') || '    - "See files_modified"'}
+${filesModified.map(f => `    - "${f}"`).join('\n') || '    - "See files_modified"'}
   key_links:
     - "See acceptance criteria for wiring requirements"
 ---
 
 # Plan ${planNum}: ${plan.name}
+
+${contextGate}
 
 ## Objective
 
@@ -877,7 +1047,7 @@ Dependencies: ${plan.dependsOn.length > 0 ? plan.dependsOn.join(', ') : 'None'}
 Read the following before execution:
 - \`AGENTS.md\` — Project agent orchestration rules
 - \`AI_CONSTITUTION.md\` — Project constitution and principles
-- \`rules/agent-coding-guardrails.md\` — Coding guardrails
+- \`${guardrailsReference()}\` — Coding guardrails
 - \`${padded}-CONTEXT.md\` — Phase context and locked decisions
 
 ## Tasks
@@ -888,18 +1058,8 @@ ${xmlTasks}
 
 After completing all tasks, run:
 \`\`\`bash
-cd ${APP_DIR}
-npm run lint
-npm run typecheck
+make -C src/go test
 \`\`\`
-
-${plan.requirements.some(r => r.includes('FOUND-6')) ? `\`\`\`bash
-npm run test:arch
-\`\`\`` : ''}
-
-${plan.sourceTasks.some(t => t.includes('test')) ? `\`\`\`bash
-npm run test
-\`\`\`` : ''}
 
 ## Success Criteria
 
@@ -995,6 +1155,7 @@ function generateQualityMap(phase, phaseDir, taskPack, planMap, requirementMappi
     };
   }
 
+  const padded = String(phase).padStart(2, '0');
   const qualityMap = {
     schema_version: '1.0',
     phase: String(phase),
@@ -1126,6 +1287,10 @@ function runValidationGates(phase, phaseDir, taskPack, planMap, requirementMappi
     if (!plan.sourceTasks || plan.sourceTasks.length === 0) {
       errors.push(`Plan ${planId} has no source tasks.`);
     }
+  }
+
+  if (bridge.context_assembly?.enabled && bridge.context_assembly.blocking) {
+    errors.push('Context Assembly phase pack has blocking missing/conflicts. Regenerate or resolve before execution.');
   }
 
   if (errors.length > 0) {
@@ -1281,8 +1446,13 @@ async function main() {
   mkdirSync(phaseDir, { recursive: true });
 
   generateContext(args.phase, phaseDir, taskPack, padded, slug, args.impl);
-  const bridge = generateTaskBridge(args.phase, phaseDir, taskPack, planMap, requirementMapping, padded, slug, args.impl);
-  generatePlans(args.phase, phaseDir, planMap, taskPack, requirementMapping, padded, slug, args.impl);
+  const initialContextAssembly = initialContextAssemblyMetadata(phaseDir);
+  generatePlans(args.phase, phaseDir, planMap, taskPack, requirementMapping, padded, slug, args.impl, initialContextAssembly);
+  const contextAssembly = generatePhaseContextPack(phaseDir, `${padded}-${slug}`);
+  if (contextAssembly.enabled && contextAssembly.blocking) {
+    warn('Context Assembly generated a blocking phase pack. Bridge validation will reject execution.');
+  }
+  const bridge = generateTaskBridge(args.phase, phaseDir, taskPack, planMap, requirementMapping, padded, slug, args.impl, contextAssembly);
   generateQualityMap(args.phase, phaseDir, taskPack, planMap, requirementMapping, args.impl);
   generateValidation(args.phase, phaseDir, taskPack, requirementMapping, padded, slug);
 

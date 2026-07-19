@@ -1,0 +1,27 @@
+{
+  "target": {
+    "kind": "skill-design",
+    "ref": "./skills/zdoc-i2i/SKILL.md"
+  },
+  "rubric": {
+    "id": "skill-design",
+    "version": "1.0.0"
+  },
+  "judges": [
+    { "id": "j-corr", "role": "correctness", "weight": 1.0 },
+    { "id": "j-comp", "role": "completeness", "weight": 1.0 },
+    { "id": "j-clr",  "role": "clarity", "weight": 0.8 }
+  ],
+  "adjudicator": {
+    "strategy": "weighted-mean",
+    "human_in_loop": false
+  },
+  "baseline": {
+    "mode": "compare",
+    "baseline_id": "sha256:abc123..."
+  },
+  "replay": {
+    "seed": "fixed-seed-001",
+    "snapshot_inputs": true
+  }
+}

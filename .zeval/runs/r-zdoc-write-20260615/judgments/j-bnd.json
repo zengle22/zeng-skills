@@ -1,0 +1,17 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.92,
+  "level": "excellent",
+  "weight": 1.5,
+  "rationale": "Boundary clarity is excellent. 'Not Equal To' section explicitly lists 4 things it is NOT. Section 1.2 non-goals lists 4 concrete non-goals with specific alternative skills. Workflow Boundary repeats the out-of-scope list. Non-negotiable Rule #5 explicitly prevents scope creep. All non-goals are actionable and verifiable.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:31","quote":"## Not Equal To"},
+    {"kind":"line","ref":"SKILL.md:33","quote":"- Not a document editor（从零撰写，不修改已有文档）"},
+    {"kind":"line","ref":"SKILL.md:63","quote":"### 1.2 非目标"},
+    {"kind":"line","ref":"SKILL.md:65","quote":"- **不修改已有文档**：除非用户明确请求更新，否则只从零撰写新文档。"},
+    {"kind":"line","ref":"SKILL.md:712","quote":"## Workflow Boundary"},
+    {"kind":"line","ref":"SKILL.md:716","quote":"- 不修改已有文档（除非用户明确要求更新）"},
+    {"kind":"line","ref":"SKILL.md:728","quote":"5. **不越界**：不同类型文档的内容不混写（如 PRD 不写 API 端点细节）"}
+  ]
+}

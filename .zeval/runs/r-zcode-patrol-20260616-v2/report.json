@@ -1,0 +1,81 @@
+{
+  "run_id": "r-zcode-patrol-20260616-v2",
+  "request_hash": "sha256:3f8a9c2e1b4d5f6e7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.88,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "SKILL.md 覆盖所有必备章节：1. 目标与非目标（1.1/1.2）明确存在；2. 输入/输出（2.1/2.2/2.3）完整，含参数表、输出产物表、退出码；3. 执行步骤（3.0）存在，且详细展开为 5 阶段；4. 何时使用/何时不使用在目标与非目标中明确区分。扣分点：缺少独立的 '何时使用/何时不使用' 显式章节（rubrics 要求 'When NOT' 区分），且执行步骤仅列出 5 阶段标题，缺少每个阶段内的详细子步骤（如 Discovery 阶段的排除规则具体是什么）。",
+      "evidence_refs": [
+        {"kind": "line", "ref": "skills/zcode-patrol/SKILL.md:17-32", "quote": "## 1. 目标与非目标 ... 1.1 目标 ... 1.2 非目标"},
+        {"kind": "line", "ref": "skills/zcode-patrol/SKILL.md:33-63", "quote": "## 2. 输入/输出 ... 2.1 输入 ... 2.2 输出 ... 2.3 退出码"},
+        {"kind": "line", "ref": "skills/zcode-patrol/SKILL.md:64-73", "quote": "## 3. 执行步骤 ... 1. Initialize ... 2. Discovery ... 3. Scan ... 4. Aggregation ... 5. Reporting"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.92,
+      "level": "excellent",
+      "weight": 1.5,
+      "rationale": "目标/非目标二分极其明确。非目标（1.2）列出 4 条具体可验证的边界：'不替代 ESLint/SonarQube'、'不做运行时分析'、'不修改源文件（只读）'、'不做 gate 决策'。每条均可直接验证——例如检查是否调用了测试框架或执行了写操作。此外，'Non-Negotiable Rules' 章节进一步强化了边界，以否定句式列出 5 条红线。",
+      "evidence_refs": [
+        {"kind": "line", "ref": "skills/zcode-patrol/SKILL.md:26-31", "quote": "### 1.2 非目标\n- 不替代 ESLint、Pylint、SonarQube（定位为补充/聚合层）\n- 不做运行时分析或测试执行（纯静态分析）\n- 不修改源文件（只读巡检）\n- 不做 gate 决策（仅产出证据，不替人判断）"},
+        {"kind": "line", "ref": "skills/zcode-patrol/SKILL.md:196-203", "quote": "## Non-Negotiable Rules\n- 不修改源文件（read-only）\n- 不执行测试或运行时分析\n- 不做 gate 决策（仅产出证据）\n- 不捏造统计数据（计数必须匹配原始证据）\n- 工具不可用时优雅跳过，不崩溃"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.85,
+      "level": "good",
+      "weight": 1.0,
+      "rationale": "Usage 章节提供 4 条具体命令示例，每条均含完整命令、参数、预期产物说明。示例覆盖全量扫描、增量扫描+基线对比、限制范围+JSON格式、高严重级别过滤 4 种典型场景。扣分点：缺少对预期输出内容的 snippet 展示（如 report.json 的结构示例），且未提供 --baseline 参数的完整路径格式示例（仅给出占位符 xxx）。",
+      "evidence_refs": [
+        {"kind": "line", "ref": "skills/zcode-patrol/SKILL.md:214-234", "quote": "## Usage\n\n在 Claude Code 中调用：\n\n```\n# 全量扫描，输出到默认目录\n/zcode-patrol --paths src/ --scope full\n# 预期产物：...\n\n# 增量扫描，对比基线\n/zcode-patrol --paths src/ --scope delta --baseline .zcode-patrol/20260527-120000-xxx/report.json\n# 预期产物：上述文件 + baseline-diff.json\n\n# 限制扫描范围与输出格式\n/zcode-patrol --paths src/ tests/ --scope targeted --max-files 200 --format json\n# 预期产物：...\n\n# 仅关注高严重级别问题\n/zcode-patrol --paths src/ --min-severity P1 --output-dir ./reports/patrol\n# 预期产物：...\n```"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.95,
+      "level": "excellent",
+      "weight": 0.8,
+      "rationale": "Pitfalls 章节列出 5 条具体坑，每条均含'影响'和'规避'两列，形成完整的风险-对策矩阵。覆盖 max-files 截断、基线路径漂移、L3 工具缺失、severity 过滤过宽、shallow clone 中 git blame 失效，均为该技能真实高概率风险点。",
+      "evidence_refs": [
+        {"kind": "line", "ref": "skills/zcode-patrol/SKILL.md:204-212", "quote": "## Pitfalls / 常见坑与规避\n\n| 坑 | 影响 | 规避 |\n|------|------|------|\n| **max-files 超限截断** | ... | ... |\n| **baseline 路径漂移** | ... | ... |\n| **L3 工具未安装** | ... | ... |\n| **severity 过滤过宽** | ... | ... |\n| **git blame 在 shallow clone 中失效** | ... | ... |"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass",
+    "score": 0.89,
+    "rationale": "加权平均得分 0.89，高于 pass_threshold 0.75。所有维度均达到 good 或以上，无 fail 维度。边界清晰度（0.92）和 pitfalls（0.95）表现 excellent，completeness（0.88）和 examples-runnable（0.85）表现 good。",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "pass",
+    "code": "PASS",
+    "message": "All dimensions scored good or above. Weighted mean 0.89 >= threshold 0.75."
+  },
+  "artifacts": {
+    "report_path": ".zeval/runs/r-zcode-patrol-20260616-v2/report.json",
+    "raw_judgments": [
+      ".zeval/runs/r-zcode-patrol-20260616-v2/judgments/j-comp.json",
+      ".zeval/runs/r-zcode-patrol-20260616-v2/judgments/j-bnd.json",
+      ".zeval/runs/r-zcode-patrol-20260616-v2/judgments/j-ex.json",
+      ".zeval/runs/r-zcode-patrol-20260616-v2/judgments/j-pit.json"
+    ],
+    "replay_bundle": ".zeval/runs/r-zcode-patrol-20260616-v2/replay_bundle/"
+  },
+  "meta": {
+    "created_at": "2026-06-16T00:00:00Z",
+    "duration_ms": 120000,
+    "model_versions": {"evaluator": "kimi-for-coding"}
+  }
+}

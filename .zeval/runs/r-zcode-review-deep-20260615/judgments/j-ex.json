@@ -1,0 +1,12 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.85,
+  "level": "good",
+  "rationale": "Three concrete CLI examples with full commands and parameters for commit, pr, and module modes. No expected output shown. Commands are realistic and match the argument-hint. Missing expected output or sample results prevents 'excellent' rating.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:145","quote":"/zcode-review-deep --mode commit --ref HEAD~1"},
+    {"kind":"line","ref":"SKILL.md:146","quote":"/zcode-review-deep --mode pr --base main --head feature/x"},
+    {"kind":"line","ref":"SKILL.md:147","quote":"/zcode-review-deep --mode module --path src/services/order/"}
+  ]
+}

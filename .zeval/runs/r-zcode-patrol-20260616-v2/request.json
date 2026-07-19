@@ -1,0 +1,38 @@
+{
+  "run_id": "r-zcode-patrol-20260616-v2",
+  "target": {
+    "kind": "skill-design",
+    "path": "skills/zcode-patrol/SKILL.md"
+  },
+  "rubric": {
+    "id": "skill-design",
+    "version": "1.0.0"
+  },
+  "judges": [
+    {
+      "id": "j-comp",
+      "dimension": "completeness",
+      "weight": 1.0,
+      "evidence_required": true
+    },
+    {
+      "id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "weight": 1.5,
+      "evidence_required": true
+    },
+    {
+      "id": "j-ex",
+      "dimension": "examples-runnable",
+      "weight": 1.0,
+      "evidence_required": true
+    },
+    {
+      "id": "j-pit",
+      "dimension": "pitfalls",
+      "weight": 0.8,
+      "evidence_required": false
+    }
+  ],
+  "created_at": "2026-06-16T00:00:00Z"
+}

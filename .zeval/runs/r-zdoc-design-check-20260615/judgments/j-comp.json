@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.65,
+  "level": "good",
+  "rationale": "SKILL.md covers most critical sections: input/output model (line 91), execution protocol (line 126), workflow boundary (line 213), non-goals in 'Not Equal To' (line 29), and severity levels. However, it lacks an explicit numbered '目标与非目标' section as required by the rubric's required_signals. The 'Not Equal To' section serves as non-goals but is not labeled as such. Execution steps are present but not in a numbered '执行步骤' heading. Missing a dedicated '何时使用/何时不使用' section beyond the boundary baseline.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:29", "quote": "## Not Equal To\n- Not a replacement for zdoc-quality-loop\n- Not a document editor\n- Not a gate decision maker\n- Not a SSOT formalization tool"},
+    {"kind": "line", "ref": "SKILL.md:91", "quote": "## 输入模型\n| 模式 | 输入 | 可执行的检查 | XC 跨维度 |"},
+    {"kind": "line", "ref": "SKILL.md:126", "quote": "## Execution Protocol\n### 执行流程\n#### 阶段 1: 文档读取与上下文构建"},
+    {"kind": "line", "ref": "SKILL.md:213", "quote": "## Workflow Boundary\n- **Input**: Document path(s)\n- **Output**: Validation artifact bundle\n- **Out of scope**: Document editing or correction; SSOT formalization"},
+    {"kind": "line", "ref": "SKILL.md:224", "quote": "## Non-Negotiable Rules\n- Do not modify source documents under any circumstance."}
+  ]
+}

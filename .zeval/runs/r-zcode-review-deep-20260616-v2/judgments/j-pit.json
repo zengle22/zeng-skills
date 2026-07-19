@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 0.8,
+  "rationale": "列出5条 pitfall，每条均带影响说明与具体规避措施。覆盖 Agent 选择、合并去重、P0 证据链、磁盘持久化、 severity 误标等关键风险点。",
+  "evidence_refs": [
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "Agent 选择过少（<2）" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "Moderator 合并时过度去重" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "P0 问题缺乏代码证据" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "输出产物未写入磁盘即中断" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "纯风格问题标记为 P0/P1" }
+  ]
+}

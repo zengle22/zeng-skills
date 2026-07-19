@@ -1,0 +1,17 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 0.8,
+  "rationale": "共列出 6 条 pitfall，每条均包含：坑的名称、具体影响、可操作的规避方法。覆盖平行目录、孤立模块、重复造轮子、覆盖率阈值造假、跳过自我 review、跳过测试设计等典型风险。表格形式清晰，可直接作为 check-list 使用。",
+  "evidence_refs": [
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## Pitfalls / 常见坑与规避" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **创建平行目录结构** | 模块路径断裂... | 始终在现有根目录... |" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **只写孤立模块不做集成** | 新代码无法被现有工作流调用... | 每次新增模块必须标明调用路径... |" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **跳过同类实现搜索直接造轮子** | 架构腐化... | 动手前强制搜索关键字... |" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **修改覆盖率阈值或屏蔽失败用例来制造绿灯** | 质量信号失真... | 覆盖率阈值与通过标准属于治理红线... |" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **不经自我 review 就宣称完成** | 低级错误遗漏... | 最终输出必须包含结构化 safety_checklist... |" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "| **在不支持测试的环境中跳过测试设计** | 改动无验证手段... | 即使无法运行也要写出测试策略... |" }
+  ]
+}

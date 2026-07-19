@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.85,
+  "level": "good",
+  "rationale": "Four concrete command examples with full flags and parameters. Each includes expected output paths. One minor gap: no example shows actual sample output content (e.g., a snippet of design-check.json), but commands are complete and runnable.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:310", "quote": "zdoc-design-check --dir docs/ --project my-project --domain all"},
+    {"kind": "line", "ref": "SKILL.md:317", "quote": "zdoc-design-check --input docs/prd/xxx-prd.md --domain business"},
+    {"kind": "line", "ref": "SKILL.md:323", "quote": "zdoc-design-check --dir docs/ --layer gate-only"},
+    {"kind": "line", "ref": "SKILL.md:313", "quote": "{output_dir}/DC-20260616-001/design-check.json"}
+  ]
+}

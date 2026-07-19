@@ -1,6 +1,6 @@
 # Zeng Skills
 
-[![Skills](https://img.shields.io/badge/skills-8-blue)](./)
+[![Skills](https://img.shields.io/badge/skills-9-blue)](./)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 个人全局自定义 AI Agent Skill 集合，主要用于 Claude Code / Codex 及其他兼容 Agent Skill 协议的运行时。
@@ -35,6 +35,12 @@
 | [`zcode-safe-dev`](./skills/zcode-safe-dev) | 临时安全编码助手（6 条硬约束 + 自检清单） | 修改项目代码时，作为编码阶段的硬约束与自检流程 |
 | [`zcode-patrol`](./skills/zcode-patrol) | 代码库自动化巡检（8 大维度） | 定期扫描代码库，发现风格漂移、架构腐化、安全漏洞等问题 |
 | [`zcode-review-deep`](./skills/zcode-review-deep) | 多智能体深度代码审查（Commit/PR/模块并行专项审查） | 关键 PR 的深度审查，生成结构化修复任务与报告 |
+
+### 评估与基线
+
+| Skill | 描述 | 适用场景 |
+|-------|------|----------|
+| [`zeval-skill`](./skills/zeval-skill) | 通用评估引擎（多视角评审 + 回归基线 + Gate） | 对 skill 设计 / agent run / 文档 / 代码 diff 执行结构化评估，输出可被 CI 消费的 gate 结果 |
 
 ---
 

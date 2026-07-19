@@ -1,0 +1,19 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.92,
+  "level": "excellent",
+  "rationale": "Boundary clarity is excellent. Non-goals (1.2) are explicitly listed with 5 concrete, verifiable items: no source doc modification, no code generation, no gate decision, does not replace Design Check, no inventing missing info. Runtime Boundary Baseline (line 116) reinforces 7 constraints. The 21 Non-Negotiable Rules (line 1164) further harden boundaries. Each phase has clear BLOCK/CONDITIONAL/PASS states. Evidence is line-referenced and directly quotable.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:28", "quote": "### 1.2 非目标"},
+    {"kind": "line", "ref": "SKILL.md:30", "quote": "- **不修改源文档**：只读取设计文档，不修改任何输入文件（状态冻结除外）"},
+    {"kind": "line", "ref": "SKILL.md:31", "quote": "- **不生成代码**：产出实施计划文档（task-*.md + INDEX.md + SUMMARY.md），不产出业务代码"},
+    {"kind": "line", "ref": "SKILL.md:32", "quote": "- **不做 gate 决策**：evidence-only，汇总报告供人工确认，不自动判定通过/不通过"},
+    {"kind": "line", "ref": "SKILL.md:33", "quote": "- **不替代 Design Check**：`zdoc-design-check` 校验设计质量，`zdoc-i2i` 做实施转化，两者互补"},
+    {"kind": "line", "ref": "SKILL.md:34", "quote": "- **不补充缺失信息**：不发明设计文档中没有的功能、技术方案或业务规则"},
+    {"kind": "line", "ref": "SKILL.md:116", "quote": "## Runtime Boundary Baseline"},
+    {"kind": "line", "ref": "SKILL.md:120", "quote": "- **Read-only** — does NOT modify source design documents."},
+    {"kind": "line", "ref": "SKILL.md:121", "quote": "- **只整合不补充** — does NOT invent features, tech solutions, or business rules not in input docs."},
+    {"kind": "line", "ref": "SKILL.md:1164", "quote": "## Non-Negotiable Rules"}
+  ]
+}

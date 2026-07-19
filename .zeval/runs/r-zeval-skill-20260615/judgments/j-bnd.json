@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.9,
+  "level": "excellent",
+  "rationale": "Explicit goals/non-goals dichotomy in section 1.1/1.2. Non-goals are concrete and verifiable (e.g., 'Not a source code fixer', 'Not a real-time monitor'). No fail_if conditions triggered.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:24","quote":"## 1. 目标与非目标"},
+    {"kind":"line","ref":"SKILL.md:34","quote":"Not a source code fixer — 评估产出评分卡 + 修复建议，不生成 patch"},
+    {"kind":"line","ref":"SKILL.md:35","quote":"Not a replacement for human review — 人类在 loop 中作为最终仲裁"},
+    {"kind":"line","ref":"SKILL.md:36","quote":"Not a real-time monitor — 是批/触发型，不做 metrics dashboard"},
+    {"kind":"line","ref":"SKILL.md:37","quote":"Not a training/eval benchmark — 不读训练数据、不调权重"},
+    {"kind":"line","ref":"SKILL.md:38","quote":"Not opinionated on aesthetics — 美学/品味/灵感等无客观证据的领域不进入 v1 rubric"}
+  ]
+}

@@ -1,0 +1,20 @@
+run_id: r-zcode-patrol-20260615
+skill: zcode-patrol
+target_ref: skills/zcode-patrol/SKILL.md
+rubric: skill-design@1.0.0
+status: completed
+adjudication:
+  strategy: weighted-mean
+  pass_threshold: 0.75
+  fail_threshold: 0.45
+  any_dimension_fail_blocks: false
+  total_score: 0.75
+  verdict: pass
+  gate: pass
+scores:
+  completeness: 0.75
+  boundary-clarity: 0.85
+  examples-runnable: 0.80
+  pitfalls: 0.50
+weakest_dimension: pitfalls
+validation_ok: true

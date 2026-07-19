@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.88,
+  "level": "good",
+  "weight": 1.0,
+  "rationale": "主要章节齐全且内容充实。具备目标/非目标、输入/输出、执行步骤、执行模型、输出 schema、severity 级别、目录结构、验证、non-negotiable rules、pitfalls、usage 等章节。扣分点：1) 缺少独立的 '何时使用 / 何时不使用' 章节（虽然非目标部分有类似内容，但 rubric 要求显式章节）；2) 缺少 '前置条件' 或 '依赖' 章节（如 pip install jsonschema 仅在验证节出现）；3) 缺少 '错误处理' 独立章节（仅在退出码表格中体现）。",
+  "evidence_refs": [
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "## 1. 目标与非目标" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "## 2. 输入/输出" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "## 3. 执行步骤" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "## Execution Protocol" }
+  ]
+}

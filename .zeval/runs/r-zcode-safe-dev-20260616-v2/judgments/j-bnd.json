@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 1.5,
+  "rationale": "目标与非目标二分极为明确。1.1 列出 4 项目标，1.2 列出 5 项非目标，每条非目标均以‘不是…’开头，具体可验证（如‘不是通用代码生成器’、‘不是 L2/L3 评审的绕过工具’）。另有‘绝对禁止的行为’章节以 6 条硬约束进一步划定边界，含触发条件与后果说明。",
+  "evidence_refs": [
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "### 1.1 目标" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "### 1.2 非目标" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "- **不是通用代码生成器**：本技能仅针对 LEE 项目既有代码的修改与扩展" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "- **不是 L2/L3 评审的绕过工具**：高风险改动...必须交由人类评审" },
+    { "kind": "file", "ref": "skills/zcode-safe-dev/SKILL.md", "quote": "## 绝对禁止的行为（看到这些需求要拒绝并提醒）" }
+  ]
+}

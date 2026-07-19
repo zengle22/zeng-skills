@@ -15,17 +15,19 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const PROJECT_ROOT = resolve(__dirname, '../../..');
+let PROJECT_ROOT = resolve(__dirname, '../../..');
 
 // ─── CLI Argument Parsing ──────────────────────────────────────────────────────
 
 function parseArgs(argv) {
   const args = argv.slice(2);
-  const result = { phase: null };
+  const result = { phase: null, projectRoot: null };
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--phase' && args[i + 1]) {
       result.phase = args[++i];
+    } else if (args[i] === '--project-root' && args[i + 1]) {
+      result.projectRoot = args[++i];
     } else if (/^\d+$/.test(args[i]) && !result.phase) {
       result.phase = args[i];
     }
@@ -58,6 +60,34 @@ function fileExists(path) {
 
 function readFile(path) {
   return readFileSync(path, 'utf-8');
+}
+
+function validateContextAssemblyPack(phaseDir, bridge) {
+  const errors = [];
+  const ca = bridge?.context_assembly;
+  if (!ca || ca.enabled !== true) return errors;
+
+  const packPath = join(phaseDir, 'AI-CONTEXT-PACK.md');
+  const packJsonPath = join(phaseDir, 'AI-CONTEXT-PACK.json');
+  if (!fileExists(packPath)) errors.push('AI-CONTEXT-PACK.md missing while context_assembly is enabled');
+  if (!fileExists(packJsonPath)) {
+    errors.push('AI-CONTEXT-PACK.json missing while context_assembly is enabled');
+    return errors;
+  }
+
+  let pack;
+  try {
+    pack = JSON.parse(readFile(packJsonPath));
+  } catch (e) {
+    errors.push(`AI-CONTEXT-PACK.json invalid JSON: ${e.message}`);
+    return errors;
+  }
+
+  const blockingMissing = Array.isArray(pack.missing) ? pack.missing.filter(m => m.blocking) : [];
+  const blockingConflicts = Array.isArray(pack.conflicts) ? pack.conflicts.filter(c => c.blocking) : [];
+  if (blockingMissing.length > 0) errors.push(`AI-CONTEXT-PACK.json has ${blockingMissing.length} blocking missing item(s)`);
+  if (blockingConflicts.length > 0) errors.push(`AI-CONTEXT-PACK.json has ${blockingConflicts.length} blocking conflict(s)`);
+  return errors;
 }
 
 // ─── Bridge Manifest Validation ────────────────────────────────────────────────
@@ -155,6 +185,20 @@ function validateBridgeManifest(bridgePath) {
     }
   }
 
+  // context assembly metadata
+  if (bridge.context_assembly) {
+    const ca = bridge.context_assembly;
+    if (ca.enabled === true) {
+      if (ca.mode !== 'zgsd-plan-phase-plan-gate') {
+        errors.push(`context_assembly.mode must be "zgsd-plan-phase-plan-gate", got "${ca.mode}"`);
+      }
+      if (!ca.phase_pack) errors.push('context_assembly.phase_pack is required when enabled');
+      if (!ca.phase_pack_json) errors.push('context_assembly.phase_pack_json is required when enabled');
+      if (ca.plans_require_gate !== true) errors.push('context_assembly.plans_require_gate must be true when enabled');
+      if (ca.blocking === true) errors.push('context_assembly reports blocking missing/conflicts');
+    }
+  }
+
   // validation flags
   if (!bridge.validation) {
     errors.push('Missing validation object');
@@ -229,6 +273,13 @@ function validatePlanContract(planPath) {
   // XML task validation
   const body = content.slice(fmMatch[0].length).trim();
 
+  if (!/##\s+0\.\s+Context Assembly Gate/i.test(body)) {
+    errors.push('Body missing required section: ## 0. Context Assembly Gate');
+  }
+  if (!/AI-CONTEXT-PACK\.md/.test(body) || !/AI-CONTEXT-PACK\.json/.test(body)) {
+    errors.push('Context Assembly Gate must reference AI-CONTEXT-PACK.md and AI-CONTEXT-PACK.json');
+  }
+
   const requiredSections = ['objective', 'tasks', 'verification', 'success.?criteria'];
   for (const section of requiredSections) {
     const re = new RegExp(`##\\s+${section}`, 'i');
@@ -298,8 +349,12 @@ function main() {
   const args = parseArgs(process.argv);
 
   if (!args.phase) {
-    console.error('Usage: node validate-bridge.mjs --phase <n>');
+    console.error('Usage: node validate-bridge.mjs --phase <n> [--project-root <path>]');
     process.exit(1);
+  }
+
+  if (args.projectRoot) {
+    PROJECT_ROOT = resolve(args.projectRoot);
   }
 
   console.log('\n\x1b[1m═══════════════════════════════════════════════════════════════\x1b[0m');
@@ -328,12 +383,25 @@ function main() {
 
   // Validate TASK-BRIDGE.json
   const bridgePath = join(phaseDir, `${padded}-TASK-BRIDGE.json`);
+  let bridge = null;
   if (!fileExists(bridgePath)) {
     fail(`${padded}-TASK-BRIDGE.json not found`);
     allValid = false;
   } else {
-    const { valid } = validateBridgeManifest(bridgePath);
-    if (!valid) allValid = false;
+    const result = validateBridgeManifest(bridgePath);
+    bridge = result.bridge;
+    if (!result.valid) allValid = false;
+  }
+
+  if (bridge?.context_assembly?.enabled === true) {
+    info('\nValidating Context Assembly pack...');
+    const contextErrors = validateContextAssemblyPack(phaseDir, bridge);
+    if (contextErrors.length === 0) {
+      success('Context Assembly pack valid.');
+    } else {
+      for (const err of contextErrors) fail(`Context Assembly: ${err}`);
+      allValid = false;
+    }
   }
 
   // Validate PLAN.md files

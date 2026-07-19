@@ -1,0 +1,6 @@
+run_id: r-zcode-safe-dev-20260616-v2
+skill: zcode-safe-dev
+eval_date: 2026-06-16
+rubric: skill-design@v1.0.0
+evaluator: outer-agent
+model: kimi-for-coding

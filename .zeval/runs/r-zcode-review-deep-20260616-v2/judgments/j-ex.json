@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.85,
+  "level": "good",
+  "weight": 1.0,
+  "rationale": "示例含完整命令与参数，且给出了预期输出路径表格。但缺少预期输出内容示例（如 final-report.md 的片段或 JSON 产物示例），以及缺少 --frz 模式的示例。",
+  "evidence_refs": [
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "/zcode-review-deep --mode commit --ref HEAD~1" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "/zcode-review-deep --mode pr --base main --head feature/x" },
+    { "kind": "file", "ref": "skills/zcode-review-deep/SKILL.md", "quote": "| `--mode commit --ref HEAD~1` | `.cr-deep/CR-{YYYYMMDD}-{NNN}/` |" }
+  ]
+}

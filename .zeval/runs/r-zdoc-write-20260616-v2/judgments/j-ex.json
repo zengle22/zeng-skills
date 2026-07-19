@@ -1,0 +1,15 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 1.0,
+  "rationale": "5个完整使用示例，均含具体命令、参数和预期输出目录结构。覆盖：指定类型撰写、内容推断类型、从现有文件补充、指定项目路径、完整参数（含API强制变更检测）。每个示例都有预期落盘文件树和决策摘要说明。",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:744", "quote": "```bash\n# 指定类型撰写\nzdoc-write prd --module M12 --output-dir docs/mvp-lite/prds/\n```" },
+    { "kind": "line", "ref": "SKILL.md:761", "quote": "```bash\n# 从内容推断类型\nzdoc-write \"我需要写一个用户注册模块的架构文档...\"\n```" },
+    { "kind": "line", "ref": "SKILL.md:779", "quote": "```bash\n# 从现有文件补充\nzdoc-write prd --input docs/drafts/prd-notes.md --output-dir docs/mvp-lite/prds/\n```" },
+    { "kind": "line", "ref": "SKILL.md:799", "quote": "```bash\n# 指定项目路径（用于交叉引用）\nzdoc-write tech --module M12 --project . --output-dir docs/mvp-lite/tech/\n```" },
+    { "kind": "line", "ref": "SKILL.md:817", "quote": "```bash\n# 完整参数\nzdoc-write api --module M12 --output-dir docs/mvp-lite/api/ --project .\n```" }
+  ]
+}

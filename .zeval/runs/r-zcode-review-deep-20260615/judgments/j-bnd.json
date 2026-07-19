@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.85,
+  "level": "good",
+  "rationale": "Clear 'Not Equal To' section with 3 concrete non-goals: not replacement for bmad-code-review, not auto-fixer, not gate decision maker. Each is specific and verifiable. However, lacks explicit 'When to use / When NOT to use' section beyond the 'Not Equal To' list. The boundary is well-drawn but could be more comprehensive with explicit usage triggers.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:18","quote":"## Not Equal To"},
+    {"kind":"line","ref":"SKILL.md:20","quote":"- Not a replacement for `bmad-code-review`（互补；bmad 用于快速扫描，deep 用于关键 PR）"},
+    {"kind":"line","ref":"SKILL.md:21","quote":"- Not a source code auto-fixer（生成修复任务，人工决定是否执行）"},
+    {"kind":"line","ref":"SKILL.md:22","quote":"- Not a gate decision maker（仅提供证据）"}
+  ]
+}

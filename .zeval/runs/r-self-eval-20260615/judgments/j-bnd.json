@@ -1,0 +1,19 @@
+{
+  "judge_id": "j-bnd",
+  "dimension": "boundary-clarity",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 1.5,
+  "rationale": "存在显式 'Not Equal To' 章节（SKILL.md:22），列出5条具体非目标，每条均可验证：不生成patch、不替代人工review、不做实时监控、不读训练数据、不评价美学。另有 TL;DR 强化边界（SKILL.md:18），以及 Non-Negotiable Rules（SKILL.md:255）以'不'字句再次锁定。非目标具体、可验证，无抽象模糊表述。",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:22", "quote": "## Not Equal To" },
+    { "kind": "line", "ref": "SKILL.md:24", "quote": "- **Not a source code fixer** — 评估产出**评分卡 + 修复建议**，不生成 patch" },
+    { "kind": "line", "ref": "SKILL.md:25", "quote": "- **Not a replacement for human review** — 人类在 loop 中作为\"最终仲裁\"或\"基线设定者\"，不在 hot path" },
+    { "kind": "line", "ref": "SKILL.md:26", "quote": "- **Not a real-time monitor** — 是**批/触发**型，不做 metrics dashboard" },
+    { "kind": "line", "ref": "SKILL.md:27", "quote": "- **Not a training/eval benchmark** — 不读训练数据、不调权重、不替代 LM Evaluation Harness" },
+    { "kind": "line", "ref": "SKILL.md:28", "quote": "- **Not opinionated on aesthetics** — 美学/品味/灵感等无客观证据的领域**不**进入 v1 rubric" },
+    { "kind": "line", "ref": "SKILL.md:18", "quote": "> `zeval-skill` 是\"裁判\"与\"基线守护者\"——它**不**直接修复问题、不**直接**产出代码。" },
+    { "kind": "line", "ref": "SKILL.md:257", "quote": "1. **不修代码** — 评估是裁判，修复是别人" },
+    { "kind": "line", "ref": "SKILL.md:261", "quote": "5. **不评价美学** — 无客观信号的维度不进 v1 rubric" }
+  ]
+}

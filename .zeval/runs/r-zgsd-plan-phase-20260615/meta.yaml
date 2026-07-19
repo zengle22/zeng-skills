@@ -1,0 +1,7 @@
+run_id: r-zgsd-plan-phase-20260615
+skill: zgsd-plan-phase
+rubric: skill-design.v1.yaml
+rubric_path: /Users/zengle/git/zeng-skills/skills/zeval-skill/rubrics/skill-design.v1.yaml
+schema_path: /Users/zengle/git/zeng-skills/skills/zeval-skill/schemas/EvalReport.schema.json
+created_at: "2026-06-15T00:00:00Z"
+model: kimi-for-coding

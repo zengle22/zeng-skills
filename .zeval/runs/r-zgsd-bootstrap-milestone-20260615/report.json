@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "run_id": "r-zgsd-bootstrap-milestone-20260615",
+  "request_hash": "sha256:a1b2c3d4e5f6",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.55,
+      "level": "acceptable",
+      "weight": 1.0,
+      "rationale": "Has execution flow (Phase 1-4) and parameter parsing, but lacks explicit numbered sections for '目标与非目标', '输入/输出', and '执行步骤' as required by rubric. No dedicated input/output section. Anti-Patterns partially covers non-goals but not as a formal section. Evidence present for execution steps but missing for two required signals.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:16","quote":"## Execution Flow"},
+        {"kind":"line","ref":"SKILL.md:18","quote":"### Phase 1: Admission Gate (Blocking)"},
+        {"kind":"line","ref":"SKILL.md:329","quote":"## Anti-Patterns"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.45,
+      "level": "poor",
+      "rationale": "Has 'Key difference from gsd-ingest-docs' and 6 'Do NOT' anti-patterns, but lacks a dedicated '非目标' / 'NOT to use' / 'When NOT' section. The rubric explicitly fails if such a section is missing. Boundary is partially clear via comparison and anti-patterns, but no formal non-goals section exists.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:10","quote":"**Key difference from `gsd-ingest-docs`**: `ingest-docs` merges doc content into existing planning incrementally. This skill treats the document package as a **self-contained milestone blueprint** and generates a complete, standalone milestone ready for `/gsd-plan-phase`."},
+        {"kind":"line","ref":"SKILL.md:329","quote":"## Anti-Patterns"},
+        {"kind":"line","ref":"SKILL.md:331","quote":"- **Do NOT** skip the admission gate unless `--force` is explicitly passed AND user has acknowledged the risk"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.65,
+      "level": "good",
+      "rationale": "Contains concrete bash commands (path validation, find, conditional pattern detection), agent spawn examples with full prompts, and markdown templates. However, no expected output is shown for any command. The bash examples are runnable but embedded in narrative flow rather than as standalone copy-paste examples.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:29","quote":"test -d \"$PACKAGE_PATH\" || { echo \"ERROR: Package path not found: $PACKAGE_PATH\"; exit 1; }"},
+        {"kind":"line","ref":"SKILL.md:37","quote":"find \"$PACKAGE_PATH\" -type f -name '*.md' | sort > /tmp/doc_list.txt"},
+        {"kind":"line","ref":"SKILL.md:118","quote":"if [ -f \"$PACKAGE_PATH/00_blueprint.md\" ]; then"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.85,
+      "level": "good",
+      "rationale": "Dedicated 'Anti-Patterns' section with 6 explicit pitfalls, each stating what NOT to do. Most include implicit mitigation via the surrounding rules (e.g., admission gate blocks incomplete packages). Strong coverage but not all pitfalls include explicit 'how to avoid' guidance beyond the negative rule.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:329","quote":"## Anti-Patterns"},
+        {"kind":"line","ref":"SKILL.md:331","quote":"- **Do NOT** skip the admission gate unless `--force` is explicitly passed AND user has acknowledged the risk"},
+        {"kind":"line","ref":"SKILL.md:332","quote":"- **Do NOT** invent requirements not present in the source documents"},
+        {"kind":"line","ref":"SKILL.md:333","quote":"- **Do NOT** change business rules, thresholds, or formulas during translation"},
+        {"kind":"line","ref":"SKILL.md:334","quote":"- **Do NOT** create phases for P1/P2 items — only P0 goes into this milestone"},
+        {"kind":"line","ref":"SKILL.md:335","quote":"- **Do NOT** delete or modify original source documents in `$PACKAGE_PATH`"},
+        {"kind":"line","ref":"SKILL.md:336","quote":"- **Do NOT** overwrite existing `.planning/` files without user approval in merge mode"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass-with-warn",
+    "score": 0.604,
+    "rationale": "Weighted mean score = 0.604. completeness=0.55, boundary-clarity=0.45, examples-runnable=0.65, pitfalls=0.85. Between fail_threshold (0.45) and pass_threshold (0.75). Weakest dimension is boundary-clarity (0.45) due to missing dedicated non-goals section."
+  },
+  "gate": {
+    "status": "warn",
+    "code": "PASS_WITH_WARN",
+    "message": "Score 0.604 >= fail_threshold 0.45 but < pass_threshold 0.75. No dimension at fail level blocks."
+  },
+  "baseline": {},
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-bootstrap-milestone-20260615/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-bootstrap-milestone-20260615/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-bootstrap-milestone-20260615/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-bootstrap-milestone-20260615/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-bootstrap-milestone-20260615/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zgsd-bootstrap-milestone-20260615/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-15T00:00:00Z",
+    "duration_ms": 120000,
+    "model_versions": {"judge": "kimi-for-coding"}
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.95,
+  "level": "excellent",
+  "weight": 1.0,
+  "rationale": "全部必备章节齐全且内容充实。包含：1.1目标/1.2非目标、2.1输入/2.2输出、3.执行步骤（Phase 1-4）、Phase 1.5旧接口变更检测、Phase 2文档生成、Phase 3决策摘要、Phase 4最终化、架构图、关联文档表、Workflow Boundary、Non-Negotiable Rules、Pitfalls、Usage、Compatibility Note。仅缺少独立的错误处理章节，但Phase 4的完整性自检已覆盖部分质量保障。",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:45", "quote": "## 1. 目标与非目标" },
+    { "kind": "line", "ref": "SKILL.md:63", "quote": "## 2. 输入/输出" },
+    { "kind": "line", "ref": "SKILL.md:85", "quote": "## 3. 执行步骤" },
+    { "kind": "line", "ref": "SKILL.md:171", "quote": "## Phase 1: 输入分析与类型识别" },
+    { "kind": "line", "ref": "SKILL.md:237", "quote": "## Phase 1.5: 旧接口/功能变更检测" },
+    { "kind": "line", "ref": "SKILL.md:415", "quote": "## Phase 2: 文档生成" },
+    { "kind": "line", "ref": "SKILL.md:588", "quote": "## Phase 3: 核心决策点与分歧点摘要" },
+    { "kind": "line", "ref": "SKILL.md:665", "quote": "## Phase 4: 最终化" },
+    { "kind": "line", "ref": "SKILL.md:703", "quote": "## Workflow Boundary" },
+    { "kind": "line", "ref": "SKILL.md:713", "quote": "## Non-Negotiable Rules" },
+    { "kind": "line", "ref": "SKILL.md:729", "quote": "## Pitfalls / 常见坑与规避" },
+    { "kind": "line", "ref": "SKILL.md:742", "quote": "## Usage" }
+  ]
+}

@@ -1,0 +1,18 @@
+run_id: zeval-zdoc-write-20260615-002
+rubric_id: skill-design
+rubric_version: 1.0.0
+target_kind: skill-design
+target_ref: ./skills/zdoc-write/SKILL.md
+baseline_id: zeval-zdoc-write-20260615-001
+started_at: 2026-06-15T00:00:00Z
+finished_at: 2026-06-15T00:01:01Z
+duration_ms: 61832
+model_versions:
+  outer_agent: kimi-for-coding
+  judge_pool: kimi-for-coding
+num_judges: 4
+verdict: pass
+gate_status: pass
+gate_code: "0"
+regressed_dimensions:
+  - examples-runnable

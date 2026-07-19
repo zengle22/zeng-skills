@@ -1,0 +1,14 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.85,
+  "level": "good",
+  "rationale": "Usage section (line 1222) provides 6 concrete command examples with full flags and expected output descriptions. Examples cover directory scan, feature filter, minimal input, src path normalization, custom output dir, and validate-only mode. Each example includes the exact command and a comment explaining the output. However, no actual stdout sample is shown (only output path descriptions), which prevents 'excellent' rating. Commands are executable as-is.",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:1224", "quote": "```bash\n# 全量目录扫描（推荐）\n# 输出: docs/mvp-lite/impl/ 目录 + delivery-report.json\nzdoc-i2i --dir docs/mvp-lite/"},
+    {"kind": "line", "ref": "SKILL.md:1229", "quote": "zdoc-i2i --dir docs/mvp-lite/ --feature M01"},
+    {"kind": "line", "ref": "SKILL.md:1235", "quote": "zdoc-i2i --prd docs/prds/PRD-M01.md --arch docs/arch/ARCH-M01.md"},
+    {"kind": "line", "ref": "SKILL.md:1239", "quote": "zdoc-i2i --dir docs/mvp-lite/ --src apps/ai-coach-skill/src"},
+    {"kind": "line", "ref": "SKILL.md:1247", "quote": "zdoc-i2i --dir docs/mvp-lite/ --validate-only"}
+  ]
+}

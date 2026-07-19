@@ -1,0 +1,10 @@
+run_id: r-zdoc-design-check-20260616-v2
+skill: zdoc-design-check
+rubric: skill-design.v1
+evaluator: outer-agent
+mode: single-pass
+judges:
+  - j-comp (completeness)
+  - j-bnd (boundary-clarity)
+  - j-ex (examples-runnable)
+  - j-pit (pitfalls)

@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.75,
+  "level": "good",
+  "rationale": "Has concrete command examples: argument-hint line 4 shows full CLI syntax, and line 1158 shows `/zdoc-quality-loop spec.md prd.md`. Phase 0.1 (lines 379-393) documents all parameters with defaults. However, no expected output is shown for any command. The File_Path_Quick_Reference (lines 1157-1191) shows directory structure after running but not as a runnable example with expected output. Good for command+params, but lacks expected output which keeps it from excellent.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:4","quote":"argument-hint: \"<doc1> [doc2 doc3 ...] [--ssot <path>] [--rubric <path>] [--max-rounds 5] [--p1-threshold 3] [--parallel] [--p2 always|never|low-risk] [--no-verify] [--output-dir .quality-loop]\""},
+    {"kind":"line","ref":"SKILL.md:1158","quote":"运行 `/zdoc-quality-loop spec.md prd.md` 后，以 spec 为例："},
+    {"kind":"line","ref":"SKILL.md:379","quote":"位置参数（可多个）：<doc1> [doc2 ...]"},
+    {"kind":"line","ref":"SKILL.md:384","quote":"--ssot <path>           SSOT 文件（可多个，重复使用 --ssot）"}
+  ]
+}

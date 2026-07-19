@@ -1,0 +1,12 @@
+{
+  "judge_id": "j-pit",
+  "dimension": "pitfalls",
+  "score": 0.40,
+  "level": "poor",
+  "rationale": "No dedicated 'Pitfalls' or 'Common Issues' section exists. The only implicit pitfall-like content is the path normalization problem description in Step 1.5 (lines 44-56), which explains a real problem (bare paths causing files to be created at wrong locations) and gives a solution (auto-detection + --app-dir). This counts as one partially-documented pitfall. No other pitfalls or anti-patterns are listed. Since evidence_required=false, this is acceptable as poor (only 1 implicit pitfall, no dedicated section).",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:44","quote":"**Problem**: impl task markdown and acceptance criteria may reference bare paths like:"},
+    {"kind":"line","ref":"SKILL.md:51","quote":"If these paths are written to the PLAN as-is, the agent executing the PLAN will create files at the project root instead of under the actual app directory."},
+    {"kind":"line","ref":"SKILL.md:54","quote":"**Solution**: The bridge script automatically normalizes bare paths by detecting common prefixes"}
+  ]
+}

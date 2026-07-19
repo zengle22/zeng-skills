@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.80,
+  "level": "good",
+  "rationale": "Usage章节提供2条具体命令示例，含完整参数（--paths, --scope, --baseline）。但缺少预期输出示例，且validate.py的示例仅展示命令未展示实际输出。示例数量偏少（仅2条），没有展示不同scope或format的用法。",
+  "evidence_refs": [
+    {"kind": "line", "ref": "SKILL.md:154", "quote": "## Usage"},
+    {"kind": "line", "ref": "SKILL.md:157", "quote": "/zcode-patrol --paths src/ --scope full"},
+    {"kind": "line", "ref": "SKILL.md:158", "quote": "/zcode-patrol --paths src/ --scope delta --baseline .zcode-patrol/20260527-120000-xxx/report.json"},
+    {"kind": "line", "ref": "SKILL.md:136", "quote": "python validate.py .zcode-patrol/20260527-120000-abc123def456"}
+  ]
+}

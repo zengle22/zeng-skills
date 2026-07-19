@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-comp",
+  "dimension": "completeness",
+  "score": 0.9,
+  "level": "excellent",
+  "rationale": "SKILL.md contains all required sections: goals/non-goals (sec 1), input/output (sec 2), execution steps (sec 3), and clear when-to-use / when-not-to-use distinctions. Additional sections (scoring model, replay/baseline, validation, relationship matrix) exceed the minimum required_signals.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:24","quote":"## 1. 目标与非目标"},
+    {"kind":"line","ref":"SKILL.md:40","quote":"## 2. 输入/输出"},
+    {"kind":"line","ref":"SKILL.md:74","quote":"## 3. 执行步骤"},
+    {"kind":"line","ref":"SKILL.md:34","quote":"Not a source code fixer / Not a replacement for human review / Not a real-time monitor"}
+  ]
+}

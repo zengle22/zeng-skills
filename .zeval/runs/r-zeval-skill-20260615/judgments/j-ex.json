@@ -1,0 +1,13 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.8,
+  "level": "good",
+  "rationale": "Five concrete usage scenarios provided with CLI commands and parameters. Scenarios 1-4 include exact flags and arguments. Scenario 5 is an orchestration diagram (not a runnable command). Missing explicit 'expected output' snippets for each scenario, preventing 'excellent'.",
+  "evidence_refs": [
+    {"kind":"line","ref":"SKILL.md:292","quote":"/zeval-skill --target skill-design:./skills/zdoc-i2i/SKILL.md --rubric skill-design@1.0.0 --judges correctness,completeness,clarity"},
+    {"kind":"line","ref":"SKILL.md:301","quote":"/zeval-skill --target agent-run:./trajectories/run-001.jsonl --rubric agent-run@1.0.0 --judges correctness,efficiency,safety,contract"},
+    {"kind":"line","ref":"SKILL.md:309","quote":"/zeval-skill --target document:./docs/my-design.md --rubric document@1.0.0 --baseline none"},
+    {"kind":"line","ref":"SKILL.md:320","quote":"/zeval-skill --target code-diff:./pr-123.diff --rubric code-diff@1.0.0 --baseline enforce --judges correctness,safety,style"}
+  ]
+}

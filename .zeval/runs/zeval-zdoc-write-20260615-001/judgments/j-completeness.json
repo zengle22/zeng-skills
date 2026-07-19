@@ -1,0 +1,24 @@
+{
+  "judge_id": "j-completeness",
+  "dimension": "completeness",
+  "score": 0.0,
+  "level": "fail",
+  "rationale": "The SKILL.md is missing all three required signals: no '## 1. 目标与非目标' section, no '## 2. 输入/输出' section, and no '## 3. 执行步骤' section. While there is a 'Workflow Boundary' section with Input/Output/Out of scope, and detailed phase descriptions, the specific required chapter headings are absent. The '何时使用 / 何时不使用' distinction is partially covered by 'Not Equal To' and 'Workflow Boundary', but not as a dedicated clear section.",
+  "evidence_refs": [
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:31-36",
+      "quote": "## Not Equal To\n- Not a document editor\n- Not a design check tool\n- Not a task decomposer\n- Not a quality loop"
+    },
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:662-670",
+      "quote": "## Workflow Boundary\n- Input: 用户描述 + 可选的现有文档/上下文\n- Output: 完整的标准文档\n- Out of scope:\n  - 不修改已有文档\n  - 不校验文档质量\n  - 不拆分实施任务\n  - 不做多轮评审"
+    },
+    {
+      "kind": "line",
+      "ref": "/Users/zengle/git/zeng-skills/skills/zdoc-write/SKILL.md:77-126",
+      "quote": "## 架构\nPhase 1... Phase 2... Phase 3... Phase 4..."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+run_id: r-zdoc-write-20260616-v2
+skill: zdoc-write
+rubric: skill-design@v1.0.0
+evaluator: zeval-skill
+status: completed
+score: 0.95
+verdict: pass

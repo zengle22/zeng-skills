@@ -1,0 +1,16 @@
+{
+  "judge_id": "j-ex",
+  "dimension": "examples-runnable",
+  "score": 0.85,
+  "level": "good",
+  "weight": 1.0,
+  "rationale": "SKILL.md 包含 5 个具体命令示例（最小调用、4 个场景），均含完整命令、参数和路径。但缺少预期输出展示（如 report.json 内容示例），故未达 excellent。",
+  "evidence_refs": [
+    { "kind": "line", "ref": "SKILL.md:196", "quote": "/zeval-skill --request /tmp/eval.req.json" },
+    { "kind": "line", "ref": "SKILL.md:293", "quote": "/zeval-skill --target skill-design:./skills/zdoc-i2i/SKILL.md --rubric skill-design@1.0.0 --judges correctness,completeness,clarity" },
+    { "kind": "line", "ref": "SKILL.md:301", "quote": "/zeval-skill --target agent-run:./trajectories/run-001.jsonl --rubric agent-run@1.0.0 --judges correctness,efficiency,safety,contract" },
+    { "kind": "line", "ref": "SKILL.md:309", "quote": "/zeval-skill --target document:./docs/my-design.md --rubric document@1.0.0 --baseline none" },
+    { "kind": "line", "ref": "SKILL.md:320", "quote": "/zeval-skill --target code-diff:./pr-123.diff --rubric code-diff@1.0.0 --baseline enforce --judges correctness,safety,style" },
+    { "kind": "line", "ref": "SKILL.md:271", "quote": "python3 skills/zeval-skill/validate.py --report .zeval/runs/<run_id>/report.json --rubric skills/zeval-skill/rubrics/skill-design.v1.yaml" }
+  ]
+}

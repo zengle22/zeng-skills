@@ -18,6 +18,64 @@ Skill for Pre-SSOT document validation. 自 ADR-006 起，支持两类输入：
 
 纯 LLM + 结构化输出架构。
 
+## 1. 目标与非目标
+
+### 1.1 目标
+
+- 对 Pre-SSOT 设计文档执行 6 大维度（商业/产品/UX/架构/测试/工程）+ 跨维度一致性检查。
+- 基于 ITERATION-DOCUMENT-CHECKLIST 和 ADR-002 的 55 项规则，产出 BLOCK / WARN / PASS 诊断报告。
+- 对涉及用户交互的 PRD，强制校验用户旅程是否覆盖主路径、分支路径、异常路径，并能映射到 FR / AC。
+- 帮助团队在正式进入 SSOT 撰写前发现文档缺陷，降低下游返工成本。
+- 作为纯 LLM + 结构化输出技能运行，无需外部 linter 或人工逐项检查。
+
+### 1.2 非目标
+
+- **Not a replacement for `zdoc-quality-loop`**（互补；Quality Loop 负责文档结构/可读性/多轮收敛，Design Check 负责商业设计输入充分性）
+- **Not a document editor**（只产出诊断报告，绝不修改源文档）
+- **Not a gate decision maker**（只提供证据，最终 verdict 由人工确认）
+- **Not a SSOT formalization tool**（在 SSOT 之前运行，不参与 SSOT 规范化）
+- **Not a code review tool**（代码审查请使用 `zcode-review-deep` / `zcode-patrol`）
+
+## 2. 输入/输出
+
+### 2.1 输入
+
+| 输入项 | 形态 | 必填 | 说明 |
+|--------|------|------|------|
+| `--input` / `--dir` | 文件路径或目录 | 是 | 待校验的设计文档（单个/多个/目录扫描） |
+| `--domain` | `business\|product\|ux\|arch\|test\|eng\|all` | 否，默认 `all` | 指定校验域 |
+| `--layer` | `gate-only\|full` | 否，默认 `full` | 仅通用质量门或全量检查 |
+| `--output-dir` | 目录路径 | 否，默认 `.design-check` | 产物输出根目录 |
+| `--project` | 项目标识 | 否 | 用于跨文档一致性追踪 |
+
+### 2.2 输出
+
+| 输出项 | 路径约定 | 说明 |
+|--------|----------|------|
+| `design-check.json` | `{output_dir}/{check_id}/design-check.json` | 结构化检查结果（全量） |
+| `design-check-report.md` | `{output_dir}/{check_id}/design-check-report.md` | 人可读 Markdown 报告 |
+| `design-check-verdict.json` | `{output_dir}/{check_id}/design-check-verdict.json` | 人工确认后的 verdict |
+
+### 2.3 退出状态
+
+| 状态 | 含义 |
+|------|------|
+| `PASS` | 所有检查通过 |
+| `CONDITIONAL` | 有 WARN 但无 BLOCK，可带标注继续 |
+| `BLOCK` | 任一文档/域触发 FAIL，需修复后重跑 |
+
+## 3. 执行步骤
+
+```
+1. 参数解析      读取 --input/--dir/--domain/--layer/--output-dir 等参数
+2. 文档发现      扫描路径，按文件名/目录/内容特征识别文档类型与域映射
+3. Gate 校验     按 gate/rubric.md 执行 G1–G5；任一 BLOCK 则停止
+4. 域检查        对每个识别到的域执行对应 rubric.md（BD/PD/UX/AD/TD/EI）
+5. 跨维度一致性   多文档模式下执行 cross-dimension/rubric.md（XC）
+6. 结构化输出     生成 design-check.json + design-check-report.md
+7. 人工确认       展示摘要，用户确认或补充后写入 design-check-verdict.json
+```
+
 ## Primary Abstraction
 
 Skill (governed capability template)
@@ -29,13 +87,6 @@ Pipeline — LLM multi-layer validation with structured report output
 ## Authority
 
 Canonical bundle: `zdoc-design-check/`
-
-## Not Equal To
-
-- Not a replacement for `zdoc-quality-loop` (complements it; Doc Quality Loop for document structure/readability, Design Check for business design input sufficiency)
-- Not a document editor (produces diagnostic reports only, never modifies source documents)
-- Not a gate decision maker (evidence-only, human confirms verdict)
-- Not a SSOT formalization tool (runs BEFORE SSOT, not during)
 
 ## Canonical Authority
 
@@ -95,7 +146,7 @@ This capability is a governed `Skill` for `Document → Structured Validation Re
 └───────────────────────────────────────────────────────────────────┘
 ```
 
-## 输入模型
+### 2.1.1 输入模式与文档识别
 
 | 模式 | 输入 | 可执行的检查 | XC 跨维度 |
 |------|------|------------|----------|
@@ -114,7 +165,7 @@ This capability is a governed `Skill` for `Document → Structured Validation Re
 **详细 SSOT 文档**（非 spec）：
 | 文档特征 | 识别规则 | 映射到域 |
 |---------|---------|---------|
-| PRD（含用户故事、AC、业务规则） | 路径含 `prd/` 或内容含 `US-`/`AC`/`用户故事` | D1 商业设计 + D2 产品设计 |
+| PRD（含用户故事、AC、业务规则、用户旅程） | 路径含 `prd/` 或内容含 `US-`/`AC`/`用户故事`/`用户旅程` | D1 商业设计 + D2 产品设计 |
 | UX 规格说明书 | 路径含 `ux/` 或内容含 `设计原则`/`交互流程`/`设计令牌` | D3 UX 设计 |
 | Tech Design（含 API、数据流、时序图） | 路径含 `tech/` 或内容含 `API`/`时序图`/`同步.*异步` | D4 架构设计 |
 | TESTSET 文档 | 路径含 `testset/` 或内容含 `测试范围`/`Happy Path`/`边界条件` | D5 测试设计 |
@@ -130,7 +181,7 @@ XC 检查项缺少任一相关域产物时标记 `SKIPPED`，不计入 BLOCK/WAR
 | **G** | 通用质量门 | `G-*` | 5 | `gate/rubric.md` | 全部 |
 | **MS** | Minimal Spec 准入 | `MS-*` | 8 | `domains/minimal-spec/rubric.md` | 仅 Minimal Spec |
 | **D1** | 商业设计 | `BD-*` | 6 | `domains/business-design/rubric.md` | 仅详细文档 |
-| **D2** | 产品设计 | `PD-*` | 7 | `domains/product-design/rubric.md` | 仅详细文档 |
+| **D2** | 产品设计 | `PD-*` | 7 | `domains/product-design/rubric.md`（PD-7 包含交互型 PRD 用户旅程强制检查） | 仅详细文档 |
 | **D3** | UX 设计 | `UX-*` | 7 | `domains/ux-design/rubric.md` | 仅详细文档 |
 | **D4** | 架构设计 | `AD-*` | 9 | `domains/architecture/rubric.md` | 仅详细文档 |
 | **D5** | 测试设计 | `TD-*` | 8 | `domains/test-design/rubric.md` | 仅详细文档 |
@@ -166,6 +217,25 @@ XC 检查项缺少任一相关域产物时标记 `SKIPPED`，不计入 BLOCK/WAR
 - 若为 Minimal Spec：按 `domains/minimal-spec/rubric.md` 执行 MS-1–MS-8，**跳过 D1–D6**
 - 若为详细文档：对每个已识别域按 Rubric 逐项检查
 
+已实现的域：
+- **D1 商业设计**: `domains/business-design/rubric.md` (BD-1–BD-6)
+- **D2 产品设计**: `domains/product-design/rubric.md` (PD-1–PD-7；PD-7 校验交互型 PRD 用户旅程)
+- **D3 UX 设计**: `domains/ux-design/rubric.md` (UX-1–UX-7)
+- **D4 架构设计**: `domains/architecture/rubric.md` (AD-1–AD-9)
+- **D5 测试设计**: `domains/test-design/rubric.md` (TD-1–TD-8)
+- **D6 工程实施**: `domains/engineering/rubric.md` (EI-1–EI-5)
+
+对每项检查输出：
+```json
+{
+  "check_id": "BD-1",
+  "status": "PASS | WARN | BLOCK | N/A",
+  "evidence": "具体发现",
+  "suggestion": "改进建议（WARN/BLOCK 时必填）",
+  "na_source": "N/A 时标注复用来源"
+}
+```
+
 域检查独立执行 — 一个域的 BLOCK 不阻塞其他域。
 
 #### 阶段 4：跨维度一致性 (XC) — 仅多文档模式且非单个 Minimal Spec
@@ -198,18 +268,19 @@ XC 检查项缺少任一相关域产物时标记 `SKIPPED`，不计入 BLOCK/WAR
 
 ## Non-Negotiable Rules
 
-- Do not modify source documents under any circumstance
-- Do not fabricate findings — every BLOCK/WARN must cite specific evidence from the document
-- Gate Check (Layer 0) must complete before domain checks begin
-- Any BLOCK in Gate Check stops execution — do not proceed to domain checks
-- Domain checks are independent — one domain's BLOCK does not block other domains
-- **不误判轻量 Spec**: Minimal Spec 只执行 MS 域，不套用详细文档标准
-- **Minimal Spec 优先识别**: 先判断是否为 spec，再识别为详细文档
-- All artifacts written to disk immediately; no in-memory-only state
-- Verdict is always human-confirmed; the skill only recommends
-- Check IDs must be stable within a run (no renumbering)
-- MAC standards from ITERATION-DOCUMENT-CHECKLIST / ADR-006 are authoritative
-- New domain rubrics must follow rubric protocol (rubric.md with PASS/FAIL conditions)
+- Do not modify source documents under any circumstance.
+- Do not fabricate findings — every BLOCK/WARN must cite specific evidence from the document.
+- Gate Check (Layer 0) must complete before domain checks begin.
+- Any BLOCK in Gate Check stops execution — do not proceed to domain checks.
+- Domain checks are independent — one domain's BLOCK does not block other domains.
+- **不误判轻量 Spec**: Minimal Spec 只执行 MS 域，不套用详细文档标准。
+- **Minimal Spec 优先识别**: 先判断是否为 spec，再识别为详细文档。
+- All artifacts written to disk immediately; no in-memory-only state.
+- Verdict is always human-confirmed; the skill only recommends.
+- Check IDs must be stable within a run (no renumbering).
+- MAC standards from ITERATION-DOCUMENT-CHECKLIST / ADR-006 are authoritative.
+- 涉及用户交互的 PRD 若缺少用户旅程，或用户旅程未覆盖主路径/分支路径/异常路径，必须判为 BLOCK；纯后端/无人工交互 PRD 仅在文档明确说明不适用原因时可标记 N/A。
+- New domain rubrics must follow the rubric protocol (rubric.md with PASS/FAIL conditions).
 
 ## Severity Levels
 
@@ -221,6 +292,17 @@ XC 检查项缺少任一相关域产物时标记 `SKIPPED`，不计入 BLOCK/WAR
 | **N/A** | 不适用（如功能迭代复用用户画像；单个 MS 时的 G3/XC） | 标注不适用原因 |
 | **SKIPPED** | 缺少相关域产物或单个 Minimal Spec | 不计入统计 |
 
+## Pitfalls / 常见坑与规避
+
+| # | 常见坑 | 影响 | 规避方法 |
+|---|--------|------|----------|
+| 1 | 把 Design Check 当文档编辑器，要求它直接修改源文档 | 破坏已评审基线、引入未授权变更 | 明确只产出诊断报告；修改文档使用 `zdoc-write` 或手动编辑 |
+| 2 | 传入 `draft` / `reviewing` 状态文档并期望通过 | 检查结果无效，下游仍可能大幅变更 | 确保文档至少为 `approved` 状态再运行 Design Check |
+| 3 | 只跑单文档却期望触发跨维度一致性（XC）检查 | XC 被 SKIP，遗漏跨文档冲突 | 传入 2+ 个不同域文件或使用 `--dir` 目录扫描 |
+| 4 | 忽略 WARN 项直接进入 SSOT | 低质量文档进入下游，导致 I2I 任务缺陷 | 将 WARN 项视为必须修复或显式接受的风险 |
+| 5 | 自定义 rubric 未遵循 `rubric.md` 协议 | Check ID 不稳定、报告无法被工具消费 | 新增域 rubric 必须含 PASS/FAIL 条件和稳定 ID 格式 |
+| 6 | 交互型 PRD 缺少用户旅程但仍被判通过 | 下游 UX、测试和实施无法对齐真实用户流程 | PD-7 必须先判断交互信号；触发时缺少用户旅程或缺少主/分支/异常路径均判 BLOCK |
+
 ## Usage Examples
 
 ```bash
@@ -229,6 +311,13 @@ zdoc-design-check --input docs/drafts/specs/SPEC-M001-xxx.md
 
 # 校验单个详细 PRD（D1+D2）
 zdoc-design-check --input docs/prd/xxx-prd.md
+
+# 预期输出：
+# {output_dir}/DC-20260616-001/design-check.json
+# {output_dir}/DC-20260616-001/design-check-report.md
+
+# 仅校验 Business Design (D1)
+zdoc-design-check --input docs/prd/xxx-prd.md --domain business
 
 # 多文档校验（触发 XC）
 zdoc-design-check --input docs/prd/xxx-prd.md --input docs/ux/xxx-ux-spec.md --input docs/tech/xxx-tech.md

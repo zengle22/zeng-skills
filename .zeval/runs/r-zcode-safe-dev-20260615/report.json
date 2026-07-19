@@ -1,0 +1,92 @@
+{
+  "run_id": "r-zcode-safe-dev-20260615",
+  "request_hash": "sha256:request-placeholder",
+  "rubric_id": "skill-design",
+  "rubric_version": "1.0.0",
+  "scores": [
+    {
+      "judge_id": "j-comp",
+      "dimension": "completeness",
+      "score": 0.45,
+      "level": "acceptable",
+      "weight": 1.0,
+      "rationale": "Has workflow steps (0-6) and output format, but missing rubric-required sections: no explicit '目标与非目标' chapter, no dedicated '输入/输出' chapter (only embedded in workflow), no '何时使用/何时不使用' distinction. Evidence exists for execution steps but not for the three required structural signals.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:59","quote":"## 工作流程（每次任务都按这个顺序来）"},
+        {"kind":"line","ref":"SKILL.md:61","quote":"### 输入参数"},
+        {"kind":"line","ref":"SKILL.md:161","quote":"## 输出格式要求"},
+        {"kind":"line","ref":"SKILL.md:176","quote":"## 使用方式"}
+      ]
+    },
+    {
+      "judge_id": "j-bnd",
+      "dimension": "boundary-clarity",
+      "score": 0.85,
+      "level": "good",
+      "rationale": "Strong '绝对禁止的行为' section with 6 concrete prohibitions (parallel dirs, isolated modules, no tests, coverage threshold manipulation, wheel reinvention, skipped self-review). Each has clear MUST/禁止 contrast. However, lacks explicit '非目标' / 'NOT to use' / 'When NOT' chapter as rubric requires; boundary is implicit in prohibitions rather than explicit non-goals.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:13","quote":"## 绝对禁止的行为（看到这些需求要拒绝并提醒）"},
+        {"kind":"line","ref":"SKILL.md:15","quote":"### 1. 创建'平行目录结构' - 禁止"},
+        {"kind":"line","ref":"SKILL.md:21","quote":"### 2. 不做集成 / 只写'孤立模块' - 禁止"},
+        {"kind":"line","ref":"SKILL.md:26","quote":"### 3. 不写测试 / 不跑测试 - 禁止"},
+        {"kind":"line","ref":"SKILL.md:33","quote":"### 4. 修改测试覆盖率阈值或通过标准来'制造绿灯' - 禁止"},
+        {"kind":"line","ref":"SKILL.md:43","quote":"### 5. 不查找系统内同类实现就'重复造轮子' - 禁止"},
+        {"kind":"line","ref":"SKILL.md:50","quote":"### 6. 不做自我 code review（只给 diff，不做检查） - 禁止"}
+      ]
+    },
+    {
+      "judge_id": "j-ex",
+      "dimension": "examples-runnable",
+      "score": 0.30,
+      "level": "poor",
+      "rationale": "No standalone executable examples. Only illustrative snippets embedded in rules (e.g., 'pytest tests/qa/test_runner_worktree.py' as a suggestion, not a complete runnable example). No full command with all parameters, no expected output shown. Fails '存在具体命令示例' signal.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:17","quote":"示例：代码实际在 src/lee/ 下，却新建一个 lee/ 目录 → 禁止"},
+        {"kind":"line","ref":"SKILL.md:99","quote":"用列表列出你计划修改/新增的文件及职责，例如："},
+        {"kind":"line","ref":"SKILL.md:100","quote":"- src/lee/qa/runner/base.py: 扩展 run() 支持 worktree 环境的 sys.path"},
+        {"kind":"line","ref":"SKILL.md:124","quote":"建议执行的测试命令（例如：pytest tests/qa/test_runner_worktree.py）"}
+      ]
+    },
+    {
+      "judge_id": "j-pit",
+      "dimension": "pitfalls",
+      "score": 0.90,
+      "level": "excellent",
+      "rationale": "6 explicit pitfalls with avoidance methods: parallel directories, isolated modules, missing tests, coverage threshold manipulation, wheel reinvention, skipped self-review. Each has 禁止 + MUST pattern and concrete remediation steps. Exceeds >=3 threshold.",
+      "evidence_refs": [
+        {"kind":"line","ref":"SKILL.md:15","quote":"### 1. 创建'平行目录结构' - 禁止"},
+        {"kind":"line","ref":"SKILL.md:21","quote":"### 2. 不做集成 / 只写'孤立模块' - 禁止"},
+        {"kind":"line","ref":"SKILL.md:26","quote":"### 3. 不写测试 / 不跑测试 - 禁止"},
+        {"kind":"line","ref":"SKILL.md:33","quote":"### 4. 修改测试覆盖率阈值或通过标准来'制造绿灯' - 禁止"},
+        {"kind":"line","ref":"SKILL.md:43","quote":"### 5. 不查找系统内同类实现就'重复造轮子' - 禁止"},
+        {"kind":"line","ref":"SKILL.md:50","quote":"### 6. 不做自我 code review（只给 diff，不做检查） - 禁止"}
+      ]
+    }
+  ],
+  "verdict": {
+    "verdict": "pass-with-warn",
+    "score": 0.638,
+    "rationale": "Weighted mean 0.638. Boundary-clarity (0.85) and pitfalls (0.90) are strong; completeness (0.45) is acceptable but missing required structural sections; examples-runnable (0.30) is poor and drags the score down. No dimension falls below fail_threshold (0.45).",
+    "conflicts": []
+  },
+  "gate": {
+    "status": "warn",
+    "code": "PASS_WITH_WARN",
+    "message": "Score 0.638 >= fail_threshold 0.45 but < pass_threshold 0.75. Weakest dimension: examples-runnable."
+  },
+  "artifacts": {
+    "report_path": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-safe-dev-20260615/report.json",
+    "raw_judgments": [
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-safe-dev-20260615/judgments/j-comp.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-safe-dev-20260615/judgments/j-bnd.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-safe-dev-20260615/judgments/j-ex.json",
+      "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-safe-dev-20260615/judgments/j-pit.json"
+    ],
+    "replay_bundle": "/Users/zengle/git/zeng-skills/.zeval/runs/r-zcode-safe-dev-20260615/replay_bundle"
+  },
+  "meta": {
+    "created_at": "2026-06-15T00:00:00Z",
+    "duration_ms": 0,
+    "model_versions": {}
+  }
+}
